@@ -14,3 +14,10 @@ $ edit config.py
 $ python3 steelybot.py
 ```
 (`config.py` is in `.gitignore`)
+
+## q&a
+
+- why the shit are some names camelCase? that's not pep8
+  - the fbchat module uses them for some reason
+- why the shit isn't the linden plugin working?
+  - :(
