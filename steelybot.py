@@ -3,6 +3,7 @@
 
 from fbchat import log, Client
 import imp
+import config
 import os
 import random
 
@@ -10,7 +11,7 @@ import random
 class SteelyBot(Client):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(SteelyBot, self).__init__(*args, **kwargs)
         self.plugins = {}
         self.load_plugins()
 
@@ -47,5 +48,5 @@ class SteelyBot(Client):
 
 
 if __name__ == '__main__':
-    client = SteelyBot("fuhohx13@gmail.com", "fuhohx131337")
+    client = SteelyBot(config.EMAIL, config.PASSWORD)
     client.listen()
