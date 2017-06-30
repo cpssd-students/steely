@@ -12,11 +12,17 @@ def get_np(apikey, user):
     base = "http://ws.audioscrobbler.com/2.0/"
     url = "?method=user.getrecenttracks&user={}&api_key={}&limit=2&format=json".format(user, apikey)
     res = requests.get(base + url)
-    print(res)
-    print(res)
-    print(res)
-    print(res)
     return res.json()["recenttracks"]["track"][0]
+
+def get_tags(artist, track):
+    base = "http://ws.audioscrobbler.com/2.0/"
+    payload = {'api_key' : config.LASTFM_API_KEY,
+              'artist' : artist,
+              'track' : track,
+              'method' : 'track.getTags'}
+    res = requests.get(base, parmas=payload).json()
+    for tag in res['tags']['tag']:
+        yield tag['name']
 
 
 def extract_song(user):
@@ -26,7 +32,7 @@ def extract_song(user):
         return 'failed to retrieve now playing information'
     artist = response['artist']['#text']
     song = response['name']
-    return '{} is playing {} by {}'.format(user, song, artist)
+    return '{} is playing {} by {}. tags:'.format(user, song, artist, get_tags(artist, song))
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
