@@ -72,7 +72,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
                                                                              max_name=max_name,
                                                                              max_lindens=max_lindens)
             string += '```'
-        bot.sendMessage(string, thread_id=thread_id, thread_type=thread_type)))
+        bot.sendMessage(string, thread_id=thread_id, thread_type=thread_type)
     USERDB.close()
 
 
