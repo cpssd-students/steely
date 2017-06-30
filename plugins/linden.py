@@ -1,4 +1,7 @@
-from tinydb import TinyDB, Query
+#!/usr/bin/env python3
+
+
+from tinydb import TinyDB, Query, where
 from tinydb.operations import increment
 
 
@@ -7,91 +10,86 @@ USERDB = TinyDB("../linden.json")
 USER = Query()
 
 
-def find_user_from_id(id, user_list):
-    filtered = list(filter(lambda x: x['uid'] == id, user_list))
-    return filtered[0] if len(list(filter(lambda x: x['uid'] == id, user_list))) > 0 else None
+def user_from_id(id, list):
+    for user in list:
+        if user['uid'] == id:
+            return user
+
+
+def user_from_name(name, list):
+    for user in list:
+        if user['name'] == name:
+            return user
+
+
+def create_user(user):
+    USERDB.insert({
+        "uid": user['uid'],
+        "name": user['name'],
+        "lindens": 2000
+    })
+
+
+def get_balance(user_id):
+    matching_users = USERDB.search(USER.uid == user_id)
+    if len(matching_users) == 0:
+        return
+    return matching_users['lindens']
+
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    users_in_chat = bot.fetchAllUsers()
-
     if not message:
-        search = USERDB.search(USER.fb_id == author_id)
-
-        response = "bleugh"
-
-        if len(search) != 0:
-            response = "You have {0:d} lindens".format(search[0]["lindens"])
-        else:
-            # User does not exist - create user and send lindens
-
-            user_name = find_user_from_id(author_id, users_in_chat)["name"]
-
-            if user_name is None:
-                response = "bad egg: user not found"
-            else:
-                USERDB.insert({
-                    "fb_id": author_id,
-                    "name": user_name,
-                    "lindens": 0
-                })
-
-                response = "You have {0:d} lindens".format(0)
-
-        bot.sendMessage(response, thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage('you have {} Linden Dollars™'.format(get_balance(author_id),
+            thread_id=thread_id, thread_type=thread_type))
         return
-    else:
-        message_split = message.split()
 
-        sub_command = message_split[0]
+    message_split = message.split()
+    users = bot.fetchAllUsers()
+    if message_split[0] in ('give', 'send') and len(message_split) > 2:
+        if not message_split[-1].isdigit():
+            bot.sendMessage('please enter a valid amount')
+            return
+        reciever_name, amount = ' '.join(message_split[1:-1]), int(message_split[-1])
+        if not USERDB.search(where('name') == reciever_name):
+            create_user(user_from_name(reciever_name, users))
+        if not USERDB.search(where('uid') == author_id):
+            create_user(user_from_id(author_id, users))
+        reciever = USERDB.get(USER.name == reciever_name)
+        sender = USERDB.get(USER.uid == author_id)
+        USERDB.update({'lindens': reciever['lindens'] + amount}, USER.name == reciever_name)
+        USERDB.update({'lindens': sender['lindens'] - amount}, USER.uid == author_id)
+        bot.sendMessage('you gave {} {} Linden Dollars™'.format(reciever_name, amount))
+        return
 
-        target = ' '.join(message_split[1:])
-
-        try:
-            if not sub_command:
-                bot.sendMessage("bad egg: command not found", thread_id=thread_id, thread_type=thread_type)
-                return
-
-            if sub_command.lower() == 'give':
-                search = USERDB.search(USER.name == target)
-
-                response = "bleugh"
-
-                if len(search) != 0 and find_user_from_id(author_id, users_in_chat) is not None:
-                    if not find_user_from_id(author_id, users_in_chat)["name"] == target:
-                        USERDB.update(increment('lindens'), USER.name == target)
-                        search = USERDB.search(USER.name == target)
-                        response = "{0:s} now has {1:d} lindens".format(target, search[0]["lindens"])
-                    else:
-                        response = "bad egg: you cannot give yourself lindens"
-                else:
-                    response = "bad egg: user not found"
-
-                bot.sendMessage(response, thread_id=thread_id, thread_type=thread_type)
-                return
-
-        except ValueError:
-            bot.sendMessage("bad egg: cannot parse amount", thread_id=thread_id, thread_type=thread_type)
-
+    if message_split[0] == 'table' and len(message_split) == 1:
+        max_lindens = len(str(max(user['lindens'] for user in USERDB.all())))
+        max_name = len(max((user['name'] for user in USERDB.all()), key=len))
+        string = '```\n'
+        for user in sorted(USERDB.all(), key=lambda user: user['lindens'], reverse=True):
+            string += '{name:<{max_name}} {lindens:>{max_lindens}}\n'.format(name=user['name'],
+                                                                           lindens=user['lindens'],
+                                                                           max_name=max_name,
+                                                                           max_lindens=max_lindens)
+            string += '```'
+        bot.sendMessage(string)
+    USERDB.close()
 
 
 if __name__ == "__main__":
-    print("dello?")
+    # tests
+    class Bot:
 
-    class bot:
         @staticmethod
-        def sendMessage(*args, **kwargs):
-            print("send", args, kwargs)
+        def sendMessage(message, *args, **kwargs):
+            print(message)
+
         @staticmethod
         def fetchAllUsers(*args, **kwargs):
-            return([
-                {"uid": "test", "name": "test"}
-            ])
+            return [{"uid": "2343", "name": "steely"},
+                    {"uid": "5435", "name": "dan"},
+                    {"uid": "54344445", "name": "egg gggggggbobu"}]
 
-    # U N I T   T E S T I N G
-
-    main(bot, "test", '', 1, 2)
-    main(bot, "1", 'give test', 1, 2)
-    main(bot, "1", 'give test', 1, 2)
-    main(bot, "1", 'give test', 1, 2)
-    main(bot, "1", 'give test', 1, 2)
-    main(bot, "1", '', 1, 2)
+    b = Bot()
+    main(Bot, '2343', 'send dan 6', 1, 1)
+    main(Bot, '2343', 'send egg gggggggbobu 6', 1, 1)
+    main(Bot, '2343', 'table', 1, 1)
