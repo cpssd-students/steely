@@ -39,7 +39,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     bot.sendMessage("please include a stop number", thread_id=thread_id, thread_type=thread_type)
   else:
     try:
-      bot.sendMessage(next_bus_realtime(message), get_stop_routes(message), thread_id=thread_id, thread_type=thread_type)
+      bot.sendMessage(next_bus_realtime(message, get_stop_routes(message)), thread_id=thread_id, thread_type=thread_type)
     except requests.exceptions.RequestException:
       bot.sendMessage("error retrieving results", thread_id=thread_id, thread_type=thread_type)
     
