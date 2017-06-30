@@ -1,6 +1,5 @@
 # steelybot
 
-----
 ## to install  
 
 ```
