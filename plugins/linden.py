@@ -47,7 +47,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     users = bot.fetchAllUsers()
     if message_split[0] in ('give', 'send') and len(message_split) > 2:
         if not message_split[-1].isdigit():
-            bot.sendMessage('please enter a valid amount', thread_id=thread_id, thread_type=thread_type)))
+            bot.sendMessage('please enter a valid amount', thread_id=thread_id, thread_type=thread_type)
             return
         reciever_name, amount = ' '.join(message_split[1:-1]), int(message_split[-1])
         if not USERDB.search(where('name') == reciever_name):
