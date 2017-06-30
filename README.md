@@ -5,6 +5,8 @@
 ```
 $ git clone this
 $ pip3 install fbchat
+$ pip3 install requests
+$ pip3 install tinydb
 ```
 
 ## to run
