@@ -29,6 +29,9 @@ class SteelyBot(Client):
         self.markAsDelivered(author_id, thread_id)
         self.markAsRead(author_id)
 
+        if author_id == self.uid:
+            return
+
         if message in ('.list', '.help'):
             commands = ', '.join((command for command in self.plugins.keys() if command))
             self.sendMessage('available commands: ' + commands, thread_id=thread_id, thread_type=thread_type)
