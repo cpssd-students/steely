@@ -11,7 +11,7 @@ def get_stop_routes(stop_id):
     response = requests.get(url).json()
     for result in response["results"]:
         for operator in result['operators']:
-            yield from operator['routes'])
+            yield from operator['routes']
 
 
 def next_bus_realtime(stop_id, routes):
