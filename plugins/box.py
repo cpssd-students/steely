@@ -23,7 +23,8 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if not message:
         bot.sendMessage('word please', thread_id=thread_id, thread_type=thread_type)
     elif 5 < len(message) < 20:
-        box = '\n'.join(gen_box(message))
-        bot.sendMessage(box, thread_id=thread_id, thread_type=thread_type)
+        while True:
+            box = '\n'.join(gen_box(message))
+            bot.sendMessage(box, thread_id=thread_id, thread_type=thread_type)
     else:
         bot.sendMessage("can't use \"{}\"".format(message), thread_id=thread_id, thread_type=thread_type)
