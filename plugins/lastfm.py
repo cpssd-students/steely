@@ -1,7 +1,11 @@
 import requests
+from tinydb import TinyDB, Query
+
 from .. import config
 
 COMMAND = '.np'
+
+USERDB_PATH = TinyDB('../lastfm.json')
 
 def get_np(apikey, user):
   base = "http://ws.audioscrobbler.com/2.0/"
