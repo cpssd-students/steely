@@ -2,9 +2,6 @@ import requests
 from tinydb import TinyDB, Query
 from steelybot import config
 
-
-from .. import config
-
 COMMAND = '.np'
 USERDB = TinyDB('../lastfm.json')
 user = Query()
@@ -28,16 +25,16 @@ def extract_song(user):
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     m = message.split()
     if not message:
-        s = USERDB.search(user.fb_id)
+        s = USERDB.search(user.fb_id == author_id)
         if len(s) != 0:
-            lastfm_name = s['lastfm']
-            bot.sendMessage(lastfm_name)
+            lastfm_name = s[0]['lastfm']
+            bot.sendMessage(extract_song(lastfm_name), thread_id=thread_id, thread_type=thread_type)
         else:
             bot.sendMessage('include username please or use .np set', thread_id=thread_id, thread_type=thread_type)
         return
 
-    if m[0] == 'set' and len(m) == 2:
-        if len(USERDB.search(user.fb_id)) == 0:
+    elif m[0] == 'set' and len(m) == 2:
+        if len(USERDB.search(user.fb_id == author_id)) == 0:
             USERDB.insert({"fb_id" : author_id, "lastfm" : m[1]})
             bot.sendMessage('good egg', thread_id=thread_id, thread_type=thread_type)
         else:
@@ -45,5 +42,5 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
             bot.sendMessage('updated egg', thread_id=thread_id, thread_type=thread_type)
         return
     else: 
-        bot.sendMessage(extract_song(user))
+        bot.sendMessage(extract_song(message), thread_id=thread_id, thread_type=thread_type)
         return
