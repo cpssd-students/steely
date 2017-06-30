@@ -22,6 +22,7 @@ def get_tags(artist, track):
               'method' : 'track.getTags'}
     res = requests.get(base, parmas=payload).json()
     for tag in res['tags']['tag']:
+        print(tag['name'])
         yield tag['name']
 
 
