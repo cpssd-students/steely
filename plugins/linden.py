@@ -6,6 +6,9 @@ COMMAND = '.give'
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     return
+
+    # how the shit do you get the nick of a user in fbchat
+
     # if len(message.split()) != 2:
     #     bot.sendMessage("must be like '.give <user> <amount>'", thread_id=thread_id, thread_type=thread_type)
     #     return
