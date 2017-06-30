@@ -1,5 +1,5 @@
 import random
-from fbchat import  MessageReaction
+from fbchat import MessageReaction
 
 
 COMMAND = None
