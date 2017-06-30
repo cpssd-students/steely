@@ -32,7 +32,7 @@ def extract_song(user):
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message_split = message.split()
     if not message:
-        search = USERDB.search(user.fb_id == author_id)
+        search = USERDB.search(USER.fb_id == author_id)
         if len(search) != 0:
             lastfm_name = search[0]['lastfm']
             bot.sendMessage(extract_song(lastfm_name), thread_id=thread_id, thread_type=thread_type)
@@ -41,11 +41,11 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         return
 
     elif message_split[0] == 'set' and len(message_split) == 2:
-        if len(USERDB.search(user.fb_id == author_id)) == 0:
+        if len(USERDB.search(USER.fb_id == author_id)) == 0:
             USERDB.insert({"fb_id" : author_id, "lastfm" : message_split[1]})
             bot.sendMessage('good egg', thread_id=thread_id, thread_type=thread_type)
         else:
-            USERDB.update({"lastfm" : message_split[1]}, user.fb_id == author_id)
+            USERDB.update({"lastfm" : message_split[1]}, USER.fb_id == author_id)
             bot.sendMessage('updated egg', thread_id=thread_id, thread_type=thread_type)
         return
     else:
