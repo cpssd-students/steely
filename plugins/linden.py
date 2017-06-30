@@ -47,7 +47,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     users = bot.fetchAllUsers()
     if message_split[0] in ('give', 'send') and len(message_split) > 2:
         if not message_split[-1].isdigit():
-            bot.sendMessage('please enter a valid amount')
+            bot.sendMessage('please enter a valid amount', thread_id=thread_id, thread_type=thread_type)))
             return
         reciever_name, amount = ' '.join(message_split[1:-1]), int(message_split[-1])
         if not USERDB.search(where('name') == reciever_name):
@@ -58,7 +58,8 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         sender = USERDB.get(USER.uid == author_id)
         USERDB.update({'lindens': reciever['lindens'] + amount}, USER.name == reciever_name)
         USERDB.update({'lindens': sender['lindens'] - amount}, USER.uid == author_id)
-        bot.sendMessage('you gave {} {} Linden Dollars™'.format(reciever_name, amount))
+        bot.sendMessage('you gave {} {} Linden Dollars™'.format(reciever_name, amount),
+            thread_id=thread_id, thread_type=thread_type)
         return
 
     if message_split[0] == 'table' and len(message_split) == 1:
@@ -67,11 +68,11 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         string = '```\n'
         for user in sorted(USERDB.all(), key=lambda user: user['lindens'], reverse=True):
             string += '{name:<{max_name}} {lindens:>{max_lindens}}\n'.format(name=user['name'],
-                                                                           lindens=user['lindens'],
-                                                                           max_name=max_name,
-                                                                           max_lindens=max_lindens)
+                                                                             lindens=user['lindens'],
+                                                                             max_name=max_name,
+                                                                             max_lindens=max_lindens)
             string += '```'
-        bot.sendMessage(string)
+        bot.sendMessage(string, thread_id=thread_id, thread_type=thread_type)))
     USERDB.close()
 
 
