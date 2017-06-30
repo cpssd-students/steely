@@ -20,7 +20,7 @@ def next_bus_realtime(stop_id, routes):
     response = requests.get(url).json()
     done = []
     for arrival in response['results']:
-        if arrival['route'] not done:
+        if arrival['route'] not in done:
             continue
         done.append(arrival['route'])
         yield base_str_format.format(arrival['route'],
