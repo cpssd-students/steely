@@ -20,12 +20,12 @@ def next_bus_realtime(stop_id, routes):
     response = requests.get(url).json()
     done = []
     for arrival in response['results']:
-        if arrival['route'] not in done:
+        if arrival['route'] in done:
             continue
         done.append(arrival['route'])
         yield base_str_format.format(arrival['route'],
-                                         arrival['duetime'],
-                                         arrival['destination'])
+                                     arrival['duetime'],
+                                     arrival['destination'])
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
