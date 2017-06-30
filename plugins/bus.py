@@ -15,7 +15,7 @@ def get_stop_routes(stop_id):
 
 def next_bus_realtime(stop_id, routes):
   url = BASE_URL + "realtimebusinformation?stopid={}&format=json".format(stop_id)
-  base_str_format = "{} should arrive in {} mins, heading to {}\n"
+  base_str_format = "{} should arrive in {} mins, heading to {}\n\n"
   res = requests.get(url).json()
   done = []
   busses = ""
