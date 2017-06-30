@@ -30,7 +30,7 @@ class SteelyBot(Client):
         self.markAsRead(author_id)
 
         if message in ('.list', '.help'):
-            commands = ', '.join((plugin.COMMAND for plugin in self.plugins))
+            commands = ', '.join((command for command in self.plugins.keys() if command))
             self.sendMessage('available commands: ' + commands, thread_id=thread_id, thread_type=thread_type)
             return
 
