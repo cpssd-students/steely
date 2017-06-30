@@ -22,10 +22,10 @@ def next_bus_realtime(stop_id, routes):
     for arrival in response['results']:
         if arrival['route'] not done:
             continue
-            done.append(arrival['route'])
-            yield base_str_format.format(arrival['route'],
-                                             arrival['duetime'],
-                                             arrival['destination'])
+        done.append(arrival['route'])
+        yield base_str_format.format(arrival['route'],
+                                         arrival['duetime'],
+                                         arrival['destination'])
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
