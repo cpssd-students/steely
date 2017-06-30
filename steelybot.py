@@ -40,7 +40,10 @@ class SteelyBot(Client):
                 plugin.main(self, author_id, message, thread_id, thread_type, **kwargs)
 
         # run plugins that have a command
-        command, message = message.split(' ', 1)
+        try:
+            command, message = message.split(' ', 1)
+        except ValueError:
+            command, message = message.strip(), ""
         if not command in self.plugins:
             return
         plugin = self.plugins[command]

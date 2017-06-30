@@ -1,5 +1,7 @@
 import requests
 from tinydb import TinyDB, Query
+from steelybot import config
+
 
 from .. import config
 
@@ -15,7 +17,7 @@ def get_np(apikey, user):
 
 def extract_song(user):
     try:
-        response = get_np(LASTFM_API_KEY, user)
+        response = get_np(config.LASTFM_API_KEY, user)
     except requests.exceptions.RequestException:
         return 'failed to retrieve now playing information'
     artist = response['artist']['#text']
