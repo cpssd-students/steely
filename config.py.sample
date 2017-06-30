@@ -1,2 +1,3 @@
 EMAIL = ''
 PASSWORD = ''
+LASTFM_API_KEY = ''
