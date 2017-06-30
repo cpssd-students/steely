@@ -1,5 +1,4 @@
 ![banner](banner.png)
-# steelybot
 
 ## to install  
 
