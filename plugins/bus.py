@@ -22,7 +22,7 @@ def next_bus_realtime(stop_id, routes):
   try: 
     for arrival in res['results']:
       if arrival['route'] not in done:
-        done.append(route)
+        done.append(arrival['route'])
         busses = busses + base_str_format.format(arrival['route'],
                                                  arrival['duetime'],
                                                  arrival['destination'])
