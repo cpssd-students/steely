@@ -22,9 +22,10 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
       song = np['name']
       bot.sendMessage('{} is playing {} by {}'.format(message, song, artist),
                        thread_id=thread_id, thread_type=thread_type)
-   except:
+   except requests.exceptions.RequestException as e:
      bot.sendMessage('failed to retrieve now playing information',
                      thread_id=thread_id, thread_type=thread_type)
+     print(e)
 
       
     
