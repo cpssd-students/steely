@@ -25,7 +25,6 @@ class SteelyBot(Client):
             self.plugins[plugin.COMMAND] = plugin
 
     def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
-        print(message)
         self.markAsDelivered(author_id, thread_id)
         self.markAsRead(author_id)
 
