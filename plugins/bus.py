@@ -23,6 +23,10 @@ def next_bus_realtime(stop_id, routes):
         if arrival['route'] in done:
             continue
         done.append(arrival['route'])
+        if arrival['duetime'] == "1":
+        	base_str_format = "{} should arrive in {} min, heading to {}\n\n"
+        elif arrival['duetime'] == "due":
+        	base_str_format = "{} is {}, heading to {}\n\n"
         yield base_str_format.format(arrival['route'],
                                      arrival['duetime'],
                                      arrival['destination'])
