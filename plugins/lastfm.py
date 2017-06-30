@@ -1,5 +1,5 @@
 import requests
-from .. import config
+from steelybot import config
 
 
 COMMAND = '.np'
@@ -17,7 +17,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         bot.sendMessage('include username please', thread_id=thread_id, thread_type=thread_type)
         return
     try:
-        response = get_np(LASTFM_API_KEY, message)
+        response = get_np(config.LASTFM_API_KEY, message)
     except requests.exceptions.RequestException:
         bot.sendMessage('failed to retrieve now playing information',
                thread_id=thread_id, thread_type=thread_type)
