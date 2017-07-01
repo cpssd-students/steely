@@ -68,7 +68,6 @@ def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
     USERDB.update({'lindens': reciever['lindens'] + amount}, USER.id == reciever_model.uid)
     bot.sendMessage('you gave {} {} Linden Dollars™'.format(reciever_name, amount),
                     thread_id=thread_id, thread_type=thread_type)
-    return
 
 
 def table_cmd(bot, message_parts, author_id, thread_id, thread_type):
@@ -85,11 +84,10 @@ def table_cmd(bot, message_parts, author_id, thread_id, thread_type):
 
 
 def invalid_cmd(bot, message_parts, author_id, thread_id, thread_type):
-    bot.sendMessage("Invalid subcommand", thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage("invalid subcommand", thread_id=thread_id, thread_type=thread_type)
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    # .linden
     if not message:
         bot.sendMessage('you have {} Linden Dollars™'.format(get_balance(author_id)),
                         thread_id=thread_id, thread_type=thread_type)
@@ -97,6 +95,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
 
     subcommand, *args = message.split()
     SUBCOMMANDS.setdefault(subcommand, invalid_cmd)(bot, args, author_id, thread_id, thread_type)
+
 
 if __name__ == "__main__":
     # tests
