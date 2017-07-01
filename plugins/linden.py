@@ -15,6 +15,7 @@ def user_from_name(name, list):
         if user.first_name == name:
             return user
 
+
 def list_users(bot, thread_id):
     group = bot.fetchGroupInfo(thread_id)[thread_id]
     user_ids = group.participants
