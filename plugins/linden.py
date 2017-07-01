@@ -43,7 +43,7 @@ def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
         bot.sendMessage('please enter a valid amount',
                         thread_id=thread_id, thread_type=thread_type)
         return
-    reciever_name, amount = message_parts[0].lstrip("@"), int(message_parts[-1])
+    reciever_name, amount = message_parts[0].lstrip("@").capitalize(), int(message_parts[-1])
     reciever_model = user_from_name(reciever_name, users)
     reciever = USERDB.get(USER.id == reciever_model.uid)
     sender_model = bot.fetchUserInfo(author_id)[author_id]
