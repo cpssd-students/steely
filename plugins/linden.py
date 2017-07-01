@@ -55,6 +55,9 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         reciever = USERDB.get(USER.id == reciever_model.uid)
         sender_model = bot.fetchUserInfo(author_id)[author_id]
         sender = USERDB.get(USER.id == author_id)
+        if sender_model.uid == reciever_model.uid:
+            bot.sendMessage('no', thread_id=thread_id, thread_type=thread_type)
+            return
         if not reciever:
             reciever = create_user(reciever_model.uid, reciever_model.first_name)
         if not sender:
