@@ -44,7 +44,7 @@ def get_balance(user_id):
 
 def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
     users = list_users(bot, thread_id)
-    if not message_parts[-1].isdigit():
+    if not message_parts[-1].isdigit() or message_parts[-1] == "0":
         bot.sendMessage('please enter a valid amount',
                         thread_id=thread_id, thread_type=thread_type)
         return
