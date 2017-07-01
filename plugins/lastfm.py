@@ -16,16 +16,19 @@ def get_np(apikey, user):
 
 def get_tags(artist, track):
     base = "http://ws.audioscrobbler.com/2.0/"
-    payload = {'method' : 'track.getTags',
+    payload = {'method' : 'artist.gettoptags',
                'api_key' : config.LASTFM_API_KEY,
-               'artist' : str(artist),
-               'track' : str(track),
+               'artist' : artist,
                'user' : 'alexkraak',
                'format' : 'json'}
     res = requests.get(base, params=payload).json()
+    top = 0
     try:
-        for tag in res['tags']['tag']:
-            yield tag['name']
+        for tag in res['toptags']['tag']:
+            if top < 3:
+                top+=1
+                yield tag['name']
+                
     except KeyError:
         yield 'None'
 
