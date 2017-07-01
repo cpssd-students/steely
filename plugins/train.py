@@ -31,4 +31,4 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         reply_string = '\n'.join(get_train_times(message))
         bot.sendMessage(reply_string, thread_id=thread_id, thread_type=thread_type)
     except urllib.error.HTTPError:
-        bot.sendMessage("error retrieving results", thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage("Error retrieving results", thread_id=thread_id, thread_type=thread_type)
