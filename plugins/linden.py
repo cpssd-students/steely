@@ -8,11 +8,6 @@ from tinydb.operations import increment
 COMMAND = ".linden"
 USERDB = TinyDB("linden.json")
 USER = Query()
-SUBCOMMANDS = {
-    'give': give_cmd,
-    'send': give_cmd,
-    'table': table_cmd,
-}
 
 
 def user_from_name(name, list):
@@ -85,6 +80,13 @@ def table_cmd(bot, message_parts, author_id, thread_id, thread_type):
 
 def invalid_cmd(bot, message_parts, author_id, thread_id, thread_type):
     bot.sendMessage("invalid subcommand", thread_id=thread_id, thread_type=thread_type)
+
+
+SUBCOMMANDS = {
+    'give': give_cmd,
+    'send': give_cmd,
+    'table': table_cmd,
+}
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
