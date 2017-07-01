@@ -10,7 +10,7 @@ USER = Query()
 
 def get_np(apikey, user):
     base = "http://ws.audioscrobbler.com/2.0/"
-    payload = {'method': 'user.getrecenttrack',
+    payload = {'method': 'user.getRecentTracks',
                'user': user,
                'api_key': apikey,
                'limit': '2',
