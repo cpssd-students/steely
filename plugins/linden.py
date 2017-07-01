@@ -59,8 +59,12 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
             reciever = create_user(reciever_model.uid, reciever_model.first_name)
         if not sender:
             sender = create_user(author_id, sender_model.first_name)
+        new_sender_balance = sender['lindens'] - amount
+        if new_sender_balance < 0:
+            bot.sendMessage('you\'d be broke boyo', thread_id=thread_id, thread_type=thread_type)
+            return
+        USERDB.update({'lindens': new_sender_balance}, USER.id == author_id)
         USERDB.update({'lindens': reciever['lindens'] + amount}, USER.id == reciever_model.uid)
-        USERDB.update({'lindens': sender['lindens'] - amount}, USER.id == author_id)
         bot.sendMessage('you gave {} {} Linden Dollars™'.format(reciever_name, amount),
             thread_id=thread_id, thread_type=thread_type)
         return
