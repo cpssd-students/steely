@@ -22,7 +22,6 @@ def get_train_times(station):
     if 0 < len(destination):
         yield duein[0] + " minutes until train to " + destination[0]
 
-print(get_train_times('bayside'))
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if not message:
