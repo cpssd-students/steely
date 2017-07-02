@@ -22,7 +22,7 @@ def get_train_times(station):
     # merge duein & destination to 2d list
     reply = sorted([list(a) for a in zip(duein, destination)])
 
-    yield '\n'.join(str(due) + ' minutes until train to ' + dest for due, dest in reply[0:3])
+    return '\n'.join(str(due) + ' minutes until train to ' + dest for due, dest in reply[0:3])
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if not message:
