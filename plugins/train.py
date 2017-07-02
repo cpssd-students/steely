@@ -14,15 +14,15 @@ def get_train_times(station):
     # regex patterns
     destination_pattern = '(?:<Destination>)(\w+)(?:<\/Destination>)'
     duein_pattern = '(?:<Duein>)(\d+)(?:<\/Duein>)'
-    
+
     destination = re.findall(destination_pattern, xml)
     duein = re.findall(duein_pattern, xml)
-    
+    duein = [int(i) for i in duein]
+
     # merge duein & destination to 2d list
-    reply = [list(a) for a in zip(duein, destination)]
+    reply = sorted([list(a) for a in zip(duein, destination)])
 
-    yield '\n'.join(due + ' minutes until train to ' + dest for due, dest in reply)
-
+    return '\n'.join(str(due) + ' minutes until train to ' + dest for due, dest in reply[0:3])
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if not message:
