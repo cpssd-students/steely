@@ -18,16 +18,16 @@ $ python3 steelybot.py
 ## credits
 |plugin|author|
 |---|---|
-|bus||
-|happy||
-|ht||
-|jokes||
-|lastfm||
-|linden||
-|skrrt||
-|spongemock||
-|train||
-|urbandict||
+|bus|[AlexKraak](https://github.com/AlexKraak)|
+|happy|[AlexKraak](https://github.com/AlexKraak)|
+|ht|[AlexKraak](https://github.com/AlexKraak)|
+|jokes|[EdwardDowling](https://github.com/EdwardDowling)|
+|lastfm|[AlexKraak](https://github.com/AlexKraak)|
+|linden|[CianLR](https://github.com/CianLR), [benmcmahon100](https://github.com/benmcmahon100)|
+|skrrt|[AlexKraak](https://github.com/AlexKraak)|
+|spongemock|[EdwardDowling](https://github.com/EdwardDowling)|
+|train|[izaakf](https://github.com/izaakf)|
+|urbandict|[EdwardDowling](https://github.com/EdwardDowling)|
 
 ## q&a
 
