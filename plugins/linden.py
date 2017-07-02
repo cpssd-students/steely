@@ -74,10 +74,10 @@ def table_cmd(bot, message_parts, author_id, thread_id, thread_type):
     max_name = len(max((user['first_name'] for user in USERDB.all()), key=len))
     string = '```'
     for user in sorted(USERDB.all(), key=lambda user: user['lindens'], reverse=True):
-        string += '\n{name:<{max_name}} {lindens:>{max_lindens}}L$'.format(name=user['first_name'],
+        string += '\n{name:<{max_name}} {lindens:>{max_lindens}.3f}L$'.format(name=user['first_name'],
                                                                          lindens=user['lindens'],
                                                                          max_name=max_name,
-                                                                         max_lindens=max_lindens)
+                                                                         max_lindens=max_lindens + 4)
     string += '\n```'
     bot.sendMessage(string, thread_id=thread_id, thread_type=thread_type)
 
