@@ -1,5 +1,4 @@
-import urllib.request
-import urllib.error
+import requests
 import re
 
 
@@ -7,20 +6,22 @@ COMMAND = '.train'
 BASE_URL = 'http://api.irishrail.ie/realtime/realtime.asmx/getStationDataByNameXML?StationDesc='
 
 
-
 def get_train_times(station):
     url = BASE_URL + station.replace(' ', '+')
-    xml = str(urllib.request.urlopen(url).read())
+    xml = requests.get(url)
+    xml = str(xml.text)
 
     # regex patterns
     destination_pattern = '(?:<Destination>)(\w+)(?:<\/Destination>)'
     duein_pattern = '(?:<Duein>)(\d+)(?:<\/Duein>)'
-    # capture strings
+    
     destination = re.findall(destination_pattern, xml)
     duein = re.findall(duein_pattern, xml)
+    
+    # merge duein & destination to 2d list
+    reply = [list(a) for a in zip(duein, destination)]
 
-    if 0 < len(destination):
-        yield duein[0] + " minutes until train to " + destination[0]
+    yield '\n'.join(due + ' minutes until train to ' + dest for due, dest in reply)
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
@@ -30,5 +31,5 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     try:
         reply_string = '\n'.join(get_train_times(message))
         bot.sendMessage(reply_string, thread_id=thread_id, thread_type=thread_type)
-    except urllib.error.HTTPError:
-        bot.sendMessage("Error retrieving results", thread_id=thread_id, thread_type=thread_type)
+    except requests.exceptions.RequestException:
+        bot.sendMessage("error retrieving results", thread_id=thread_id, thread_type=thread_type)
