@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import json
 import requests
 
@@ -6,30 +8,25 @@ COMMAND = '.dbus'
 BASE_URL = "http://data.dublinked.ie/cgi-bin/rtpi/"
 
 
-def get_stop_routes(stop_id):
-    url = BASE_URL + "busstopinformation?stopid={}&format=json".format(stop_id)
-    response = requests.get(url).json()
-    for result in response["results"]:
-        for operator in result['operators']:
-            yield from operator['routes']
-
-
-def next_bus_realtime(stop_id, routes):
+def next_bus_realtime(stop_id):
     url = BASE_URL + "realtimebusinformation?stopid={}&format=json".format(stop_id)
-    base_str_format = "{} should arrive in {} mins, heading to {}\n\n"
     response = requests.get(url).json()
-    done = []
+    done_routes = []
     for arrival in response['results']:
-        if arrival['route'] in done:
+        if arrival["route"] in done_routes:
             continue
-        done.append(arrival['route'])
-        if arrival['duetime'] == "1":
-        	base_str_format = "{} should arrive in {} min, heading to {}\n\n"
-        elif arrival['duetime'] == "due":
-        	base_str_format = "{} is {}, heading to {}\n\n"
-        yield base_str_format.format(arrival['route'],
-                                     arrival['duetime'],
-                                     arrival['destination'])
+        yield arrival["route"], arrival["duetime"], arrival["destination"]
+        done_routes.append(arrival["route"])
+
+
+def gen_reply_string(arrivals):
+    max_route = max(len(arrival[0]) for arrival in arrivals)
+    max_duetime = max(len(arrival[1]) for arrival in arrivals)
+    max_dest = max(len(arrival[2]) for arrival in arrivals)
+    yield "```"
+    for route, duetime, destination in arrivals:
+        yield '{route:<{max_route}} {destination:<{max_dest}} {duetime:>{max_duetime}}'.format_map(locals())
+    yield "```"
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
@@ -37,7 +34,13 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         bot.sendMessage("please include a stop number", thread_id=thread_id, thread_type=thread_type)
         return
     try:
-        reply_string = '\n'.join(next_bus_realtime(message, get_stop_routes(message)))
-        bot.sendMessage(reply_string, thread_id=thread_id, thread_type=thread_type)
+        arrivals = list(next_bus_realtime(message))
     except requests.exceptions.RequestException:
         bot.sendMessage("error retrieving results", thread_id=thread_id, thread_type=thread_type)
+        return
+    bot.sendMessage("\n".join(gen_reply_string(arrivals)), thread_id=thread_id, thread_type=thread_type)
+
+
+if __name__ == "__main__":
+    arrivals = list(next_bus_realtime("37"))
+    print("\n".join(gen_reply_string(arrivals)))
