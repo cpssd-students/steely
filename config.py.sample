@@ -1,3 +1,4 @@
 EMAIL = ''
 PASSWORD = ''
 LASTFM_API_KEY = ''
+JOKES_API_KEY = ''
