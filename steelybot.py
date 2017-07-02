@@ -24,6 +24,11 @@ class SteelyBot(Client):
             plugin_path = os.path.join('plugins', file)
             plugin = imp.load_source(file, plugin_path)
             self.plugins[plugin.COMMAND] = plugin
+    
+    def onEmojiChange(self, author_id, new_emoji, thread_id, thread_type, **kwargs):
+        nose = '👃'
+        if new_emoji != nose:
+            self.changeThreadEmoji(nose, thread_id=thread_id)
 
     def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
         self.markAsDelivered(author_id, thread_id)
