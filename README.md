@@ -4,7 +4,7 @@
 
 ```
 $ git clone this
-$ pip3 install --user fbchat requests tinydb
+$ pip3 install --user -r requirements.txt
 ```
 
 ## to run
