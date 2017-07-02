@@ -25,7 +25,7 @@ def gen_reply_string(arrivals):
     max_dest = max(len(arrival[2]) for arrival in arrivals)
     yield "```"
     for route, duetime, destination in arrivals:
-        yield '{route:<{max_route}} {destination:<{max_dest}} {duetime:>{max_duetime}}'.format_map(locals())
+        yield '{route:<{max_route}} {destination:<{max_dest}} {duetime:>{max_duetime}} min'.format_map(locals())
     yield "```"
 
 
