@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+
 import requests
 import re
+from operator import itemgetter
 
 
 COMMAND = '.train'
@@ -14,22 +17,38 @@ def get_train_times(station):
     # regex patterns
     destination_pattern = '(?:<Destination>)(\w+)(?:<\/Destination>)'
     duein_pattern = '(?:<Duein>)(\d+)(?:<\/Duein>)'
-
     destination = re.findall(destination_pattern, xml)
-    duein = re.findall(duein_pattern, xml)
-    duein = [int(i) for i in duein]
+    duein = map(int, re.findall(duein_pattern, xml))
 
     # merge duein & destination to 2d list
-    reply = sorted([list(a) for a in zip(duein, destination)])
+    yield from sorted(zip(destination, duein), key=itemgetter(1))[:3]
 
-    yield '\n'.join(str(due) + ' minutes until train to ' + dest for due, dest in reply[0:3])
+
+def gen_reply_string(times):
+    yield "```"
+    max_destin = max(len(line[0]) for line in times)
+    max_time = max(len(str(line[1])) for line in times)
+    for destin, time in times:
+        yield "{destin:<{max_destin}} {time:<{max_time}} min".format_map(locals())
+    yield "```"
+
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if not message:
         bot.sendMessage("Invalid train station", thread_id=thread_id, thread_type=thread_type)
         return
     try:
-        reply_string = '\n'.join(get_train_times(message))
-        bot.sendMessage(reply_string, thread_id=thread_id, thread_type=thread_type)
+        times = list(get_train_times(message))
     except requests.exceptions.RequestException:
         bot.sendMessage("error retrieving results", thread_id=thread_id, thread_type=thread_type)
+    if times:
+        bot.sendMessage("\n".join(gen_reply_string(times)), thread_id=thread_id, thread_type=thread_type)
+    else:
+        bot.sendMessage("no results", thread_id=thread_id, thread_type=thread_type)
+
+
+
+if __name__ == "__main__":
+    times = list(get_train_times("bayside"))
+    print("\n".join(gen_reply_string(times)))
+
