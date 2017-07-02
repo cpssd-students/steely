@@ -29,7 +29,7 @@ def gen_reply_string(times):
     max_destin = max(len(line[0]) for line in times)
     max_time = max(len(str(line[1])) for line in times)
     for destin, time in times:
-        yield "{destin:<{max_destin}} {time:<{max_time}} min".format_map(locals())
+        yield "{destin:<{max_destin}} {time:>{max_time}} min".format_map(locals())
     yield "```"
 
 
