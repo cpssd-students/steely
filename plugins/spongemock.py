@@ -5,7 +5,14 @@ COMMAND = '.mock'
 
 
 def mock(string):
-    return ''.join([(c.upper(), c.lower())[random.randint(0, 1)] for c in string])
+    return ''.join(map(trans_char, string))
+
+def trans_char(char):
+    if char == "(":
+        return ")"
+    if char == ")":
+        return "("
+    return (char.upper(), char.lower())[random.randint(0, 1)]
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
