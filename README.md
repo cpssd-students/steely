@@ -15,9 +15,24 @@ $ python3 steelybot.py
 ```
 (`config.py` is in `.gitignore`)
 
+## credits
+|plugin|author|
+|---|---|
+|bus||
+|happy||
+|ht||
+|jokes||
+|lastfm||
+|linden||
+|skrrt||
+|spongemock||
+|train||
+|urbandict||
+
 ## q&a
 
 - why the shit are some names camelCase? that's not pep8
   - the fbchat module uses them for some reason
 - why the shit isn't the linden plugin working?
-  - :(
+  - ~~:(~~
+  - :)
