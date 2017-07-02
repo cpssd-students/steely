@@ -26,7 +26,7 @@ class SteelyBot(Client):
             self.plugins[plugin.COMMAND] = plugin
     
     def onEmojiChange(self, author_id, new_emoji, thread_id, thread_type, **kwargs):
-        node = '👃'
+        nose = '👃'
         if new_emoji != nose:
             self.changeThreadEmoji(nose, thread_id=thread_id)
 
