@@ -29,7 +29,7 @@ def get_tags(artist, track):
     top = 0
     try:
         for tag in response['toptags']['tag']:
-            if top < 3:
+            if top < 3 and tag['name'] != 'seen live':
                 top += 1
                 yield tag['name']
     except KeyError:
