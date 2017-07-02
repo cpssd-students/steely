@@ -24,7 +24,7 @@ class SteelyBot(Client):
             plugin_path = os.path.join('plugins', file)
             plugin = imp.load_source(file, plugin_path)
             self.plugins[plugin.COMMAND] = plugin
-    
+
     def onEmojiChange(self, author_id, new_emoji, thread_id, thread_type, **kwargs):
         nose = '👃'
         if new_emoji != nose:
@@ -40,6 +40,11 @@ class SteelyBot(Client):
         if message in ('.list', '.help'):
             commands = ', '.join((command for command in self.plugins.keys() if command))
             self.sendMessage('available commands: ' + commands, thread_id=thread_id, thread_type=thread_type)
+            return
+
+        if message == '.reload':
+            self.load_plugins()
+            self.sendMessage('plugins reloaded', thread_id=thread_id, thread_type=thread_type)
             return
 
         # run plugins that have no command
