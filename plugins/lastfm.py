@@ -35,6 +35,19 @@ def get_tags(artist, track):
     except KeyError:
         yield 'None'
 
+def collage(author_id, user):
+    base = "http://www.tapmusic.net/collage.php/"
+    payload = {'user': user,
+               'type': '1month',
+               'size': '3x3',
+               'caption': 'true'}
+    image_url = requests.get(base, params=payload)
+    image = image_url.content
+    print(image_url.url)
+    image_path = '/tmp/{}.jpg'.format(str(author_id))
+    with open(image_path, 'wb') as f:
+        f.write(image)
+    return image_path
 
 def extract_song(user):
     try:
@@ -71,6 +84,12 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
             bot.sendMessage('updated egg',
                             thread_id=thread_id, thread_type=thread_type)
         return
+    elif message_split[0] == 'collage' and len(message_split) == 2:
+        bot.sendLocalImage(collage(author_id, message_split[1]),
+                           message=None,
+                           thread_id=thread_id,
+                           thread_type=thread_type)
+        
     else:
         bot.sendMessage(extract_song(message),
                         thread_id=thread_id, thread_type=thread_type)
