@@ -4,6 +4,7 @@
 from tinydb import TinyDB, Query, where
 from tinydb.operations import increment
 from datetime import datetime, timedelta
+import tabulate
 import requests
 import json
 
@@ -191,16 +192,15 @@ def invest_list_cmd(user_id, args):
     tics = list(user['investments'])
     quotes = invest_get_quotes_w_cache(tics)
     total_profit = 0
-    out += "Ticker   Quant   Value    Profit\n"
+    table = []
     for quote in quotes:
         holding = user['investments'][quote['Symbol']]
         quant, orig_value = holding['quantity'], holding['orig_value']
         bid = float(quote['Bid'])
-        out += "{}:      {}  {:.2f}    {:.2f}%\n".format(
-                quote['Symbol'], quant,
-                quant * float(quote['Bid']),
-                100 * ((quant * bid) - orig_value) / orig_value)
+        table.append([quote['Symbol'], quant, quant * bid,
+            100 * ((quant * bid) - orig_value) / orig_value])
         total_profit += (quant * bid) - orig_value
+    out += tabulate.tabulate(table, headers=("ticker", "quant", "value", "% profit"), tablefmt="plain", floatfmt=".4f")
     out += "\nCurrent Profit: {:.2f}L$```".format(total_profit)
     return out
 
