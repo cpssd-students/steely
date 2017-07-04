@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
+
 import requests
 from tinydb import TinyDB, Query
-from steelybot import config
+from operator import itemgetter
+# from steelybot import config
 
 
 COMMAND = '.np'
@@ -8,15 +11,27 @@ USERDB = TinyDB('../lastfm.json')
 USER = Query()
 
 
-def get_np(apikey, user):
+def get_np(user):
     base = "http://ws.audioscrobbler.com/2.0/"
     payload = {'method': 'user.getRecentTracks',
                'user': user,
-               'api_key': apikey,
+               'api_key': "f18d9bd2cc53c33d6be50fba1a418b4f",
+               # 'api_key': config.LASTFM_API_KEY,
                'limit': '2',
                'format': 'json'}
     response = requests.get(base, params=payload)
     return response.json()["recenttracks"]["track"][0]
+
+def get_playcount(user):
+    base = "http://ws.audioscrobbler.com/2.0/"
+    payload = {'method': 'user.getInfo',
+               'user': user,
+               'api_key': "f18d9bd2cc53c33d6be50fba1a418b4f",
+               # 'api_key': config.LASTFM_API_KEY,
+               'limit': '1',
+               'format': 'json'}
+    response = requests.get(base, params=payload)
+    return response.json()["user"]["playcount"]
 
 def get_tags(artist, track):
     base = "http://ws.audioscrobbler.com/2.0/"
@@ -51,7 +66,7 @@ def collage(author_id, user):
 
 def extract_song(user):
     try:
-        response = get_np(config.LASTFM_API_KEY, user)
+        response = get_np(user)
     except requests.exceptions.RequestException:
         return 'failed to retrieve now playing information'
     artist = response['artist']['#text']
@@ -89,7 +104,16 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
                            message=None,
                            thread_id=thread_id,
                            thread_type=thread_type)
-        
+
+    elif message_split[0] == 'list' and len(message_split) == 2:
+        max_lastfm = max(len(user["lastfm"]) for user in USERDB.all())
+        stats = []
+        for user in USERDB.all():
+            lastfm = user["lastfm"]
+            stats.append((lastfm, get_playcount(lastfm)))
+        for lastfm, playcount in sorted(stats, key=itemgetter(1), reverse=True):
+            print("{:<{max_lastfm}} {:>6,}".format(lastfm, int(playcount), max_lastfm=max_lastfm))
+
     else:
         bot.sendMessage(extract_song(message),
                         thread_id=thread_id, thread_type=thread_type)
