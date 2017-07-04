@@ -196,7 +196,14 @@ def invest_list_cmd(user_id, args):
     for quote in quotes:
         holding = user['investments'][quote['Symbol']]
         quant, orig_value = holding['quantity'], holding['orig_value']
+
+        if quote['Bid'] is None:
+            print("Broken stock", holding['symbol'], 'for', user_id, '\nfull quote:\n', quote)
+
+            return "The following stock broke: " + holding['symbol']
+
         bid = float(quote['Bid'])
+
         table.append([quote['Symbol'], quant, quant * bid,
             100 * ((quant * bid) - orig_value) / orig_value])
         total_profit += (quant * bid) - orig_value
