@@ -3,7 +3,7 @@
 import requests
 from tinydb import TinyDB, Query
 from operator import itemgetter
-# from steelybot import config
+from steelybot import config
 
 
 COMMAND = '.np'
@@ -15,8 +15,7 @@ def get_np(user):
     base = "http://ws.audioscrobbler.com/2.0/"
     payload = {'method': 'user.getRecentTracks',
                'user': user,
-               'api_key': "f18d9bd2cc53c33d6be50fba1a418b4f",
-               # 'api_key': config.LASTFM_API_KEY,
+               'api_key': config.LASTFM_API_KEY,
                'limit': '2',
                'format': 'json'}
     response = requests.get(base, params=payload)
@@ -26,12 +25,11 @@ def get_playcount(user):
     base = "http://ws.audioscrobbler.com/2.0/"
     payload = {'method': 'user.getInfo',
                'user': user,
-               'api_key': "f18d9bd2cc53c33d6be50fba1a418b4f",
-               # 'api_key': config.LASTFM_API_KEY,
+               'api_key': config.LASTFM_API_KEY,
                'limit': '1',
                'format': 'json'}
     response = requests.get(base, params=payload)
-    return response.json()["user"]["playcount"]
+    return int(response.json()["user"]["playcount"])
 
 def get_tags(artist, track):
     base = "http://ws.audioscrobbler.com/2.0/"
@@ -105,14 +103,18 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
                            thread_id=thread_id,
                            thread_type=thread_type)
 
-    elif message_split[0] == 'list' and len(message_split) == 2:
+    elif message_split[0] == 'list':
         max_lastfm = max(len(user["lastfm"]) for user in USERDB.all())
         stats = []
         for user in USERDB.all():
             lastfm = user["lastfm"]
             stats.append((lastfm, get_playcount(lastfm)))
+        message = "```\n"
         for lastfm, playcount in sorted(stats, key=itemgetter(1), reverse=True):
-            print("{:<{max_lastfm}} {:>6,}".format(lastfm, int(playcount), max_lastfm=max_lastfm))
+            message += "{:<{max_lastfm}} {:>6,}\n".format(lastfm, playcount, max_lastfm=max_lastfm)
+        message += "```"
+        bot.sendMessage(message,
+                        thread_id=thread_id, thread_type=thread_type)
 
     else:
         bot.sendMessage(extract_song(message),
