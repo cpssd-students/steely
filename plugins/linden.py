@@ -103,6 +103,25 @@ def invest_get_quotes(tickers):
         return [json.loads(r.text)['query']['results']['quote']]
     return json.loads(r.text)['query']['results']['quote']
 
+def invest_get_quote_slow_backup(ticker):
+    base_url = "https://www.alphavantage.co/query"
+    params = "?function=TIME_SERIES_INTRADAY&symbol={}&interval=1min&apikey={}"
+    KEY = "6A98QBQPTOVNV1AD"
+    url = base_url + params.format(ticker, KEY)
+
+    r = requests.get(url)
+    resp = json.loads(r.text)
+    if "Error Message" in resp:
+        return {"Symbol": ticker, "Bid": None, "Ask": None}
+
+    most_recent_time = max(resp["Time Series (1min)"])
+    latest = resp["Time Series (1min)"][most_recent_time]
+    return {
+        "Symbol": ticker,
+        "Bid": latest["4. close"],
+        "Ask": latest["4. close"],
+    }
+
 
 def invest_get_quotes_w_cache(tickers):
     cached_quotes = []
@@ -114,6 +133,8 @@ def invest_get_quotes_w_cache(tickers):
             tics_to_get.append(tic)
     new_quotes = invest_get_quotes(tics_to_get)
     for quote in new_quotes:
+        if quote["Bid"] is None or quote["Ask"] is None:
+            quote = invest_get_quote_slow_backup(quote["Symbol"])
         QUOTE_CACHE[quote['Symbol']] = quote
         QUOTE_CACHE[quote['Symbol']]['time'] = datetime.now()
     return cached_quotes + new_quotes
