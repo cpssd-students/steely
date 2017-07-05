@@ -3,6 +3,7 @@
 
 from fbchat import log, Client
 import imp
+import threading
 import config
 import os
 import random
@@ -50,7 +51,10 @@ class SteelyBot(Client):
         # run plugins that have no command
         for plugin in self.plugins.values():
             if not plugin.COMMAND:
-                plugin.main(self, author_id, message, thread_id, thread_type, **kwargs)
+                thread = threading.Thread(target=plugin.main,
+                    args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
+                thread.deamon = True
+                thread.start()
 
         # run plugins that have a command
         try:
@@ -60,7 +64,10 @@ class SteelyBot(Client):
         if not command in self.plugins:
             return
         plugin = self.plugins[command]
-        plugin.main(self, author_id, message, thread_id, thread_type, **kwargs)
+        thread = threading.Thread(target=plugin.main,
+            args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
+        thread.deamon = True
+        thread.start()
 
 
 if __name__ == '__main__':
