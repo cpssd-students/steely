@@ -233,6 +233,13 @@ def invest_list_cmd(user_id, args):
     out += "\nCurrent Profit: {:.2f}L$```".format(total_profit)
     return out
 
+def invest_quote_cmd(user_id, args):
+    if len(args) != 1:
+        return "Usage: .linden invest quote TICKER"
+    quote = invest_get_quotes_w_cache(args)
+    return (quote['Symbol'] + ' -' +
+            ' Bid: ' + str(quote['Bid']) +
+            ' Ask: ' + str(quote['Ask']))
 
 def invest_cmd(bot, message_parts, author_id, thread_id, thread_type):
     if len(message_parts) == 0:
@@ -242,6 +249,7 @@ def invest_cmd(bot, message_parts, author_id, thread_id, thread_type):
         'buy': invest_buy_cmd,
         'sell': invest_sell_cmd,
         'list': invest_list_cmd,
+        'quote': invest_quote_cmd,
     }
     out_message = ''
     if message_parts[0] not in invest_cmds:
