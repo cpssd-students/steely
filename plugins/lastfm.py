@@ -97,8 +97,12 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
             bot.sendMessage('updated egg',
                             thread_id=thread_id, thread_type=thread_type)
         return
-    elif message_split[0] == 'collage' and len(message_split) == 2:
-        bot.sendLocalImage(collage(author_id, message_split[1]),
+    elif message_split[0] == 'collage':
+        if len(message_split) == 1:
+            user = USERDB.get(USER.fb_id == author_id)["lastfm"]
+        else:
+            user = message_split[1]
+        bot.sendLocalImage(collage(author_id, user),
                            message=None,
                            thread_id=thread_id,
                            thread_type=thread_type)
