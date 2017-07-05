@@ -236,7 +236,7 @@ def invest_list_cmd(user_id, args):
 def invest_quote_cmd(user_id, args):
     if len(args) != 1:
         return "Usage: .linden invest quote TICKER"
-    quote = invest_get_quotes_w_cache(args)
+    quote = invest_get_quotes_w_cache(args)[0]
     return (quote['Symbol'] + ' -' +
             ' Bid: ' + str(quote['Bid']) +
             ' Ask: ' + str(quote['Ask']))
