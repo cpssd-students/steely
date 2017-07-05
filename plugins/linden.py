@@ -170,7 +170,7 @@ def invest_buy_cmd(user_id, args):
     total_holdings[tic] = new_holding
     USERDB.update({'investments': total_holdings}, USER.id == user_id)
     USERDB.update({'lindens': user_balance - (ask * qt)}, USER.id == user_id)
-    return "Successfully bought {} shares of ${} for {} Lindens".format(qt, tic, ask * qt)
+    return "Successfully bought {} shares of ${} for {:.4d}L$".format(qt, tic, ask * qt)
 
 
 def invest_sell_cmd(user_id, args):
