@@ -14,6 +14,7 @@ class SteelyBot(Client):
     def __init__(self, *args, **kwargs):
         super(SteelyBot, self).__init__(*args, **kwargs)
         self.plugins = {}
+        self.non_plugins = []
         self.load_plugins()
 
     def load_plugins(self):
@@ -24,7 +25,10 @@ class SteelyBot(Client):
                 continue
             plugin_path = os.path.join('plugins', file)
             plugin = imp.load_source(file, plugin_path)
-            self.plugins[plugin.COMMAND] = plugin
+            if plugin.COMMAND:
+                self.plugins[plugin.COMMAND] = plugin
+            else:
+                self.non_plugins.append(plugin)
 
     def onEmojiChange(self, author_id, new_emoji, thread_id, thread_type, **kwargs):
         nose = '👃'
@@ -49,8 +53,7 @@ class SteelyBot(Client):
             return
 
         # run plugins that have no command
-        for plugin in self.plugins.values():
-            if not plugin.COMMAND:
+        for plugin in self.non_plugins:
                 thread = threading.Thread(target=plugin.main,
                     args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
                 thread.deamon = True
