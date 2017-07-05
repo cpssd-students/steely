@@ -5,6 +5,7 @@ from tinydb import TinyDB, Query, where
 from tinydb.operations import increment
 from datetime import datetime, timedelta
 import tabulate
+import random
 import requests
 import json
 
@@ -234,8 +235,39 @@ def invalid_cmd(bot, message_parts, author_id, thread_id, thread_type):
     bot.sendMessage("invalid subcommand", thread_id=thread_id, thread_type=thread_type)
 
 
+def gamble_cmd(bot, message_parts, author_id, thread_id, thread_type):
+    if not message_parts or not message_parts[0].isdigit() or len(message_parts) != 1:
+        bot.sendMessage("usage: .linden gamble <number 1-3>\nit's 2L$ to enter\n5$L if you win",
+            thread_id=thread_id, thread_type=thread_type)
+        return
+    guess, number = int(message_parts[0]), random.randint(1, 3)
+    if 1 > guess or guess > 3:
+        bot.sendMessage("number between 1 and 3 please",
+            thread_id=thread_id, thread_type=thread_type)
+        return
+    user = USERDB.get(USER.id == author_id)
+    user_lindens = user["lindens"]
+    if user_lindens < 3:
+        bot.sendMessage(u"you'd be broke boyo",
+                thread_id=thread_id, thread_type=thread_type)
+        return
+
+    if guess == number:
+        bot.sendMessage(u"you won, thats ✔ some good👌👌\n5L$ added to your balance",
+                thread_id=thread_id, thread_type=thread_type)
+        USERDB.update({"lindens": user_lindens + 5}, USER.id == author_id)
+
+    else:
+        bot.sendMessage(u"you lost, the number was {}\n3L$ removed from your balance".format(number),
+            thread_id=thread_id, thread_type=thread_type)
+        USERDB.update({"lindens": user["lindens"] - 3}, USER.id == author_id)
+    bot.sendMessage(u"your new balance is {:.4f}L$".format(get_balance(author_id)),
+            thread_id=thread_id, thread_type=thread_type)
+
+
 SUBCOMMANDS = {
     'give': give_cmd,
+    'gamble': gamble_cmd,
     'send': give_cmd,
     'table': table_cmd,
     'invest': invest_cmd,
