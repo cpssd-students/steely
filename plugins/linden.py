@@ -205,6 +205,7 @@ def invest_sell_cmd(user_id, args):
     return "Successfully sold {} shares of ${} for {} Lindens ({:.2f}L profit)".format(
             qt, tic, qt * bid, qt * (bid - orig_bid))
 
+
 def invest_list_cmd(user_id, args):
     user_balance = get_balance(user_id)
     if user_balance is None:
@@ -233,13 +234,13 @@ def invest_list_cmd(user_id, args):
     out += "\nCurrent Profit: {:.2f}L$```".format(total_profit)
     return out
 
+
 def invest_quote_cmd(user_id, args):
     if len(args) != 1:
         return "Usage: .linden invest quote TICKER"
     quote = invest_get_quotes_w_cache(args)[0]
-    return (quote['Symbol'] + ' -' +
-            ' Bid: ' + str(quote['Bid']) +
-            ' Ask: ' + str(quote['Ask']))
+    return "${Symbol}\nbid: {Bid}, ask: {Ask}".format(**quote)
+
 
 def invest_cmd(bot, message_parts, author_id, thread_id, thread_type):
     if len(message_parts) == 0:
