@@ -59,5 +59,6 @@ ENV/
 
 lastfm.json
 linden.json
+quote.json
 
 .idea
