@@ -7,7 +7,9 @@ import threading
 import config
 import os
 import random
+from tinydb import TinyDB
 
+CMD_DB = TinyDB('./quote.json')
 
 class SteelyBot(Client):
 
@@ -44,7 +46,8 @@ class SteelyBot(Client):
 
         if message in ('.list', '.help'):
             commands = ', '.join((command for command in self.plugins.keys() if command))
-            self.sendMessage('available commands: ' + commands, thread_id=thread_id, thread_type=thread_type)
+            user_cmds = ', '.join((command['cmd'] for command in CMD_DB)) 
+            self.sendMessage('available commands: {}\nuser commands: {}'.format(commands, user_cmds), thread_id=thread_id, thread_type=thread_type)
             return
 
         if message == '.reload':

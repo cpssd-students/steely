@@ -3,7 +3,7 @@
 from tinydb import TinyDB, Query
 
 COMMAND = '.define'
-CMD_DB = TinyDB('../quote.json')
+CMD_DB = TinyDB('./quote.json')
 CMD = Query()
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
