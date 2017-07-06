@@ -3,7 +3,7 @@
 from tinydb import TinyDB, Query
 
 COMMAND = '.define'
-CMD_DB = TinyDB('./quote.json')
+CMD_DB = TinyDB('quote.json')
 CMD = Query()
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
@@ -21,7 +21,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
             bot.sendMessage('Your command ~{} has been updated'.format(message_split[0]),
                             thread_id=thread_id, thread_type=thread_type)
             return
-            
+
     else:
         bot.sendMessage('please use in form .define <command_name> <command text>',
                         thread_id=thread_id, thread_type=thread_type)

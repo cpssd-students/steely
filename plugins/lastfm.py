@@ -7,7 +7,7 @@ from steelybot import config
 
 
 COMMAND = '.np'
-USERDB = TinyDB('../lastfm.json')
+USERDB = TinyDB('lastfm.json')
 USER = Query()
 
 

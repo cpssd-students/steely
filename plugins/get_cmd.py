@@ -3,7 +3,7 @@
 from tinydb import TinyDB, Query
 
 COMMAND = None
-CMD_DB = TinyDB('./quote.json')
+CMD_DB = TinyDB('quote.json')
 CMD = Query()
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
@@ -11,5 +11,5 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if search != None:
         bot.sendMessage(search['text'],
                         thread_id=thread_id, thread_type=thread_type)
-        
-        
+
+
