@@ -9,7 +9,9 @@ import os
 import random
 from tinydb import TinyDB
 
+
 CMD_DB = TinyDB('quote.json')
+
 
 class SteelyBot(Client):
 
