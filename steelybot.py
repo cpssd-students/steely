@@ -13,11 +13,11 @@ class SteelyBot(Client):
 
     def __init__(self, *args, **kwargs):
         super(SteelyBot, self).__init__(*args, **kwargs)
-        self.plugins = {}
-        self.non_plugins = []
         self.load_plugins()
 
     def load_plugins(self):
+        self.non_plugins = []
+        self.plugins = {}
         for file in os.listdir('plugins'):
             if file.startswith("_"):
                 continue
