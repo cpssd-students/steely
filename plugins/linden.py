@@ -160,7 +160,9 @@ def invest_buy_cmd(user_id, args):
     if user_balance is None:
         return "User doesn't exist, get urself some Lindens"
     elif user_balance < ask * qt:
-        return "You don't have enough Lindens"
+        needs = ("You have {}L$ ".format(user_balance) +
+                 "but need {}L$ ({} * {}L$)".format(ask * qt, qt, ask))
+        return "You don't have enough Lindens. " + needs
     # Edit that database
     total_holdings = USERDB.get(USER.id == user_id)['investments']
     new_holding = {'symbol': tic, 'quantity': qt, 'orig_value': ask * qt}
