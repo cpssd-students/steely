@@ -155,24 +155,25 @@ def invest_buy_cmd(user_id, args):
     if quote['Ask'] is None:
         return "Stock ${} not found (you sure it's on the NASDAQ?)".format(tic)
     ask = float(quote['Ask'])
+    total_cost = ask * qt
     # Check the user's not a snek
     user_balance = get_balance(user_id)
     if user_balance is None:
         return "User doesn't exist, get urself some Lindens"
-    elif user_balance < ask * qt:
-        needs = ("You have {}L$ ".format(user_balance) +
-                 "but need {}L$ ({} * {}L$)".format(ask * qt, qt, ask))
-        return "You don't have enough Lindens. " + needs
+    elif user_balance < total_cost:
+        return "you don't have enough Lindens\n" \
+               "you have {user_balance:.2f}L$,\n" \
+               "but you need {total_cost:.2f}L$ ({qt} * {ask:.2f})".format_map(locals())
     # Edit that database
     total_holdings = USERDB.get(USER.id == user_id)['investments']
-    new_holding = {'symbol': tic, 'quantity': qt, 'orig_value': ask * qt}
+    new_holding = {'symbol': tic, 'quantity': qt, 'orig_value': total_cost}
     if tic in total_holdings:
         new_holding['quantity'] += total_holdings[tic]['quantity']
         new_holding['orig_value'] += total_holdings[tic]['orig_value']
     total_holdings[tic] = new_holding
     USERDB.update({'investments': total_holdings}, USER.id == user_id)
-    USERDB.update({'lindens': user_balance - (ask * qt)}, USER.id == user_id)
-    return "Successfully bought {} shares of ${} for {:.4f}L$".format(qt, tic, ask * qt)
+    USERDB.update({'lindens': user_balance - (total_cost)}, USER.id == user_id)
+    return "Successfully bought {} shares of ${} for {:.4f}L$".format(qt, tic, total_cost)
 
 
 def invest_sell_cmd(user_id, args):
