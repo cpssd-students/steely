@@ -22,7 +22,7 @@ def get_np(user):
               'limit': '1',
               'format': 'json'}
     response = requests.get(API_BASE, params=params)
-    return response.json()["recenttracks"]["track"]
+    return response.json()["recenttracks"]["track"][0]
 
 
 def get_playcount(user):
@@ -98,7 +98,7 @@ def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
         bot.sendMessage('include username please or use .np set',
                         thread_id=thread_id, thread_type=thread_type)
         return
-    latest_track_obj = get_np(lastfm)[0]
+    latest_track_obj = get_np(lastfm)
     album = latest_track_obj["album"]["#text"]
     artist = latest_track_obj["artist"]["#text"]
     track = latest_track_obj["name"]
