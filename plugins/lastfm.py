@@ -118,7 +118,9 @@ def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     if "image" in latest_track_obj:
         image = latest_track_obj["image"][2]["#text"]
         bot.sendRemoteImage(image, thread_id=thread_id, thread_type=thread_type)
-    bot.sendMessage("{username} is playing `{track}` by {artist}\n" \
+    is_was = "is" if "@attr" in latest_track_obj and \
+        "nowplaying" in latest_track_obj["@attr"] else "was"
+    bot.sendMessage("{username} {is_was} playing `{track}` by {artist}\n" \
                     "tags: {tags}\n{link}".format_map(locals()),
                     thread_id=thread_id, thread_type=thread_type)
 
