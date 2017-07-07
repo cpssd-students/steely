@@ -300,6 +300,7 @@ SUBCOMMANDS = {
     'gamble': gamble_cmd,
     'send': give_cmd,
     'table': table_cmd,
+    'list': table_cmd,
     'invest': invest_cmd,
 }
 
