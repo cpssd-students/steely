@@ -2,6 +2,7 @@
 
 
 import requests
+import json
 from tinydb import TinyDB, Query
 from operator import itemgetter
 from steelybot import config
@@ -12,6 +13,7 @@ USERDB = TinyDB('lastfm.json')
 USER = Query()
 API_BASE = "http://ws.audioscrobbler.com/2.0/"
 COLLAGE_BASE = "http://www.tapmusic.net/collage.php/"
+SHORTENER_BASE = 'https://www.googleapis.com/urlshortener/v1/url'
 
 
 ## helpers ##
@@ -62,6 +64,15 @@ def make_collage(author_id, user):
     return image_path
 
 
+def shorten_url(url):
+    data = {'longUrl': url}
+    params = {'key': config.SHORTENER_API_KEY}
+    headers = {'content-type': 'application/json'}
+    response = requests.post(SHORTENER_BASE, params=params,
+        data=json.dumps(data), headers=headers)
+    return response.json()["id"]
+
+
 ## subcommands ##
 def send_collage(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     if not message_parts:
@@ -91,20 +102,24 @@ def send_list(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
 def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     user = USERDB.get(USER.fb_id == author_id)
     if message_parts:
-        lastfm = message_parts[0]
+        username = message_parts[0]
     elif user:
-        lastfm = user['lastfm']
+        username = user['lastfm']
     else:
         bot.sendMessage('include username please or use .np set',
                         thread_id=thread_id, thread_type=thread_type)
         return
-    latest_track_obj = get_np(lastfm)
+    latest_track_obj = get_np(username)
     album = latest_track_obj["album"]["#text"]
     artist = latest_track_obj["artist"]["#text"]
     track = latest_track_obj["name"]
     tags = ", ".join(get_tags(artist, track))
-    bot.sendMessage("{lastfm} is playing '{track}' by {artist} from \"{album}\"\n" \
-                    "tags: {tags}".format_map(locals()),
+    link = shorten_url(latest_track_obj["url"])
+    if "image" in latest_track_obj:
+        image = latest_track_obj["image"][2]["#text"]
+        bot.sendRemoteImage(image, thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage("{username} is playing `{track}` by {artist}\n" \
+                    "tags: {tags}\n{link}".format_map(locals()),
                     thread_id=thread_id, thread_type=thread_type)
 
 
