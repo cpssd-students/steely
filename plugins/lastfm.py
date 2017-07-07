@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 import requests
 from tinydb import TinyDB, Query
 from operator import itemgetter
@@ -18,7 +19,7 @@ def get_np(user):
     params = {'method': 'user.getRecentTracks',
               'user': user,
               'api_key': config.LASTFM_API_KEY,
-              'limit': '2',
+              'limit': '1',
               'format': 'json'}
     response = requests.get(API_BASE, params=params)
     return response.json()["recenttracks"]["track"]
@@ -40,7 +41,7 @@ def get_tags(artist, track):
               'artist': artist,
               'user': 'alexkraak',
               'format': 'json'}
-    response = requests.get(base, params=params)
+    response = requests.get(API_BASE, params=params)
     for tag in response.json()['toptags']['tag'][:3]:
         tag_name = tag['name']
         if tag_name in ('seen live', ):
@@ -53,8 +54,8 @@ def make_collage(author_id, user):
               'type': '1month',
               'size': '3x3',
               'caption': 'true'}
-    image_url = requests.get(base, params=params)
-    image = image_url.content
+    image_res = requests.get(COLLAGE_BASE, params=params)
+    image = image_res.content
     image_path = '/tmp/{}.jpg'.format(author_id)
     with open(image_path, 'wb') as image_file:
         image_file.write(image)
@@ -88,15 +89,23 @@ def send_list(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
 
 
 def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
-    max_lastfm = max(len(user["lastfm"]) for user in USERDB.all())
     user = USERDB.get(USER.fb_id == author_id)
-    if user:
-        lastfm_name = user['lastfm']
-        bot.sendMessage(extract_song(lastfm_name),
-                        thread_id=thread_id, thread_type=thread_type)
+    if message_parts:
+        lastfm = message_parts[0]
+    elif user:
+        lastfm = user['lastfm']
     else:
         bot.sendMessage('include username please or use .np set',
                         thread_id=thread_id, thread_type=thread_type)
+        return
+    latest_track_obj = get_np(lastfm)[0]
+    album = latest_track_obj["album"]["#text"]
+    artist = latest_track_obj["artist"]["#text"]
+    track = latest_track_obj["name"]
+    tags = ", ".join(get_tags(artist, track))
+    bot.sendMessage("{lastfm} is playing '{track}' by {artist} from \"{album}\"\n" \
+                    "tags: {tags}".format_map(locals()),
+                    thread_id=thread_id, thread_type=thread_type)
 
 
 def set_username(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
@@ -104,8 +113,13 @@ def set_username(bot, author_id, message_parts, thread_id, thread_type, **kwargs
         bot.sendMessage('provide a username',
                 thread_id=thread_id, thread_type=thread_type)
         return
-    USERDB.insert({'fb_id': author_id, 'lastfm': message_parts[0]})
-    bot.sendMessage('good egg', thread_id=thread_id, thread_type=thread_type)
+    username = message_parts[1]
+    if not USERDB.search(USER.fb_id == author_id):
+        USERDB.insert({'fb_id': author_id, 'lastfm': username})
+        bot.sendMessage('good egg', thread_id=thread_id, thread_type=thread_type)
+    else:
+        USERDB.update({'lastfm': username}, USER.fb_id == author_id)
+        bot.sendMessage('updated egg', thread_id=thread_id, thread_type=thread_type)
 
 
 SUBCOMMANDS = {
@@ -114,7 +128,10 @@ SUBCOMMANDS = {
     'set': set_username
 }
 
+
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    subcommand, *message_parts = message.split()
-    SUBCOMMANDS.setdefault(subcommand, send_np)(bot, message_parts, author_id,
-        thread_id, thread_type)
+    message_parts = message.split()
+    if message_parts and message_parts[0] in SUBCOMMANDS:
+        SUBCOMMANDS[message_parts[0]](bot, author_id, message_parts[1:], thread_id, thread_type, **kwargs)
+    else:
+        send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs)
