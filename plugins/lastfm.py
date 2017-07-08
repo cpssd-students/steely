@@ -6,6 +6,7 @@ import json
 from tinydb import TinyDB, Query
 from operator import itemgetter
 from steelybot import config
+from contextlib import suppress
 
 
 COMMAND = '.np'
@@ -115,7 +116,7 @@ def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     track = latest_track_obj["name"]
     tags = ", ".join(get_tags(artist, track))
     link = shorten_url(latest_track_obj["url"])
-    if "image" in latest_track_obj:
+    with suppress(ValueError):
         image = latest_track_obj["image"][2]["#text"]
         bot.sendRemoteImage(image, thread_id=thread_id, thread_type=thread_type)
     is_was = "is" if "@attr" in latest_track_obj and \
