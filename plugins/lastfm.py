@@ -54,7 +54,7 @@ def get_tags(artist, track):
 
 def make_collage(author_id, user):
     params = {'user': user,
-              'type': '1month',
+              'type': '7day',
               'size': '3x3',
               'caption': 'true'}
     image_res = requests.get(COLLAGE_BASE, params=params)
