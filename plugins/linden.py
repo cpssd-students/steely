@@ -123,18 +123,24 @@ def invest_get_quote_slow_backup(ticker):
         "Ask": latest["4. close"],
     }
 
+def invest_check_valid_quote(quote):
+    return "Bid" in quote and quote["Bid"] and "Ask" in quote and quote["Ask"]
 
 def invest_get_quotes_w_cache(tickers):
     cached_quotes = []
     tics_to_get = []
     for tic in tickers:
-        if tic in QUOTE_CACHE and datetime.now() - QUOTE_CACHE[tic]['time'] < QUOTE_TTL:
-            cached_quotes.append(QUOTE_CACHE[tic])
-        else:
+        if tic not in QUOTE_CACHE:
             tics_to_get.append(tic)
+        elif datetime.now() - QUOTE_CACHE[tic]['time'] > QUOTE_TTL:
+            tics_to_get.append(tic)
+        elif not invest_check_valid_quote(QUOTE_CACHE[tic]):
+            tics_to_get.append(tic)
+        else:
+            cached_quotes.append(QUOTE_CACHE[tic])
     new_quotes = invest_get_quotes(tics_to_get)
     for quote in new_quotes:
-        if quote["Bid"] is None or quote["Ask"] is None:
+        if not invest_check_valid_quote(quote):
             quote = invest_get_quote_slow_backup(quote["Symbol"])
         QUOTE_CACHE[quote['Symbol']] = quote
         QUOTE_CACHE[quote['Symbol']]['time'] = datetime.now()
