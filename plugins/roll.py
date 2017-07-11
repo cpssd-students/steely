@@ -33,7 +33,7 @@ def parse_roll(r):
     return roll(r[0], r[1]) 
             
 def dorolls(s):
-    rolls = s[1:].split(' ')
+    rolls = s.split(' ')
     if len(rolls) > 25:
         return 'Too many rolls!'
     out = []
