@@ -7,6 +7,7 @@ import threading
 import config
 import os
 import random
+import spell
 from tinydb import TinyDB
 
 
@@ -33,6 +34,7 @@ class SteelyBot(Client):
                 self.plugins[plugin.COMMAND.lower()] = plugin
             else:
                 self.non_plugins.append(plugin)
+        spell.WORDS = (command.lstrip('.') for command in self.plugins.keys())
 
     def onEmojiChange(self, author_id, new_emoji, thread_id, thread_type, **kwargs):
         nose = '👃'
@@ -49,7 +51,8 @@ class SteelyBot(Client):
         if message in ('.list', '.help'):
             commands = ', '.join((command for command in self.plugins.keys() if command))
             user_cmds = ', '.join((command['cmd'] for command in CMD_DB))
-            self.sendMessage('available commands: {}\nuser commands: {}'.format(commands, user_cmds), thread_id=thread_id, thread_type=thread_type)
+            self.sendMessage('available commands: {}\nuser commands: {}'.format(commands, user_cmds),
+                thread_id=thread_id, thread_type=thread_type)
             return
 
         if message == '.reload':
@@ -69,7 +72,7 @@ class SteelyBot(Client):
             command, message = message.split(' ', 1)
         else:
             command, message = message, ""
-        command = command.lower()
+        command = spell.correction(command.lower())[0]
         if not command in self.plugins:
             return
         plugin = self.plugins[command]
