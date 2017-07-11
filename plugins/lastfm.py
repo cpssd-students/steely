@@ -74,6 +74,15 @@ def shorten_url(url):
     return response.json()["id"]
 
 
+def is_online(user):
+    try:
+        latest_track_obj = get_np(user)
+    except IndexError:
+        return False
+    return "@attr" in latest_track_obj and \
+        "nowplaying" in latest_track_obj["@attr"]
+
+
 ## subcommands ##
 def send_collage(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     if not message_parts:
@@ -91,10 +100,11 @@ def send_list(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     stats = []
     for user in USERDB.all():
         lastfm = user["lastfm"]
-        stats.append((lastfm, get_playcount(lastfm)))
+        stats.append((is_online(lastfm), lastfm, get_playcount(lastfm)))
     message = "```\n"
-    for lastfm, playcount in sorted(stats, key=itemgetter(1), reverse=True):
-        message += "{:<{max_lastfm}} {:>6,}\n".format(lastfm, playcount, max_lastfm=max_lastfm)
+    for online, lastfm, playcount in sorted(stats, key=itemgetter(0, 2), reverse=True):
+        online_str = " ♬"[online]
+        message += "{online_str} {lastfm:<{max_lastfm}} {playcount:>6,}\n".format_map(locals())
     message += "```"
     bot.sendMessage(message,
                     thread_id=thread_id, thread_type=thread_type)
@@ -125,7 +135,6 @@ def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
                     "tags: {tags}\n{link}".format_map(locals()),
                     thread_id=thread_id, thread_type=thread_type)
 
-
 def set_username(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     if not message_parts:
         bot.sendMessage('provide a username',
@@ -143,6 +152,7 @@ def set_username(bot, author_id, message_parts, thread_id, thread_type, **kwargs
 SUBCOMMANDS = {
     'collage': send_collage,
     'list': send_list,
+    'online': send_online,
     'set': set_username
 }
 
