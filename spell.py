@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
 
-WORDS = ('nipples', 'hello', 'okay sam')
+WORDS = []
 
 
 def correction(word):
     "most probable spelling correction for word"
-    return candidates(word)
+    return list(candidates(word))
 
 
 def candidates(word):
     "generate possible spelling corrections for word"
-    return (known([word]) or known(edits1(word)) or known(edits2(word)) or [word])
+    return known([word]) or known(edits1(word)) or known(edits2(word)) or [word]
 
 
 def known(words):

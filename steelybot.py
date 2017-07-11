@@ -34,7 +34,7 @@ class SteelyBot(Client):
                 self.plugins[plugin.COMMAND.lower()] = plugin
             else:
                 self.non_plugins.append(plugin)
-        spell.WORDS = (command.lstrip('.') for command in self.plugins.keys())
+        spell.WORDS = self.plugins.keys()
 
     def onEmojiChange(self, author_id, new_emoji, thread_id, thread_type, **kwargs):
         nose = '👃'
