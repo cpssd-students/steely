@@ -30,7 +30,7 @@ class SteelyBot(Client):
             plugin_path = os.path.join('plugins', file)
             plugin = imp.load_source(file, plugin_path)
             if plugin.COMMAND:
-                self.plugins[plugin.COMMAND] = plugin
+                self.plugins[plugin.COMMAND.lower()] = plugin
             else:
                 self.non_plugins.append(plugin)
 
@@ -69,6 +69,7 @@ class SteelyBot(Client):
             command, message = message.split(' ', 1)
         else:
             command, message = message, ""
+        command = command.lower()
         if not command in self.plugins:
             return
         plugin = self.plugins[command]
