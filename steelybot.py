@@ -25,6 +25,7 @@ class SteelyBot(Client):
     def load_plugins(self):
         self.non_plugins = []
         self.plugins = {}
+        self.plugin_helps = {}
         for file in os.listdir('plugins'):
             if file.startswith("_"):
                 continue
@@ -34,6 +35,7 @@ class SteelyBot(Client):
             plugin = imp.load_source(file, plugin_path)
             if plugin.COMMAND:
                 self.plugins[plugin.COMMAND.lower()] = plugin
+                self.plugin_helps[plugin.COMMAND.lower()] = plugin.__doc__
             else:
                 self.non_plugins.append(plugin)
         spell.WORDS = self.plugins.keys()
@@ -76,11 +78,23 @@ class SteelyBot(Client):
         if author_id == self.uid:
             return
 
-        if message in ('.list', '.help'):
-            commands = ', '.join((command for command in self.plugins.keys() if command))
-            user_cmds = ', '.join((command['cmd'] for command in CMD_DB))
-            self.sendMessage('available commands: {}\nuser commands: {}'.format(commands, user_cmds),
-                thread_id=thread_id, thread_type=thread_type)
+        message_parts = message.split()
+        if message_parts[0] in ('.list', '.help'):
+            if len(message_parts) == 1:
+                commands = ', '.join((command for command in self.plugins.keys() if command))
+                user_cmds = ', '.join((command['cmd'] for command in CMD_DB))
+                self.sendMessage('available commands: {}\nuser commands: {}'.format(commands, user_cmds),
+                    thread_id=thread_id, thread_type=thread_type)
+            else:
+                plugin = message_parts[1]
+                if not plugin.startswith("."):
+                    plugin = "." + plugin
+                if not plugin in self.plugin_helps:
+                    self.sendMessage('help not found for command "{}"'.format(plugin),
+                        thread_id=thread_id, thread_type=thread_type)
+                    return
+                self.sendMessage("```" + self.plugin_helps[plugin] + "```",
+                    thread_type=thread_type, thread_id=thread_id)
             return
 
         if message == '.reload':
@@ -102,7 +116,6 @@ class SteelyBot(Client):
         if message.isdigit():
             for number, suggestion in self.last_suggestions:
                 if number == int(message):
-                    print("sending", suggestion, self.last_message)
                     message = suggestion + " " + self.last_message
                     self.send_command(author_id, message, thread_id, thread_type, **kwargs)
                     self.last_message = ""
@@ -113,6 +126,7 @@ class SteelyBot(Client):
             return
 
         self.send_command(author_id, message, thread_id, thread_type, **kwargs)
+
 
 if __name__ == '__main__':
     client = SteelyBot(config.EMAIL, config.PASSWORD)
