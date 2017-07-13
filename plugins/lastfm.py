@@ -28,21 +28,31 @@ def get_np(user):
     return response.json()["recenttracks"]["track"][0]
 
 
-def get_playcount(user):
+def get_info(user):
     params = {'method': 'user.getInfo',
               'user': user,
               'api_key': config.LASTFM_API_KEY,
               'limit': '1',
               'format': 'json'}
     response = requests.get(API_BASE, params=params)
-    return int(response.json()["user"]["playcount"])
+    return response.json()["user"]
+
+
+def get_top(user, period):
+    params = {'method': 'user.getTopArtists',
+              'api_key': config.LASTFM_API_KEY,
+              'period': period,
+              'user': user,
+              'limit': "6",
+              'format': 'json'}
+    response = requests.get(API_BASE, params=params)
+    return response.json()["topartists"]["artist"]
 
 
 def get_tags(artist, track):
     params = {'method': 'artist.gettoptags',
               'api_key': config.LASTFM_API_KEY,
               'artist': artist,
-              'user': 'alexkraak',
               'format': 'json'}
     response = requests.get(API_BASE, params=params)
     for tag in response.json()['toptags']['tag'][:3]:
@@ -84,12 +94,33 @@ def is_online(user):
 
 
 ## subcommands ##
+def send_top(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
+    username = USERDB.get(USER.id == author_id)["username"]
+    periods = ("overall", "7day", "1month", "3month", "6month", "12month")
+    if not message_parts:
+        period = "7day"
+    elif message_parts[0] in periods:
+        period = message_parts[0]
+    else:
+        bot.sendMessage("period must be one of `{}`".format(", ".join(periods)),
+            thread_id=thread_id, thread_type=thread_type)
+        return
+    artists, string = [], "```"
+    for artist in get_top(username, period):
+        artists.append((artist["name"], int(artist["playcount"])))
+    max_artist = max(len(artist) for artist, plays in artists)
+    max_plays = max(len(str(plays)) for artists, plays in artists)
+    for artist, playcount in artists:
+        string += "\n{artist:<{max_artist}} {playcount:>{max_plays}}".format_map(locals())
+    bot.sendMessage(string + "```", thread_id=thread_id, thread_type=thread_type)
+
+
 def send_collage(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     if not message_parts:
-        user = USERDB.get(USER.id == author_id)["username"]
+        username = USERDB.get(USER.id == author_id)["username"]
     else:
-        user = message_parts[0]
-    bot.sendLocalImage(make_collage(author_id, user),
+        username = message_parts[0]
+    bot.sendLocalImage(make_collage(author_id, username),
                        message=None,
                        thread_id=thread_id,
                        thread_type=thread_type)
@@ -100,7 +131,8 @@ def send_list(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     stats = []
     for user in USERDB.all():
         username = user["username"]
-        stats.append((is_online(username), username, get_playcount(username)))
+        playcount = int(get_info(username)["playcount"])
+        stats.append((is_online(username), username, playcount))
     message = "```\n"
     for online, username, playcount in sorted(stats, key=itemgetter(0, 2), reverse=True):
         online_str = " ♬"[online]
@@ -135,6 +167,7 @@ def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
                     "tags: {tags}\n{link}".format_map(locals()),
                     thread_id=thread_id, thread_type=thread_type)
 
+
 def set_username(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     if not message_parts:
         bot.sendMessage('provide a username',
@@ -151,6 +184,7 @@ def set_username(bot, author_id, message_parts, thread_id, thread_type, **kwargs
 
 SUBCOMMANDS = {
     'collage': send_collage,
+    'top': send_top,
     'list': send_list,
     'set': set_username
 }
