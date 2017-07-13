@@ -86,7 +86,7 @@ def is_online(user):
 ## subcommands ##
 def send_collage(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     if not message_parts:
-        user = USERDB.get(USER.fb_id == author_id)["lastfm"]
+        user = USERDB.get(USER.id == author_id)["username"]
     else:
         user = message_parts[0]
     bot.sendLocalImage(make_collage(author_id, user),
@@ -96,26 +96,26 @@ def send_collage(bot, author_id, message_parts, thread_id, thread_type, **kwargs
 
 
 def send_list(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
-    max_lastfm = max(len(user["lastfm"]) for user in USERDB.all())
+    max_username = max(len(user["username"]) for user in USERDB.all())
     stats = []
     for user in USERDB.all():
-        lastfm = user["lastfm"]
-        stats.append((is_online(lastfm), lastfm, get_playcount(lastfm)))
+        username = user["username"]
+        stats.append((is_online(username), username, get_playcount(username)))
     message = "```\n"
-    for online, lastfm, playcount in sorted(stats, key=itemgetter(0, 2), reverse=True):
+    for online, username, playcount in sorted(stats, key=itemgetter(0, 2), reverse=True):
         online_str = " ♬"[online]
-        message += "{online_str} {lastfm:<{max_lastfm}} {playcount:>6,}\n".format_map(locals())
+        message += "{online_str} {username:<{max_username}} {playcount:>6,}\n".format_map(locals())
     message += "```"
     bot.sendMessage(message,
                     thread_id=thread_id, thread_type=thread_type)
 
 
 def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
-    user = USERDB.get(USER.fb_id == author_id)
+    user = USERDB.get(USER.id == author_id)
     if message_parts:
         username = message_parts[0]
     elif user:
-        username = user['lastfm']
+        username = user['username']
     else:
         bot.sendMessage('include username please or use .np set',
                         thread_id=thread_id, thread_type=thread_type)
@@ -140,19 +140,18 @@ def set_username(bot, author_id, message_parts, thread_id, thread_type, **kwargs
         bot.sendMessage('provide a username',
                 thread_id=thread_id, thread_type=thread_type)
         return
-    username = message_parts[1]
-    if not USERDB.search(USER.fb_id == author_id):
-        USERDB.insert({'fb_id': author_id, 'lastfm': username})
+    username = message_parts[0]
+    if not USERDB.search(USER.id == author_id):
+        USERDB.insert({'id': author_id, 'username': username})
         bot.sendMessage('good egg', thread_id=thread_id, thread_type=thread_type)
     else:
-        USERDB.update({'lastfm': username}, USER.fb_id == author_id)
+        USERDB.update({'username': username}, USER.id == author_id)
         bot.sendMessage('updated egg', thread_id=thread_id, thread_type=thread_type)
 
 
 SUBCOMMANDS = {
     'collage': send_collage,
     'list': send_list,
-    'online': send_online,
     'set': set_username
 }
 
