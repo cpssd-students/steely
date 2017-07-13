@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
 
+"""
+"[]" denotes an optional argument
+
+.np set user
+.np [user]
+.np collage [user]
+.np top [overall|7day|1month|3month|6month|12month]
+.np list
+"""
+
 
 import requests
 import json
