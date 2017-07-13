@@ -33,10 +33,10 @@ class SteelyBot(Client):
                 continue
             plugin_path = os.path.join('plugins', file)
             plugin = imp.load_source(file, plugin_path)
+            if plugin.__doc__:
+                self.plugin_helps[plugin.COMMAND.lower()] = plugin.__doc__
             if plugin.COMMAND:
                 self.plugins[plugin.COMMAND.lower()] = plugin
-                if plugin.__doc__:
-                    self.plugin_helps[plugin.COMMAND.lower()] = plugin.__doc__
             else:
                 self.non_plugins.append(plugin)
         spell.WORDS = self.plugins.keys()
