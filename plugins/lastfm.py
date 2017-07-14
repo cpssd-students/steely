@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
 """
-"[]" denotes an optional argument
+`[]` optional, `<>` mandatory
 
-.np set user
-.np [user]
-.np collage [user]
+.np set <username>
+.np [username]
+.np collage [username]
 .np top [overall|7day|1month|3month|6month|12month]
 .np list
 """
