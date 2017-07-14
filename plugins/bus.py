@@ -38,6 +38,9 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     except requests.exceptions.RequestException:
         bot.sendMessage("error retrieving results", thread_id=thread_id, thread_type=thread_type)
         return
+    if not arrivals:
+        bot.sendMessage("no buses found >:(", thread_id=thread_id, thread_type=thread_type)
+        return
     bot.sendMessage("\n".join(gen_reply_string(arrivals)), thread_id=thread_id, thread_type=thread_type)
 
 
