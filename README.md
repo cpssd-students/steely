@@ -15,6 +15,17 @@ $ python3 steelybot.py
 ```
 (`config.py` is in `.gitignore`)
 
+## to run tests
+```
+$ make test
+```
+or simply...
+```
+$ nosetest
+```
+
+If the tests are failing to import, you probably aren't in the virtualenv.
+
 ## credits
 |plugin|author|
 |---|---|
@@ -28,6 +39,7 @@ $ python3 steelybot.py
 |spongemock|[EdwardDowling](https://github.com/EdwardDowling)|
 |train|[izaakf](https://github.com/izaakf)|
 |urbandict|[EdwardDowling](https://github.com/EdwardDowling)|
+|exp|[Byxor](https://github.com/Byxor)|
 
 ## q&a
 

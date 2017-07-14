@@ -2,3 +2,4 @@ fbchat
 requests
 tinydb
 tabulate
+nose
