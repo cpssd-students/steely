@@ -3,7 +3,7 @@
 
 .roll rolls an arbitrary amount of dice and outputs the result
 
-For example:
+for example:
 .roll 2d20 d20 1d100 ...
 '''
 import random
