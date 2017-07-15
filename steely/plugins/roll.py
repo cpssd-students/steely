@@ -21,7 +21,7 @@ def roll(n, r):
         r = int(r)
     except ValueError:
         return None
-    if n > NLIMIT or r > RLIMIT:
+    if n > NLIMIT or r > RLIMIT or r == 0 or n == 0:
         return None
     s = ' '.join([str(random.randint(1, r)) for i in range(0, n)])
     return '{:<7}| {}'.format(str(n) + 'd' + str(r), s)
