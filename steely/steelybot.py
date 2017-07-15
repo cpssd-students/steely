@@ -14,7 +14,6 @@ from tinydb import TinyDB
 
 
 CMD_DB = TinyDB('quote.json')
-
 HELP_DOC = '''help <command>
 
 help syntax:
@@ -23,6 +22,7 @@ mandatory arguments: <arg name>
 literal arguments: `this|yesterday|tomorrow`
 
 literal commands can be mandatory or optional'''
+
 
 class SteelyBot(Client):
 
