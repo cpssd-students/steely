@@ -18,6 +18,7 @@ invest in the stock market:
 .linden invest list
 '''
 
+
 from tinydb import TinyDB, Query, where
 from tinydb.operations import increment
 from datetime import datetime, timedelta

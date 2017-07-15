@@ -2,6 +2,7 @@
 
 
 from fbchat import log, Client
+from vapor import vapor
 import imp
 import threading
 import config
@@ -13,7 +14,6 @@ from tinydb import TinyDB
 
 
 CMD_DB = TinyDB('quote.json')
-
 HELP_DOC = '''help <command>
 
 help syntax:
@@ -22,6 +22,7 @@ mandatory arguments: <arg name>
 literal arguments: `this|yesterday|tomorrow`
 
 literal commands can be mandatory or optional'''
+
 
 class SteelyBot(Client):
 
@@ -81,6 +82,13 @@ class SteelyBot(Client):
         nose = '👃'
         if new_emoji != nose:
             self.changeThreadEmoji(nose, thread_id=thread_id)
+
+    def onNicknameChange(self, mid, author_id, changed_for, new_nickname, thread_id, thread_type, ts, metadata, msg):
+        self.changeNickname(vapor(new_nickname), user_id=changed_for, thread_id=thread_id, thread_type=thread_type)
+
+    def onFriendRequest(self, from_id, msg):
+        print("OKAY SM")
+        self.friendConnect(from_id)
 
     def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
         self.markAsDelivered(author_id, thread_id)

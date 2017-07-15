@@ -6,11 +6,14 @@
 They can be accessed via ~<command_name>, and will output what you put in.
 '''
 
+
 from tinydb import TinyDB, Query
+
 
 COMMAND = '.define'
 CMD_DB = TinyDB('quote.json')
 CMD = Query()
+
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message_split = message.split()

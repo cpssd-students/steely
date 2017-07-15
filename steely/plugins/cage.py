@@ -1,5 +1,6 @@
 '''our one true god'''
 
+
 import random
 
 

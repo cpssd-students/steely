@@ -1,4 +1,6 @@
 '''predict the future with mersenne twister'''
+
+
 import random
 
 
