@@ -43,7 +43,7 @@ class SteelyBot(Client):
             plugin_path = os.path.join('plugins', file)
             plugin = imp.load_source(file, plugin_path)
             if plugin.__doc__:
-                self.plugin_helps[plugin.COMMAND.lower()] = plugin.__doc__
+                self.plugin_helps[plugin.COMMAND.lower()] = plugin.__doc__.strip('\n')
             if plugin.COMMAND:
                 self.plugins[plugin.COMMAND.lower()] = plugin
             else:
@@ -111,7 +111,7 @@ class SteelyBot(Client):
                         thread_id=thread_id, thread_type=thread_type)
                     return
 
-                self.sendMessage("```\n" + string.strip(self.plugin_helps[plugin], '\n') + "\n```",
+                self.sendMessage("```\n" + self.plugin_helps[plugin] + "\n```",
                     thread_type=thread_type, thread_id=thread_id)
             return
 
