@@ -1,3 +1,8 @@
+'''
+.exp <url>
+
+expand dat url
+'''
 from urllib.request import Request, urlopen
 import json
 
@@ -31,4 +36,3 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         send(expand(short_url))
     else:
         send(NO_URL_MESSAGE)
-

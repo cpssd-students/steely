@@ -26,6 +26,13 @@ $ nosetest
 
 If the tests are failing to import, you probably aren't in the virtualenv.
 
+## how to write help for you commands
+
+Throw a doc string in the top of the plugin.
+
+If it's short just make it one line but if its `thicc` and has subcommands check
+steely/plugins/linden for an example.
+
 ## credits
 |plugin|author|
 |---|---|
@@ -40,6 +47,7 @@ If the tests are failing to import, you probably aren't in the virtualenv.
 |train|[izaakf](https://github.com/izaakf)|
 |urbandict|[EdwardDowling](https://github.com/EdwardDowling)|
 |exp|[Byxor](https://github.com/Byxor)|
+|roll|[devoxel](https://github.com/devoxel)|
 
 ## q&a
 

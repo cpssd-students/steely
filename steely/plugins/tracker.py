@@ -1,4 +1,6 @@
 '''
+.tracker outputs tracker status
+
 .tracker <tracker>
 .tracker list
 '''

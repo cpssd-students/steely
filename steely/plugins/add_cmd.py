@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+'''
+.define <command_name> <some text ...>
+
+.define allows you to add commands which contain an arbitrary text.
+They can be accessed via ~<command_name>, and will output what you put in.
+'''
 
 from tinydb import TinyDB, Query
 
@@ -26,4 +32,3 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         bot.sendMessage('please use in form .define <command_name> <command text>',
                         thread_id=thread_id, thread_type=thread_type)
         return
-

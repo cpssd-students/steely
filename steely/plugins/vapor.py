@@ -1,3 +1,4 @@
+'''gives the previous command ａｅｓｔｈｅｔｉｃ'''
 COMMAND = '.vapor'
 
 

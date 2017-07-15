@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+'''ur nosey'''
 
 import random
 

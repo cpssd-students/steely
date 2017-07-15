@@ -14,6 +14,12 @@ from tinydb import TinyDB
 
 CMD_DB = TinyDB('quote.json')
 
+HELP_DOC = """
+help <command>
+
+help syntax:
+[optional arguments] <mandatory arguments> `literal|arguments`
+"""
 
 class SteelyBot(Client):
 
@@ -25,7 +31,9 @@ class SteelyBot(Client):
     def load_plugins(self):
         self.non_plugins = []
         self.plugins = {}
-        self.plugin_helps = {}
+        self.plugin_helps = {
+            'help': HELP_DOC
+        }
         for file in os.listdir('plugins'):
             if file.startswith("_"):
                 continue

@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
+'''
+.dbus <stop id>
 
+list dublin bus times for a given stop id
+'''
 import json
 import requests
 
