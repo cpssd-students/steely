@@ -13,22 +13,15 @@ def expand(url):
     return expanded_url
 
 
-# --- Bot-related knowledge ----------------
-
-
 COMMAND = '.exp'
-
 NO_URL_MESSAGE = "Input Error: You didn't provide a URL..."
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-
     def send(text):
         bot.sendMessage(text, thread_id=thread_id, thread_type=thread_type)
-
     if message:
         short_url = message
         send(expand(short_url))
     else:
         send(NO_URL_MESSAGE)
-
