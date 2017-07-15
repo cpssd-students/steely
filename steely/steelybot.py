@@ -32,7 +32,7 @@ class SteelyBot(Client):
         self.non_plugins = []
         self.plugins = {}
         self.plugin_helps = {
-            'help': HELP_DOC
+            '.help': HELP_DOC
         }
         for file in os.listdir('plugins'):
             if file.startswith("_"):
