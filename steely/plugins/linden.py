@@ -238,6 +238,7 @@ def invest_list_cmd(user_id, args):
         return "User does not exist, poke Senan"
     user = USERDB.get(USER.id == user_id)
     out = "```\n{}: {:.2f}L$ Cash\n\n".format(user['first_name'], user['lindens'])
+    total_assets = float(user['lindens'])
     tics = list(user['investments'])
     quotes = invest_get_quotes_w_cache(tics)
     total_profit = 0
@@ -252,12 +253,14 @@ def invest_list_cmd(user_id, args):
             return "The following stock broke: " + holding['symbol']
 
         bid = float(quote['Bid'])
+        total_assets += quant * bid
 
         table.append([quote['Symbol'], quant, quant * bid,
             100 * ((quant * bid) - orig_value) / orig_value])
         total_profit += (quant * bid) - orig_value
     out += tabulate.tabulate(table, headers=("ticker", "quant", "value", "% profit"), tablefmt="plain", floatfmt=".4f")
-    out += "\nCurrent Profit: {:.2f}L$```".format(total_profit)
+    out += "\nCurrent Profit: {:.2f}L$".format(total_profit)
+    out += "\nTotal Assets: {:.2f}L$\n```".format(total_assets)
     return out
 
 
