@@ -14,7 +14,7 @@ list the current lindens:
 .linden table
 
 invest in the stock market:
-.linden invest `buy|sell|quote|list` <nasdaq stock>
+.linden invest <`buy|sell|quote|list`> <nasdaq stock>
 .linden invest list
 '''
 

@@ -7,7 +7,7 @@ set your username:
 
 check whats your listening to:
 .np [username]
-.np top [overall|7day|1month|3month|6month|12month]
+.np top [`overall|7day|1month|3month|6month|12month`]
 
 make a collage:
 .np collage [username]
