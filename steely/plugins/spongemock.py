@@ -1,3 +1,4 @@
+'''.mock mocks the previous command'''
 import random
 
 

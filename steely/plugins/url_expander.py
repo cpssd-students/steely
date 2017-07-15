@@ -1,3 +1,8 @@
+'''
+.exp <url>
+
+expand dat url
+'''
 from urllib.request import Request, urlopen
 import json
 

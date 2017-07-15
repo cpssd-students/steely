@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+'''
+.train <train station>
+
+get irish rail train state times
+'''
 
 import requests
 import re
@@ -51,4 +56,3 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
 if __name__ == "__main__":
     times = list(get_train_times("bayside"))
     print("\n".join(gen_reply_string(times)))
-

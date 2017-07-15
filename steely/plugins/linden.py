@@ -1,5 +1,22 @@
 #!/usr/bin/env python3
+'''
+linden gives the plebians currency.
 
+give lindens to people:
+.linden give <user> <amount>
+.linden send <user> <amount>
+
+gamble:
+.linden gamble <number between 1 and 3>
+
+list the current lindens:
+.linden list
+.linden table
+
+invest in the stock market:
+.linden invest <`buy|sell|quote|list`> <nasdaq stock>
+.linden invest list
+'''
 
 from tinydb import TinyDB, Query, where
 from tinydb.operations import increment

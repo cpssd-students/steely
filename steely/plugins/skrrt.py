@@ -1,3 +1,4 @@
+'''.skrrt ey'''
 from random import randint
 
 

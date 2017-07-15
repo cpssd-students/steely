@@ -1,7 +1,10 @@
-import vapor
+'''gives the previous command ａｅｓｔｈｅｔｉｃ'''
 
 
 COMMAND = '.vapor'
+
+
+import vapor
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):

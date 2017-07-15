@@ -15,6 +15,14 @@ from tinydb import TinyDB
 
 CMD_DB = TinyDB('quote.json')
 
+HELP_DOC = '''help <command>
+
+help syntax:
+optinal arguments: [arg name]
+mandatory arguments: <arg name>
+literal arguments: `this|yesterday|tomorrow`
+
+literal commands can be mandatory or optional'''
 
 class SteelyBot(Client):
 
@@ -26,7 +34,9 @@ class SteelyBot(Client):
     def load_plugins(self):
         self.non_plugins = []
         self.plugins = {}
-        self.plugin_helps = {}
+        self.plugin_helps = {
+            '.help': HELP_DOC
+        }
         for file in os.listdir('plugins'):
             if file.startswith("_"):
                 continue
@@ -35,7 +45,7 @@ class SteelyBot(Client):
             plugin_path = os.path.join('plugins', file)
             plugin = imp.load_source(file, plugin_path)
             if plugin.__doc__:
-                self.plugin_helps[plugin.COMMAND.lower()] = plugin.__doc__
+                self.plugin_helps[plugin.COMMAND.lower()] = plugin.__doc__.strip('\n')
             if plugin.COMMAND:
                 self.plugins[plugin.COMMAND.lower()] = plugin
             else:
@@ -102,7 +112,8 @@ class SteelyBot(Client):
                     self.sendMessage('help not found for command "{}"'.format(plugin),
                         thread_id=thread_id, thread_type=thread_type)
                     return
-                self.sendMessage("```" + self.plugin_helps[plugin] + "```",
+
+                self.sendMessage("```\n" + self.plugin_helps[plugin] + "\n```",
                     thread_type=thread_type, thread_id=thread_id)
             return
 
