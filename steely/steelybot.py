@@ -9,7 +9,6 @@ import os
 import sys
 import random
 import spell
-import string
 from tinydb import TinyDB
 
 
@@ -43,7 +42,7 @@ class SteelyBot(Client):
             plugin_path = os.path.join('plugins', file)
             plugin = imp.load_source(file, plugin_path)
             if plugin.__doc__:
-                self.plugin_helps[plugin.COMMAND.lower()] = string.strip(plugin.__doc__, '\n')
+                self.plugin_helps[plugin.COMMAND.lower()] = plugin.__doc__.strip('\n')
             if plugin.COMMAND:
                 self.plugins[plugin.COMMAND.lower()] = plugin
             else:
