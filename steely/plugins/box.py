@@ -1,5 +1,11 @@
-import random
+'''
+.box <text>
 
+.box will generate a cool lookin 3d box using the text.
+the text must be between 6 and 19 characters.
+'''
+
+import random
 
 COMMAND = '.box'
 

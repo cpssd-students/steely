@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
-
 """
-`[]` optional, `<>` mandatory
+np does last fm stuff
 
+set your username:
 .np set <username>
+
+check whats your listening to:
 .np [username]
-.np collage [username]
 .np top [overall|7day|1month|3month|6month|12month]
+
+make a collage:
+.np collage [username]
+
+scrobbles:
 .np list
 """
 

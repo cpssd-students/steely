@@ -1,3 +1,4 @@
+'''yer the joke'''
 import requests
 from steelybot import config
 

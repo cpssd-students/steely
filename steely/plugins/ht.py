@@ -1,3 +1,4 @@
+'''heads or tails'''
 import random
 
 
