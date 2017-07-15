@@ -1,16 +1,21 @@
-"""
-Example:
+'''
+.roll <dice_string> ...
 
+.roll rolls an arbitrary amount of dice and outputs the result
+
+For example:
 .roll 2d20 d20 1d100 ...
-"""
+'''
 import random
+import re
 
+REPATTERN = re.compile('[\ \W]+')
 COMMAND = '.roll'
-NLIMIT, RLIMIT = 999, 999
+NLIMIT, RLIMIT = 30, 10000
 
 
 def roll(n, r):
-    """Returns a formatted string of n roll results between 1 and r"""
+    '''Returns a formatted string of n roll results between 1 and r'''
     try:
         n = int(n)
         r = int(r)
@@ -22,7 +27,7 @@ def roll(n, r):
     return '{:<7}| {}'.format(str(n) + 'd' + str(r), s)
 
 def parse_roll(r):
-    """Take a string that should look like: NdR and parse it"""
+    '''Take a string that should look like: NdR and parse it'''
     r = r.split('d')
     if len(r) > 2:
         return None
@@ -33,9 +38,7 @@ def parse_roll(r):
     return roll(r[0], r[1])
 
 def dorolls(s):
-    rolls = s.split(' ')
-    if len(rolls) > 25:
-        return 'Too many rolls!'
+    rolls = REPATTERN.sub('', s).split(' ')[:NLIMIT]
     out = []
     for r in rolls:
         o = parse_roll(r)
@@ -43,10 +46,7 @@ def dorolls(s):
             out.append(o)
     if len(out) == 0:
         return 'No valid rolls scrub'
-    return "```" + '\n'.join(out) + "```"
+    return '```\n' + '\n'.join(out) + '\n```'
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     bot.sendMessage(dorolls(message), thread_id=thread_id, thread_type=thread_type)
-
-if __name__ == '__main__':
-	print(dorolls('4d20 10d100 1d6 2d8'))
