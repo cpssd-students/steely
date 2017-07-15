@@ -110,7 +110,8 @@ class SteelyBot(Client):
                     self.sendMessage('help not found for command "{}"'.format(plugin),
                         thread_id=thread_id, thread_type=thread_type)
                     return
-                self.sendMessage("```" + self.plugin_helps[plugin] + "```",
+
+                self.sendMessage("```\n" + string.strip(self.plugin_helps[plugin], '\n') + "\n```",
                     thread_type=thread_type, thread_id=thread_id)
             return
 
