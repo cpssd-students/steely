@@ -3,7 +3,10 @@
 
 slags a person in the chat
 '''
-# i think some of these maybe are a bit too harsh.
+
+
+import random
+
 
 COMMAND='.slag'
 REPLIES = (
@@ -32,8 +35,8 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     # NOTE: could validate name. easier if i dont tho lol
     name = message.strip()
     if not name:
-        bot.sendMessage("cant even type a command correctly jfc", 
+        bot.sendMessage("cant even type a command correctly jfc",
             thread_id=thread_id, thread_type=thread_type)
         return
-    bot.sendMessage(random.choice(REPLIES).format(name), 
+    bot.sendMessage(random.choice(REPLIES).format(name),
         thread_id=thread_id, thread_type=thread_type)
