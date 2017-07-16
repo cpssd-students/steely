@@ -5,7 +5,7 @@ slags a person in the chat
 '''
 # i think some of these maybe are a bit too harsh.
 
-COMMAND='slag'
+COMMAND='.slag'
 REPLIES = (
     "{} smells like a baby prostitute",
     "{}, you whore",
@@ -27,10 +27,13 @@ REPLIES = (
     "{} you are a fucking overdeveloped cumshot. GET OUT OF MY SIGHT.",
 )
 
+
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     # NOTE: could validate name. easier if i dont tho lol
-    u = message.strip()
-    if not u:
-        bot.sendMessage("cant even type a command correctly jfc", thread_id=thread_id, thread_type=thread_type)
+    name = message.strip()
+    if not name:
+        bot.sendMessage("cant even type a command correctly jfc", 
+            thread_id=thread_id, thread_type=thread_type)
         return
-    bot.sendMessage(random.choice(REPLIES).format(), thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(random.choice(REPLIES).format(name), 
+        thread_id=thread_id, thread_type=thread_type)
