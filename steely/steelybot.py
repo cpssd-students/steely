@@ -58,7 +58,7 @@ class SteelyBot(Client):
             command, message = message.split(' ', 1)
         else:
             command, message = message, ""
-        command = command.lower()
+        command = command.lower().strip()
         if not command in self.plugins:
             suggestions = list(enumerate(spell.correction(command)))
             if not suggestions:
