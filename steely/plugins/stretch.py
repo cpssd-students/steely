@@ -10,6 +10,8 @@ STRETCH_FACTOR = 5
 def stretch(message):
     if not message:
         return ""
+    if len(message) > 300:
+        return "Too long you spammy fuck"
     out = ""
     count = 1
     for c in message:
