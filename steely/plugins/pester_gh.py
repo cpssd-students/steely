@@ -17,12 +17,12 @@ def handle_last():
                                              commits[0]['commit']['author']['name'])
 
 SUBCOMMANDS = {
-    '': handle_prs,
     'prs': handle_prs,
     'last': handle_last,
 }
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
+    message = message or 'prs'
     output = "Valid commands: " + ', '.join(SUBCOMMANDS)
     if message in SUBCOMMANDS:
         output = SUBCOMMANDS[message]()
