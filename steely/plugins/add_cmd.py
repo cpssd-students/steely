@@ -37,9 +37,6 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if len(command) > LIMIT:
         bot.sendMessage("that's too long dickhead", thread_id=thread_id, thread_type=thread_type)
         return
-    if not len(text) >= 2:
-        bot.sendMessage(ANGRY_STRING, thread_id=thread_id, thread_type=thread_type)
-        return
     search = CMD_DB.get(CMD.cmd == command)
     if search == None:
         CMD_DB.insert({"cmd": command, "text": text})
