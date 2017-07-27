@@ -2,6 +2,7 @@
 
 '''
 .define [`code`] <command_name> <some text ...>
+.define list
 
 .define allows you to add commands which contains text.
 They can be accessed via ~<command_name>, and will output what you put in.
@@ -21,6 +22,10 @@ ANGRY_STRING = 'please use in form .define <command_name> <command text>'
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
+    if message == 'list':
+        user_cmds = ', '.join((command['cmd'] for command in CMD_DB))
+        bot.sendMessage(user_cmds, thread_id=thread_id, thread_type=thread_type)
+        return
     if not ' ' in message:
         bot.sendMessage(ANGRY_STRING, thread_id=thread_id, thread_type=thread_type)
         return
