@@ -18,55 +18,80 @@ scrobbles:
 
 
 import requests
+from requests_futures.sessions import FuturesSession
 import json
 from tinydb import TinyDB, Query
 from operator import itemgetter
-from steelybot import config
+# from steelybot import config
 from contextlib import suppress
 
 
 COMMAND = '.np'
 USERDB = TinyDB('lastfm.json')
 USER = Query()
+SESSION = FuturesSession(max_workers=50)
 API_BASE = "http://ws.audioscrobbler.com/2.0/"
 COLLAGE_BASE = "http://www.tapmusic.net/collage.php/"
 SHORTENER_BASE = 'https://www.googleapis.com/urlshortener/v1/url'
 
 
 ## helpers ##
-def get_np(user):
-    params = {'method': 'user.getRecentTracks',
-              'user': user,
+def get_lastfm_asyncrequest(method, **kwargs):
+    params = {'method': method,
               'api_key': config.LASTFM_API_KEY,
-              'limit': '1',
               'format': 'json'}
-    response = requests.get(API_BASE, params=params)
-    return response.json()["recenttracks"]["track"][0]
+    params.update(kwargs)
+    return SESSION.get(API_BASE, params=params)
 
 
-def get_info(user):
-    params = {'method': 'user.getInfo',
-              'user': user,
+def get_lastfm_request(method, **kwargs):
+    params = {'method': method,
               'api_key': config.LASTFM_API_KEY,
-              'limit': '1',
               'format': 'json'}
-    response = requests.get(API_BASE, params=params)
-    return response.json()["user"]
+    params.update(kwargs)
+    return requests.get(API_BASE, params=params)
 
 
-def get_top(user, period):
-    params = {'method': 'user.getTopArtists',
-              'api_key': config.LASTFM_API_KEY,
-              'period': period,
-              'user': user,
-              'limit': "6",
-              'format': 'json'}
-    response = requests.get(API_BASE, params=params)
-    return response.json()["topartists"]["artist"]
+def get_online_user_requests():
+    requests = []
+    for user in USERDB.all():
+        username = user["username"]
+        requests.append(get_lastfm_asyncrequest("user.getRecentTracks",
+            user=username, limit=1))
+    return requests
+
+    # online = {}
+    # for waiting_response in responses:
+    #     response = waiting_response.result()
+    #     username = response.json()["recenttracks"]["@attr"]["user"]
+    #     try:
+    #         latest_track_obj = response.json()["recenttracks"]["track"][0]
+    #     except IndexError:
+    #         online[username] = False
+    #     else:
+    #         online[username] = "@attr" in latest_track_obj and \
+    #             "nowplaying" in latest_track_obj["@attr"]
+    # return online
+
+
+def get_user_playcounts_requests():
+    requests = []
+    for user in USERDB.all():
+        username = user["username"]
+        requests.append(get_lastfm_asyncrequest("user.getInfo",
+            user=username, limit=1))
+    return requests
+    # playcounts = {}
+    # for response in responses:
+    #     response_obj = response.json()
+    #     username = response_obj["user"]["name"]
+    #     playcount = int(response_obj["user"]["playcount"])
+    #     playcounts[username] = playcount
+    # return playcounts
 
 
 def get_tags(artist, track):
-    params = {'method': 'artist.gettoptags',
+    params = {'method': 'artist.getTopTags',
               'api_key': config.LASTFM_API_KEY,
               'artist': artist,
               'format': 'json'}
@@ -78,7 +103,7 @@ def get_tags(artist, track):
         yield tag_name.lower()
 
 
-def make_collage(author_id, user):
+def get_collage(author_id, user):
     params = {'user': user,
               'type': '7day',
               'size': '3x3',
@@ -91,22 +116,13 @@ def make_collage(author_id, user):
     return image_path
 
 
-def shorten_url(url):
+def get_short_url(url):
     data = {'longUrl': url}
     params = {'key': config.SHORTENER_API_KEY}
     headers = {'content-type': 'application/json'}
     response = requests.post(SHORTENER_BASE, params=params,
         data=json.dumps(data), headers=headers)
     return response.json()["id"]
-
-
-def is_online(user):
-    try:
-        latest_track_obj = get_np(user)
-    except IndexError:
-        return False
-    return "@attr" in latest_track_obj and \
-        "nowplaying" in latest_track_obj["@attr"]
 
 
 ## subcommands ##
@@ -136,26 +152,25 @@ def send_collage(bot, author_id, message_parts, thread_id, thread_type, **kwargs
         username = USERDB.get(USER.id == author_id)["username"]
     else:
         username = message_parts[0]
-    bot.sendLocalImage(make_collage(author_id, username),
+    bot.sendLocalImage(get_collage(author_id, username),
                        message=None,
                        thread_id=thread_id,
                        thread_type=thread_type)
 
 
 def send_list(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
-    max_username = max(len(user["username"]) for user in USERDB.all())
-    stats = []
-    for user in USERDB.all():
-        username = user["username"]
-        playcount = int(get_info(username)["playcount"])
-        stats.append((is_online(username), username, playcount))
+    usernames = [user["username"] for user in USERDB.all()]
+    max_username = max(len(username) for username in usernames)
+    online_users = get_online_users()
+    user_playcounts = get_user_playcounts()
+    stats = [(online_users[username], username, user_playcounts[username]) \
+            for username in usernames]
     message = "```\n"
     for online, username, playcount in sorted(stats, key=itemgetter(0, 2), reverse=True):
         online_str = " ♬"[online]
         message += "{online_str} {username:<{max_username}} {playcount:>6,}\n".format_map(locals())
     message += "```"
-    bot.sendMessage(message,
-                    thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
 
 
 def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
@@ -168,15 +183,16 @@ def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
         bot.sendMessage('include username please or use .np set',
                         thread_id=thread_id, thread_type=thread_type)
         return
-    latest_track_obj = get_np(username)
+    latest_track_obj = get_lastfm_request("user.getRecentTracks",
+        user=username, limit=1).json()["recenttracks"]["track"][0]
     album = latest_track_obj["album"]["#text"]
     artist = latest_track_obj["artist"]["#text"]
     track = latest_track_obj["name"]
     tags = ", ".join(get_tags(artist, track))
-    link = shorten_url(latest_track_obj["url"])
-    with suppress(ValueError):
-        image = latest_track_obj["image"][2]["#text"]
-        bot.sendRemoteImage(image, thread_id=thread_id, thread_type=thread_type)
+    link = get_short_url(latest_track_obj["url"])
+    # with suppress(ValueError):
+    #     image = latest_track_obj["image"][2]["#text"]
+    #     bot.sendRemoteImage(image, thread_id=thread_id, thread_type=thread_type)
     is_was = "is" if "@attr" in latest_track_obj and \
         "nowplaying" in latest_track_obj["@attr"] else "was"
     bot.sendMessage("{username} {is_was} playing `{track}` by {artist}\n" \
@@ -212,3 +228,15 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         SUBCOMMANDS[message_parts[0]](bot, author_id, message_parts[1:], thread_id, thread_type, **kwargs)
     else:
         send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs)
+
+
+if __name__ == "__main__":
+    class Config:
+        PASSWORD = 'ahdernowshimalrightnkdernow'
+        EMAIL = 'notsteelybot@protonmail.com'
+        LASTFM_API_KEY = '133c81be62e455d32fad36be8e111270'
+        SHORTENER_API_KEY = 'AIzaSyC5f4VmqA4ln1794Lj9rDC2G3PwhyaAyvY'
+        JOKES_API_KEY = ''
+    config = Config()
+    print(get_online_user_requests())
+    print(get_user_playcounts_requests())
