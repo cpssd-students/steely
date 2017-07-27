@@ -20,7 +20,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         bot.sendMessage(", ".join(TRACKERS),
                         thread_id=thread_id, thread_type=thread_type)
         return
-    if not message:
+    if not message in TRACKERS:
         bot.sendMessage("please provide one of " + ", ".join(TRACKERS),
                         thread_id=thread_id, thread_type=thread_type)
         return
