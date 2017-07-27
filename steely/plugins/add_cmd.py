@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/us}r/bin/env python3
+
 '''
 .define [`code`] <command_name> <some text ...>
 
@@ -15,33 +16,36 @@ from tinydb import TinyDB, Query
 COMMAND = '.define'
 CMD_DB = TinyDB('quote.json')
 CMD = Query()
-# if u guess the correct expression used to generate LIMIT
-# i will give u a biscuit
-LIMIT = 8234
+LIMIT = 20
+ANGRY_STRING = 'please use in form .define <command_name> <command text>'
+
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    if len(message) > LIMIT:
-        bot.sendMessage('thats too long dickhead', thread_id=thread_id, thread_type=thread_type)
-    message_split = message.split()
-    if message_split[0] == 'code' and len(message_split) >= 3:
-        # this might seem hacky, but you're wrong
-        # adding a single ``` works because facebook is weird
-        message_split = message_split[1] + ['```\n'] + message_split[2:] 
-    search = CMD_DB.get(CMD.cmd == '~' + message_split[0])
-    if len(message_split) >= 2:
-        if search == None:
-            CMD_DB.insert({"cmd": '~' + message_split[0],
-                           "text": " ".join(message_split[1:])})
-            bot.sendMessage('Your command can be run with ~' + message_split[0],
-                            thread_id=thread_id, thread_type=thread_type)
-            return
-        else:
-            CMD_DB.update({"text": " ".join(message_split[1:])}, CMD.cmd == '~' + message_split[0])
-            bot.sendMessage('Your command ~{} has been updated'.format(message_split[0]),
-                            thread_id=thread_id, thread_type=thread_type)
-            return
-
-    else:
-        bot.sendMessage('please use in form .define <command_name> <command text>',
-                        thread_id=thread_id, thread_type=thread_type)
+    if not ' ' in message:
+        bot.sendMessage(ANGRY_STRING, thread_id=thread_id, thread_type=thread_type)
         return
+    command, text = message.split(' ', 1)
+    if command == 'code':
+        if ' ' in text:
+            command, text = text.split(' ', 1)
+            text = f'```\n{text}\n```'
+        else:
+            bot.sendMessage(ANGRY_STRING, thread_id=thread_id, thread_type=thread_type)
+            return
+    if not command.startswith('~'):
+        command = f'~{command}'
+    if len(command) > LIMIT:
+        bot.sendMessage("that's too long dickhead", thread_id=thread_id, thread_type=thread_type)
+        return
+    if not len(text) >= 2:
+        bot.sendMessage(ANGRY_STRING, thread_id=thread_id, thread_type=thread_type)
+        return
+    search = CMD_DB.get(CMD.cmd == command)
+    if search == None:
+        CMD_DB.insert({"cmd": command, "text": text})
+        bot.sendMessage(f'Your command can be run with {command}',
+            thread_id=thread_id, thread_type=thread_type)
+    else:
+        CMD_DB.update({"text": text}, CMD.cmd == command)
+        bot.sendMessage(f'Your command {command} has been updated',
+            thread_id=thread_id, thread_type=thread_type)
