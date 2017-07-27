@@ -101,8 +101,7 @@ class SteelyBot(Client):
         if message_parts[0] in ('.list', '.help'):
             if len(message_parts) == 1:
                 commands = ', '.join((command for command in self.plugins.keys() if command))
-                user_cmds = ', '.join((command['cmd'] for command in CMD_DB))
-                self.sendMessage('available commands: {}\nuser commands: {}'.format(commands, user_cmds),
+                self.sendMessage(f'available commands: {commands}',
                     thread_id=thread_id, thread_type=thread_type)
             else:
                 plugin = message_parts[1]
