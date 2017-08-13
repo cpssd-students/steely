@@ -33,10 +33,8 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     source_code = message
     try:
         result = limp.evaluate(source_code)
-    except SyntaxError as e:
-        sendError(e)
-    except NameError as e:
+    except (SyntaxError, NameError) as e:
         sendError(e)
     except Exception as e:
         send("Something unexpected happened: {}".format(e))
-        send("Please inform Brandon, thanks")
+        send("Please inform Brandon, thanks.")
