@@ -1,18 +1,19 @@
 '''
 Evaluate limp, a lisp-flavoured language.
 
-Usage: .limp <source_code> 
+Usage: .limp <source_code>
 
-### Example 1###
+# example 1
 UncleBob: ".limp (+ 2 3)"
 Chat Bot: "5"
 
-### Example 2###
+# example 2
 UncleBob: ".limp (// 100 (- 5 2))"
 Chat Bot: "33"
 
 For more information on how to write limp code, see https://www.github.com/byxor/limp
-Perhaps you feel like contributing to the language! I welcome anything (relevant) that has been fully covered by automatic tests and doesn't limit the architecture.
+Perhaps you feel like contributing to the language!
+I welcome anything (relevant) that has been fully covered by automatic tests and doesn't limit the architecture.
 '''
 
 
@@ -22,16 +23,15 @@ import limp
 COMMAND = '.limp'
 
 
-def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-
+def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
     def send(text):
         bot.sendMessage(text, thread_id=thread_id, thread_type=thread_type)
 
-    source_code = message
     try:
         result = limp.evaluate(source_code)
-    except (SyntaxError, NameError) as e:
-        send("Sorry, you have an error: {}".format(error))
-    except Exception as e:
-        send("Something unexpected happened: {}".format(e))
-        send("Please inform Brandon, thanks.")
+        send(result)
+    except (SyntaxError, NameError) as error:
+        send(f'you have an error: {error}')
+    except Exception as error:
+        send(f'something unexpected happened: {error}')
+        send('please inform Brandon')
