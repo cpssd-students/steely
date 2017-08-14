@@ -8,48 +8,64 @@ list dublin bus times for a given stop id
 
 import json
 import requests
+from collections import namedtuple
+import operator
 
 
 COMMAND = '.dbus'
-BASE_URL = "http://data.dublinked.ie/cgi-bin/rtpi/"
+BASE_URL = "http://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation"
+COLUMNS =  ('route', 'destination', 'duetime')
 
 
 def next_bus_realtime(stop_id):
-    url = BASE_URL + "realtimebusinformation?stopid={}&format=json".format(stop_id)
-    response = requests.get(url).json()
-    done_routes = []
+    params = {
+        'stopid': stop_id,
+        'format': 'json',
+    }
+    response = requests.get(BASE_URL, params=params).json()
     for arrival in response['results']:
-        if arrival["route"] in done_routes:
-            continue
-        yield arrival["route"], arrival["duetime"], arrival["destination"]
-        done_routes.append(arrival["route"])
+        yield arrival
+
+
+def arrival_sort(arrival):
+    if arrival['duetime'] == 'Due':
+        return 0
+    sort_column = COLUMNS[-1]
+    return int(arrival[sort_column])
 
 
 def gen_reply_string(arrivals):
-    max_route = max(len(arrival[0]) for arrival in arrivals)
-    max_duetime = max(len(arrival[1]) for arrival in arrivals)
-    max_dest = max(len(arrival[2]) for arrival in arrivals)
+    arrivals = list(arrivals)
+    def max_string(column):
+        return max(len(str(arrival[column])) for arrival in arrivals)
+    max_route, max_dest, max_duetime = map(max_string, COLUMNS)
     yield "```"
-    for route, duetime, destination in arrivals:
-        yield '{route:<{max_route}} {destination:<{max_dest}} {duetime:>{max_duetime}}min'.format_map(locals())
+    for arrival in sorted(arrivals, key=arrival_sort):
+        due_suffix, extra_due_padding = 'min', 0
+        if not arrival['duetime'].isdigit():
+            due_suffix = ''
+            extra_due_padding = 3
+            arrival['duetime'] = 'due'
+        yield f'{arrival["route"]:<{max_route}} ' + \
+              f'{arrival["destination"]:<{max_dest}} ' + \
+              f'{arrival["duetime"]:>{max_duetime + extra_due_padding}}{due_suffix}'
     yield "```"
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
+    def send_message(message):
+        bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
     if not message:
-        bot.sendMessage("please include a stop number", thread_id=thread_id, thread_type=thread_type)
+        send_message("please include a stop number")
         return
-    try:
-        arrivals = list(next_bus_realtime(message))
-    except requests.exceptions.RequestException:
-        bot.sendMessage("error retrieving results", thread_id=thread_id, thread_type=thread_type)
-        return
+    arrivals = next_bus_realtime(message)
     if not arrivals:
-        bot.sendMessage("no buses found >:(", thread_id=thread_id, thread_type=thread_type)
+        send_message("no buses found >:(")
         return
-    bot.sendMessage("\n".join(gen_reply_string(arrivals)), thread_id=thread_id, thread_type=thread_type)
+    send_message("\n".join(gen_reply_string(arrivals)))
 
 
 if __name__ == "__main__":
-    arrivals = list(next_bus_realtime("37"))
-    print("\n".join(gen_reply_string(arrivals)))
+    # print("\n".join(gen_reply_string(next_bus_realtime(37))))
+    print("\n".join(gen_reply_string(next_bus_realtime(1995))))
+    # print("\n".join(gen_reply_string(next_bus_realtime(91))))
