@@ -27,14 +27,11 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     def send(text):
         bot.sendMessage(text, thread_id=thread_id, thread_type=thread_type)
 
-    def sendError(error):
-        send("Sorry, you have an error: {}".format(error))
-        
     source_code = message
     try:
         result = limp.evaluate(source_code)
     except (SyntaxError, NameError) as e:
-        sendError(e)
+        send("Sorry, you have an error: {}".format(error))
     except Exception as e:
         send("Something unexpected happened: {}".format(e))
         send("Please inform Brandon, thanks.")
