@@ -6,10 +6,11 @@ list dublin bus times for a given stop id
 '''
 
 
-import json
-import requests
 from collections import namedtuple
+import json
 import operator
+import re
+import requests
 
 
 COMMAND = '.dbus'
@@ -24,14 +25,25 @@ def next_bus_realtime(stop_id):
     }
     response = requests.get(BASE_URL, params=params).json()
     for arrival in response['results']:
-        yield arrival
+        yield sanitized(arrival)
 
 
 def arrival_sort(arrival):
-    if arrival['duetime'] == 'Due':
+    if arrival['duetime'] == 'due':
         return 0
     sort_column = COLUMNS[-1]
-    return int(arrival[sort_column])
+    return arrival[sort_column]
+
+def sanitized(arrival):
+    dirty_duetime = arrival['duetime']
+    dirty_dest = arrival['destination']
+    street_match = r'\b(Street|St)(?![\w\.])'
+    if dirty_duetime == 'Due':
+        arrival['duetime'] = 'due'
+    elif dirty_duetime.isdigit():
+        arrival['duetime'] = int(dirty_duetime)
+    arrival['destination'] = re.sub(street_match, 'St.', dirty_dest)
+    return arrival
 
 
 def gen_reply_string(arrivals):
@@ -42,10 +54,9 @@ def gen_reply_string(arrivals):
     yield "```"
     for arrival in sorted(arrivals, key=arrival_sort):
         due_suffix, extra_due_padding = 'min', 0
-        if not arrival['duetime'].isdigit():
+        if arrival['duetime'] == 'due':
             due_suffix = ''
             extra_due_padding = 3
-            arrival['duetime'] = 'due'
         yield f'{arrival["route"]:<{max_route}} ' + \
               f'{arrival["destination"]:<{max_dest}} ' + \
               f'{arrival["duetime"]:>{max_duetime + extra_due_padding}}{due_suffix}'
