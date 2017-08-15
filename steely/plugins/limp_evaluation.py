@@ -33,7 +33,7 @@ def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
         send(f'{info}: {_full_error_message}')
 
     try:
-        environment = environment.create_standard()
+        environment = limp.environment.create_standard()
         environment['send'] = send
         result = limp.evaluate(source_code, environment)
         send(result)
