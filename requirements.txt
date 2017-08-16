@@ -3,3 +3,4 @@ requests
 tinydb
 tabulate
 nose
+limp==0.2

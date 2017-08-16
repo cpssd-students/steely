@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 
 
+from contextlib import suppress
 from fbchat import log, Client
-from vapor import vapor
-import imp
-import threading
-import config
-import os
-import sys
-import random
-import spell
 from tinydb import TinyDB
+from vapor import vapor
+import config
+import imp
+import os
+import random
+import requests
+import spell
+import sys
+import threading
 
 
 CMD_DB = TinyDB('quote.json')
@@ -149,4 +151,6 @@ class SteelyBot(Client):
 
 if __name__ == '__main__':
     client = SteelyBot(config.EMAIL, config.PASSWORD)
-    client.listen()
+    while True:
+        with suppress(requests.exceptions.ConnectionError):
+            client.listen()
