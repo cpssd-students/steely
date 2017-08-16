@@ -1,4 +1,4 @@
-#!/us}r/bin/env python3
+#!/usr/bin/env python3
 
 '''
 .define [`code`] <command_name> <some text ...>
