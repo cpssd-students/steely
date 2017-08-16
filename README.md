@@ -33,6 +33,11 @@ Throw a doc string in the top of the plugin.
 If it's short just make it one line but if its `thicc` and has subcommands check
 steely/plugins/linden for an example.
 
+## todo
+[ ] async lastfm plugin stuff
+[ ] trigger decorators for plugins, not just main()
+[ ] [izaakf](https://github.com/izaakf)'s secret idea
+
 ## credits
 |plugin|author|
 |---|---|
