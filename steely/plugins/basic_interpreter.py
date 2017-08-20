@@ -9,7 +9,7 @@ UncleBob:
     10 PRINTLN counter
     20 LET counter = counter + 1
     30 IF counter < 5 THEN GOTO 10
-    10 PRINTLN "Done"
+    40 PRINTLN "Done"
 Chat Bot:
     0
     1
