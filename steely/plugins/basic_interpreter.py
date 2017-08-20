@@ -154,6 +154,8 @@ class BasicInterpreter:
 
     def add_instructions(self, instructions):
         for line in instructions:
+            if not line:
+                continue
             label, instr, args = line.strip().split(' ', 2)
             self._instrs[int(label)] = (instr, args)
         label_order = sorted(self._instrs)
