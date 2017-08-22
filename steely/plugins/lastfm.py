@@ -18,6 +18,7 @@ scrobbles:
 
 
 import requests
+import timeit
 from requests_futures.sessions import FuturesSession
 import json
 from tinydb import TinyDB, Query
@@ -35,62 +36,10 @@ COLLAGE_BASE = "http://www.tapmusic.net/collage.php/"
 SHORTENER_BASE = 'https://www.googleapis.com/urlshortener/v1/url'
 
 
-## helpers ##
-def get_lastfm_asyncrequest(method, **kwargs):
-    params = {'method': method,
-              'api_key': config.LASTFM_API_KEY,
-              'format': 'json'}
-    params.update(kwargs)
-    return SESSION.get(API_BASE, params=params)
-
-
-def get_lastfm_request(method, **kwargs):
-    params = {'method': method,
-              'api_key': config.LASTFM_API_KEY,
-              'format': 'json'}
-    params.update(kwargs)
-    return requests.get(API_BASE, params=params)
-
-
-def get_online_user_requests():
-    requests = []
-    for user in USERDB.all():
-        username = user["username"]
-        requests.append(get_lastfm_asyncrequest("user.getRecentTracks",
-            user=username, limit=1))
-    return requests
-
-    # online = {}
-    # for waiting_response in responses:
-    #     response = waiting_response.result()
-    #     username = response.json()["recenttracks"]["@attr"]["user"]
-    #     try:
-    #         latest_track_obj = response.json()["recenttracks"]["track"][0]
-    #     except IndexError:
-    #         online[username] = False
-    #     else:
-    #         online[username] = "@attr" in latest_track_obj and \
-    #             "nowplaying" in latest_track_obj["@attr"]
-    # return online
-
-
-def get_user_playcounts_requests():
-    requests = []
-    for user in USERDB.all():
-        username = user["username"]
-        requests.append(get_lastfm_asyncrequest("user.getInfo",
-            user=username, limit=1))
-    return requests
-    # playcounts = {}
-    # for response in responses:
-    #     response_obj = response.json()
-    #     username = response_obj["user"]["name"]
-    #     playcount = int(response_obj["user"]["playcount"])
-    #     playcounts[username] = playcount
-    # return playcounts
-
-
+# misc requests
 def get_tags(artist, track):
+    ''' should be using the built in lfm gette
+    '''
     params = {'method': 'artist.getTopTags',
               'api_key': config.LASTFM_API_KEY,
               'artist': artist,
@@ -125,7 +74,68 @@ def get_short_url(url):
     return response.json()["id"]
 
 
-## subcommands ##
+# requesting
+def get_lastfm_request(method, **kwargs):
+    ''' make a normal python request to the last.fm api
+        return a Response()
+    '''
+    params = {'method': method,
+              'api_key': config.LASTFM_API_KEY,
+              'format': 'json'}
+    params.update(kwargs)
+    return requests.get(API_BASE, params=params)
+
+
+def get_lastfm_asyncrequest(method, **kwargs):
+    ''' make an aysnc request using a requests_futures FuturesSession
+        to the last.fm api
+        return a Future()
+    '''
+    params = {'method': method,
+              'api_key': config.LASTFM_API_KEY,
+              'format': 'json'}
+    params.update(kwargs)
+    return SESSION.get(API_BASE, params=params)
+
+
+def get_lastfm_asyncrequest_list(method, **kwargs):
+    ''' make a big list of running Futures()
+    '''
+    for user in USERDB.all():
+        username = user["username"]
+        yield get_lastfm_asyncrequest(method,
+            user=username, limit=1, **kwargs)
+
+# parsing
+def parse_onlines(async_responses):
+    ''' take a list of Futures() for who's online, wait for each to complete,
+        and yield if each user is online or not
+    '''
+    for async_response in async_responses:
+        response = async_response.result()
+        # username = response.json()["recenttracks"]["@attr"]["user"]
+        try:
+            latest_track_obj = response.json()["recenttracks"]["track"][0]
+        except IndexError:
+            yield False
+        else:
+            yield "@attr" in latest_track_obj and \
+                    "nowplaying" in latest_track_obj["@attr"]
+
+
+def parse_playcounts(async_responses):
+    ''' take a list of Futures() for playcounts, wait for each to complete,
+        and yield the playcount
+    '''
+    for async_response in async_responses:
+        response = async_response.result()
+        response_obj = response.json()
+        username = response_obj["user"]["name"]
+        playcount = int(response_obj["user"]["playcount"])
+        yield playcount
+
+
+# commands
 def send_top(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     username = USERDB.get(USER.id == author_id)["username"]
     periods = ("overall", "7day", "1month", "3month", "6month", "12month")
@@ -159,12 +169,13 @@ def send_collage(bot, author_id, message_parts, thread_id, thread_type, **kwargs
 
 
 def send_list(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
+    playcount_asyncrequests = get_lastfm_asyncrequest_list('user.getInfo')
+    online_aysncrequests = get_lastfm_asyncrequest_list('user.getRecentTracks')
+    playcounts = parse_playcounts(playcount_asyncrequests)
+    onlines = parse_onlines(online_aysncrequests)
     usernames = [user["username"] for user in USERDB.all()]
     max_username = max(len(username) for username in usernames)
-    online_users = get_online_users()
-    user_playcounts = get_user_playcounts()
-    stats = [(online_users[username], username, user_playcounts[username]) \
-            for username in usernames]
+    stats = zip(list(onlines), usernames, list(playcounts))
     message = "```\n"
     for online, username, playcount in sorted(stats, key=itemgetter(0, 2), reverse=True):
         online_str = " ♬"[online]
@@ -238,5 +249,4 @@ if __name__ == "__main__":
         SHORTENER_API_KEY = 'AIzaSyC5f4VmqA4ln1794Lj9rDC2G3PwhyaAyvY'
         JOKES_API_KEY = ''
     config = Config()
-    print(get_online_user_requests())
-    print(get_user_playcounts_requests())
+    send_list()
