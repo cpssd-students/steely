@@ -30,7 +30,7 @@ from contextlib import suppress
 COMMAND = '.np'
 USERDB = TinyDB('lastfm.json')
 USER = Query()
-SESSION = FuturesSession(max_workers=50)
+SESSION = FuturesSession(max_workers=100)
 API_BASE = "http://ws.audioscrobbler.com/2.0/"
 COLLAGE_BASE = "http://www.tapmusic.net/collage.php/"
 SHORTENER_BASE = 'https://www.googleapis.com/urlshortener/v1/url'
