@@ -37,6 +37,7 @@ SHORTENER_BASE = 'https://www.googleapis.com/urlshortener/v1/url'
 PERIODS = ("7day", "1month", "3month", "6month", "12month", "overall")
 
 
+# misc requesting
 def get_collage(author_id, user, period):
     params = {'user': user,
               'type': period,
@@ -122,13 +123,20 @@ def parse_playcounts(async_responses):
 
 
 def parse_tags(response):
-    ''' should be using the built in lfm gette
+    ''' parse artist.getTopTags and return the top 3 tags
     '''
     for tag in response.json()['toptags']['tag'][:3]:
         tag_name = tag['name']
         if tag_name in ('seen live', ):
             continue
         yield tag_name.lower()
+
+
+def parse_top(response):
+    ''' parse arist.getTopArtists and return the artist objects
+    '''
+    for artist in response.json()['topartists']['artist']:
+        yield artist["name"], int(artist["playcount"])
 
 
 # commands
@@ -144,8 +152,9 @@ def send_top(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     else:
         username = USERDB.get(USER.id == author_id)["username"]
     artists, string = [], "```"
-    for artist in get_top(username, period):
-        artists.append((artist["name"], int(artist["playcount"])))
+    topartsts_response = get_lastfm_request('user.getTopArtists',
+            period=period, user=username, limit=8)
+    artists = list(parse_top(topartsts_response))
     max_artist = max(len(artist) for artist, plays in artists)
     max_plays = max(len(str(plays)) for artists, plays in artists)
     for artist, playcount in artists:
