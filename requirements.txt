@@ -1,5 +1,6 @@
 fbchat
 requests
+requests-futures
 tinydb
 tabulate
 nose
