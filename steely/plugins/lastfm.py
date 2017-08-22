@@ -23,7 +23,7 @@ from requests_futures.sessions import FuturesSession
 import json
 from tinydb import TinyDB, Query
 from operator import itemgetter
-# from steelybot import config
+from steelybot import config
 from contextlib import suppress
 
 
