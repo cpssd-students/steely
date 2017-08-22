@@ -89,7 +89,7 @@ class SteelyBot(Client):
         self.changeNickname(vapor(new_nickname), user_id=changed_for, thread_id=thread_id, thread_type=thread_type)
 
     def onFriendRequest(self, from_id, msg):
-        print("OKAY SM")
+        print("OKAY SAM")
         self.friendConnect(from_id)
 
     def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
