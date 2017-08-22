@@ -7,10 +7,10 @@ set your username:
 
 check whats your listening to:
 .np [username]
-.np top [`overall|7day|1month|3month|6month|12month`]
+.np top <overall|7day|1month|3month|6month|12month> [username]
 
 make a collage:
-.np collage [username]
+.np collage <overall|7day|1month|3month|6month|12month> [username]
 
 scrobbles:
 .np list
@@ -18,80 +18,39 @@ scrobbles:
 
 
 import requests
+import timeit
+from requests_futures.sessions import FuturesSession
 import json
 from tinydb import TinyDB, Query
 from operator import itemgetter
-from steelybot import config
+# from steelybot import config
 from contextlib import suppress
 
 
 COMMAND = '.np'
 USERDB = TinyDB('lastfm.json')
 USER = Query()
+SESSION = FuturesSession(max_workers=100)
 API_BASE = "http://ws.audioscrobbler.com/2.0/"
 COLLAGE_BASE = "http://www.tapmusic.net/collage.php/"
 SHORTENER_BASE = 'https://www.googleapis.com/urlshortener/v1/url'
+PERIODS = ("7day", "1month", "3month", "6month", "12month", "overall")
 
 
-## helpers ##
-def get_np(user):
-    params = {'method': 'user.getRecentTracks',
-              'user': user,
-              'api_key': config.LASTFM_API_KEY,
-              'limit': '1',
-              'format': 'json'}
-    response = requests.get(API_BASE, params=params)
-    return response.json()["recenttracks"]["track"][0]
-
-
-def get_info(user):
-    params = {'method': 'user.getInfo',
-              'user': user,
-              'api_key': config.LASTFM_API_KEY,
-              'limit': '1',
-              'format': 'json'}
-    response = requests.get(API_BASE, params=params)
-    return response.json()["user"]
-
-
-def get_top(user, period):
-    params = {'method': 'user.getTopArtists',
-              'api_key': config.LASTFM_API_KEY,
-              'period': period,
-              'user': user,
-              'limit': "6",
-              'format': 'json'}
-    response = requests.get(API_BASE, params=params)
-    return response.json()["topartists"]["artist"]
-
-
-def get_tags(artist, track):
-    params = {'method': 'artist.gettoptags',
-              'api_key': config.LASTFM_API_KEY,
-              'artist': artist,
-              'format': 'json'}
-    response = requests.get(API_BASE, params=params)
-    for tag in response.json()['toptags']['tag'][:3]:
-        tag_name = tag['name']
-        if tag_name in ('seen live', ):
-            continue
-        yield tag_name.lower()
-
-
-def make_collage(author_id, user):
+def get_collage(author_id, user, period):
     params = {'user': user,
-              'type': '7day',
+              'type': period,
               'size': '3x3',
               'caption': 'true'}
     image_res = requests.get(COLLAGE_BASE, params=params)
     image = image_res.content
-    image_path = '/tmp/{}.jpg'.format(author_id)
+    image_path = f'/tmp/{author_id}.jpg'
     with open(image_path, 'wb') as image_file:
         image_file.write(image)
     return image_path
 
 
-def shorten_url(url):
+def get_short_url(url):
     data = {'longUrl': url}
     params = {'key': config.SHORTENER_API_KEY}
     headers = {'content-type': 'application/json'}
@@ -100,62 +59,129 @@ def shorten_url(url):
     return response.json()["id"]
 
 
-def is_online(user):
-    try:
-        latest_track_obj = get_np(user)
-    except IndexError:
-        return False
-    return "@attr" in latest_track_obj and \
-        "nowplaying" in latest_track_obj["@attr"]
+# requesting
+def get_lastfm_request(method, **kwargs):
+    ''' make a normal python request to the last.fm api
+        return a Response()
+    '''
+    params = {'method': method,
+              'api_key': config.LASTFM_API_KEY,
+              'format': 'json'}
+    params.update(kwargs)
+    return requests.get(API_BASE, params=params)
 
 
-## subcommands ##
+def get_lastfm_asyncrequest(method, **kwargs):
+    ''' make an aysnc request using a requests_futures FuturesSession
+        to the last.fm api
+        return a Future()
+    '''
+    params = {'method': method,
+              'api_key': config.LASTFM_API_KEY,
+              'format': 'json'}
+    params.update(kwargs)
+    return SESSION.get(API_BASE, params=params)
+
+
+def get_lastfm_asyncrequest_list(method, **kwargs):
+    ''' make a big list of running Futures()
+    '''
+    for user in USERDB.all():
+        username = user["username"]
+        yield get_lastfm_asyncrequest(method,
+            user=username, limit=1, **kwargs)
+
+
+# parsing
+def parse_onlines(async_responses):
+    ''' take a list of Futures() for who's online, wait for each to complete,
+        and yield if each user is online or not
+    '''
+    for async_response in async_responses:
+        response = async_response.result()
+        # username = response.json()["recenttracks"]["@attr"]["user"]
+        try:
+            latest_track_obj = response.json()["recenttracks"]["track"][0]
+        except IndexError:
+            yield False
+        else:
+            yield "@attr" in latest_track_obj and \
+                    "nowplaying" in latest_track_obj["@attr"]
+
+
+def parse_playcounts(async_responses):
+    ''' take a list of Futures() for playcounts, wait for each to complete,
+        and yield the playcount
+    '''
+    for async_response in async_responses:
+        response = async_response.result()
+        response_obj = response.json()
+        username = response_obj["user"]["name"]
+        playcount = int(response_obj["user"]["playcount"])
+        yield playcount
+
+
+def parse_tags(response):
+    ''' should be using the built in lfm gette
+    '''
+    for tag in response.json()['toptags']['tag'][:3]:
+        tag_name = tag['name']
+        if tag_name in ('seen live', ):
+            continue
+        yield tag_name.lower()
+
+
+# commands
 def send_top(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
-    username = USERDB.get(USER.id == author_id)["username"]
-    periods = ("overall", "7day", "1month", "3month", "6month", "12month")
-    if not message_parts:
-        period = "7day"
-    elif message_parts[0] in periods:
-        period = message_parts[0]
-    else:
-        bot.sendMessage("period must be one of `{}`".format(", ".join(periods)),
+    if not message_parts or message_parts[0] not in PERIODS:
+        bot.sendMessage('usage: .np top <period> [username]',
             thread_id=thread_id, thread_type=thread_type)
         return
+    else:
+        period = message_parts[0]
+    if len(message_parts) == 2:
+        username = message_parts[1]
+    else:
+        username = USERDB.get(USER.id == author_id)["username"]
     artists, string = [], "```"
     for artist in get_top(username, period):
         artists.append((artist["name"], int(artist["playcount"])))
     max_artist = max(len(artist) for artist, plays in artists)
     max_plays = max(len(str(plays)) for artists, plays in artists)
     for artist, playcount in artists:
-        string += "\n{artist:<{max_artist}} {playcount:>{max_plays}}".format_map(locals())
+        string += f"\n{artist:<{max_artist}} {playcount:>{max_plays}}"
     bot.sendMessage(string + "```", thread_id=thread_id, thread_type=thread_type)
 
 
 def send_collage(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
-    if not message_parts:
-        username = USERDB.get(USER.id == author_id)["username"]
+    if not message_parts or message_parts[0] not in PERIODS:
+        bot.sendMessage('usage: .np collage <period> [username]',
+            thread_id=thread_id, thread_type=thread_type)
+        return
     else:
-        username = message_parts[0]
-    bot.sendLocalImage(make_collage(author_id, username),
-                       message=None,
-                       thread_id=thread_id,
-                       thread_type=thread_type)
+        period = message_parts[0]
+    if len(message_parts) == 2:
+        username = message_parts[1]
+    else:
+        username = USERDB.get(USER.id == author_id)["username"]
+    bot.sendLocalImage(get_collage(author_id, username, period),
+                       message=None, thread_id=thread_id, thread_type=thread_type)
 
 
 def send_list(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
-    max_username = max(len(user["username"]) for user in USERDB.all())
-    stats = []
-    for user in USERDB.all():
-        username = user["username"]
-        playcount = int(get_info(username)["playcount"])
-        stats.append((is_online(username), username, playcount))
+    playcount_asyncrequests = get_lastfm_asyncrequest_list('user.getInfo')
+    online_aysncrequests = get_lastfm_asyncrequest_list('user.getRecentTracks')
+    playcounts = parse_playcounts(playcount_asyncrequests)
+    onlines = parse_onlines(online_aysncrequests)
+    usernames = [user["username"] for user in USERDB.all()]
+    max_username = max(len(username) for username in usernames)
+    stats = zip(list(onlines), usernames, list(playcounts))
     message = "```\n"
     for online, username, playcount in sorted(stats, key=itemgetter(0, 2), reverse=True):
         online_str = " ♬"[online]
-        message += "{online_str} {username:<{max_username}} {playcount:>6,}\n".format_map(locals())
+        message += f"{online_str} {username:<{max_username}} {playcount:>6,}\n"
     message += "```"
-    bot.sendMessage(message,
-                    thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
 
 
 def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
@@ -168,19 +194,21 @@ def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
         bot.sendMessage('include username please or use .np set',
                         thread_id=thread_id, thread_type=thread_type)
         return
-    latest_track_obj = get_np(username)
+    latest_track_obj = get_lastfm_request("user.getRecentTracks",
+        user=username, limit=1).json()["recenttracks"]["track"][0]
     album = latest_track_obj["album"]["#text"]
     artist = latest_track_obj["artist"]["#text"]
     track = latest_track_obj["name"]
-    tags = ", ".join(get_tags(artist, track))
-    link = shorten_url(latest_track_obj["url"])
+    tag_response = get_lastfm_request("artist.getTopTags", artist=artist)
+    tags = ', '.join(parse_tags(tag_response))
+    link = get_short_url(latest_track_obj["url"])
     with suppress(ValueError):
         image = latest_track_obj["image"][2]["#text"]
         bot.sendRemoteImage(image, thread_id=thread_id, thread_type=thread_type)
     is_was = "is" if "@attr" in latest_track_obj and \
         "nowplaying" in latest_track_obj["@attr"] else "was"
-    bot.sendMessage("{username} {is_was} playing _{track}_ by *{artist}*\n" \
-                    "tags: {tags}\n{link}".format_map(locals()),
+    bot.sendMessage(f"{username} {is_was} playing `{track}` by {artist}\n" + \
+                    f"tags: {tags}\n{link}",
                     thread_id=thread_id, thread_type=thread_type)
 
 
