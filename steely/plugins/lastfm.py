@@ -207,8 +207,9 @@ def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
         bot.sendRemoteImage(image, thread_id=thread_id, thread_type=thread_type)
     is_was = "is" if "@attr" in latest_track_obj and \
         "nowplaying" in latest_track_obj["@attr"] else "was"
-    bot.sendMessage(f"{username} {is_was} playing `{track}` by {artist}\n" + \
-                    f"tags: {tags}\n{link}",
+    tags_or_no = f"\ntags: {tags}" if tags else ''
+    bot.sendMessage(f"{username} {is_was} playing `{track}` by {artist}" + \
+                    f"{tags_or_no}\n{link}",
                     thread_id=thread_id, thread_type=thread_type)
 
 
