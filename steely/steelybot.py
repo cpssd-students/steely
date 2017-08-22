@@ -88,7 +88,6 @@ class SteelyBot(Client):
         self.changeNickname(vapor(new_nickname), user_id=changed_for, thread_id=thread_id, thread_type=thread_type)
 
     def onFriendRequest(self, from_id, msg):
-        print("OKAY SAM")
         self.friendConnect(from_id)
 
     def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
@@ -97,15 +96,6 @@ class SteelyBot(Client):
 
         if author_id == self.uid:
             return
-
-        if message == '.reload':
-            self.load_plugins()
-            self.sendMessage('plugins reloaded', thread_id=thread_id, thread_type=thread_type)
-            return
-
-        if message == '.restart':
-            self.sendMessage('about to restart', thread_id=thread_id, thread_type=thread_type)
-            os.execv(sys.executable, ['python'] + sys.argv)
 
         # run plugins that have no command
         for plugin in self.non_plugins:
