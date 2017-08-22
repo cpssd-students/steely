@@ -1,5 +1,5 @@
 import unittest
-from steely.plugins.url_expander import expand
+from steely.plugins.url import expand
 
 
 class UrlExpansionTest(unittest.TestCase):
