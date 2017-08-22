@@ -179,7 +179,7 @@ def send_list(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     message = "```\n"
     for online, username, playcount in sorted(stats, key=itemgetter(0, 2), reverse=True):
         online_str = " ♬"[online]
-        message += "{online_str} {username:<{max_username}} {playcount:>6,}\n".format_map(locals())
+        message += f"{online_str} {username:<{max_username}} {playcount:>6,}\n"
     message += "```"
     bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
 
@@ -200,7 +200,7 @@ def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     artist = latest_track_obj["artist"]["#text"]
     track = latest_track_obj["name"]
     tag_response = get_lastfm_request("artist.getTopTags", artist=artist)
-    tags = parse_tags(tag_response)
+    tags = ', '.join(parse_tags(tag_response))
     link = get_short_url(latest_track_obj["url"])
     with suppress(ValueError):
         image = latest_track_obj["image"][2]["#text"]
