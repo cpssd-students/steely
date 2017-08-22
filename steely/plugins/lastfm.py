@@ -44,7 +44,7 @@ def get_collage(author_id, user, period):
               'caption': 'true'}
     image_res = requests.get(COLLAGE_BASE, params=params)
     image = image_res.content
-    image_path = '/tmp/{}.jpg'.format(author_id)
+    image_path = f'/tmp/{author_id}.jpg'
     with open(image_path, 'wb') as image_file:
         image_file.write(image)
     return image_path
@@ -134,7 +134,7 @@ def parse_tags(response):
 # commands
 def send_top(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     if not message_parts or message_parts[0] not in PERIODS:
-        bot.sendMessage("period must be one of `{}`".format(", ".join(PERIODS)),
+        bot.sendMessage('usage: .np top <period> [username]',
             thread_id=thread_id, thread_type=thread_type)
         return
     else:
@@ -149,7 +149,7 @@ def send_top(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     max_artist = max(len(artist) for artist, plays in artists)
     max_plays = max(len(str(plays)) for artists, plays in artists)
     for artist, playcount in artists:
-        string += "\n{artist:<{max_artist}} {playcount:>{max_plays}}".format_map(locals())
+        string += f"\n{artist:<{max_artist}} {playcount:>{max_plays}}"
     bot.sendMessage(string + "```", thread_id=thread_id, thread_type=thread_type)
 
 
@@ -207,8 +207,8 @@ def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
         bot.sendRemoteImage(image, thread_id=thread_id, thread_type=thread_type)
     is_was = "is" if "@attr" in latest_track_obj and \
         "nowplaying" in latest_track_obj["@attr"] else "was"
-    bot.sendMessage("{username} {is_was} playing `{track}` by {artist}\n" \
-                    "tags: {tags}\n{link}".format_map(locals()),
+    bot.sendMessage(f"{username} {is_was} playing `{track}` by {artist}\n" + \
+                    f"tags: {tags}\n{link}",
                     thread_id=thread_id, thread_type=thread_type)
 
 
@@ -240,14 +240,3 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         SUBCOMMANDS[message_parts[0]](bot, author_id, message_parts[1:], thread_id, thread_type, **kwargs)
     else:
         send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs)
-
-
-if __name__ == "__main__":
-    class Config:
-        PASSWORD = 'ahdernowshimalrightnkdernow'
-        EMAIL = 'notsteelybot@protonmail.com'
-        LASTFM_API_KEY = '133c81be62e455d32fad36be8e111270'
-        SHORTENER_API_KEY = 'AIzaSyC5f4VmqA4ln1794Lj9rDC2G3PwhyaAyvY'
-        JOKES_API_KEY = ''
-    config = Config()
-    send_list()
