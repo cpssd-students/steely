@@ -27,9 +27,8 @@ literal commands can be mandatory or optional'''
 
 
 class SteelyBot(Client):
-
     def __init__(self, *args, **kwargs):
-        super(SteelyBot, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.last_suggestions = {}
         self.load_plugins()
 
