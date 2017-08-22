@@ -7,10 +7,10 @@ set your username:
 
 check whats your listening to:
 .np [username]
-.np top [`overall|7day|1month|3month|6month|12month`]
+.np top <overall|7day|1month|3month|6month|12month> [username]
 
 make a collage:
-.np collage [username]
+.np collage <overall|7day|1month|3month|6month|12month> [username]
 
 scrobbles:
 .np list
@@ -34,6 +34,7 @@ SESSION = FuturesSession(max_workers=50)
 API_BASE = "http://ws.audioscrobbler.com/2.0/"
 COLLAGE_BASE = "http://www.tapmusic.net/collage.php/"
 SHORTENER_BASE = 'https://www.googleapis.com/urlshortener/v1/url'
+PERIODS = ("7day", "1month", "3month", "6month", "12month", "overall")
 
 
 # misc requests
@@ -52,9 +53,9 @@ def get_tags(artist, track):
         yield tag_name.lower()
 
 
-def get_collage(author_id, user):
+def get_collage(author_id, user, period):
     params = {'user': user,
-              'type': '7day',
+              'type': period,
               'size': '3x3',
               'caption': 'true'}
     image_res = requests.get(COLLAGE_BASE, params=params)
@@ -137,16 +138,16 @@ def parse_playcounts(async_responses):
 
 # commands
 def send_top(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
-    username = USERDB.get(USER.id == author_id)["username"]
-    periods = ("overall", "7day", "1month", "3month", "6month", "12month")
-    if not message_parts:
-        period = "7day"
-    elif message_parts[0] in periods:
-        period = message_parts[0]
-    else:
-        bot.sendMessage("period must be one of `{}`".format(", ".join(periods)),
+    if not message_parts or message_parts[0] not in PERIODS:
+        bot.sendMessage("period must be one of `{}`".format(", ".join(PERIODS)),
             thread_id=thread_id, thread_type=thread_type)
         return
+    else:
+        period = message_parts[0]
+    if len(message_parts) == 2:
+        username = message_parts[1]
+    else:
+        username = USERDB.get(USER.id == author_id)["username"]
     artists, string = [], "```"
     for artist in get_top(username, period):
         artists.append((artist["name"], int(artist["playcount"])))
@@ -158,14 +159,18 @@ def send_top(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
 
 
 def send_collage(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
-    if not message_parts:
-        username = USERDB.get(USER.id == author_id)["username"]
+    if not message_parts or message_parts[0] not in PERIODS:
+        bot.sendMessage('usage: .np collage <period> [username]',
+            thread_id=thread_id, thread_type=thread_type)
+        return
     else:
-        username = message_parts[0]
-    bot.sendLocalImage(get_collage(author_id, username),
-                       message=None,
-                       thread_id=thread_id,
-                       thread_type=thread_type)
+        period = message_parts[0]
+    if len(message_parts) == 2:
+        username = message_parts[1]
+    else:
+        username = USERDB.get(USER.id == author_id)["username"]
+    bot.sendLocalImage(get_collage(author_id, username, period),
+                       message=None, thread_id=thread_id, thread_type=thread_type)
 
 
 def send_list(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
