@@ -37,22 +37,6 @@ SHORTENER_BASE = 'https://www.googleapis.com/urlshortener/v1/url'
 PERIODS = ("7day", "1month", "3month", "6month", "12month", "overall")
 
 
-# misc requests
-def get_tags(artist, track):
-    ''' should be using the built in lfm gette
-    '''
-    params = {'method': 'artist.getTopTags',
-              'api_key': config.LASTFM_API_KEY,
-              'artist': artist,
-              'format': 'json'}
-    response = requests.get(API_BASE, params=params)
-    for tag in response.json()['toptags']['tag'][:3]:
-        tag_name = tag['name']
-        if tag_name in ('seen live', ):
-            continue
-        yield tag_name.lower()
-
-
 def get_collage(author_id, user, period):
     params = {'user': user,
               'type': period,
@@ -107,6 +91,7 @@ def get_lastfm_asyncrequest_list(method, **kwargs):
         yield get_lastfm_asyncrequest(method,
             user=username, limit=1, **kwargs)
 
+
 # parsing
 def parse_onlines(async_responses):
     ''' take a list of Futures() for who's online, wait for each to complete,
@@ -134,6 +119,16 @@ def parse_playcounts(async_responses):
         username = response_obj["user"]["name"]
         playcount = int(response_obj["user"]["playcount"])
         yield playcount
+
+
+def parse_tags(response):
+    ''' should be using the built in lfm gette
+    '''
+    for tag in response.json()['toptags']['tag'][:3]:
+        tag_name = tag['name']
+        if tag_name in ('seen live', ):
+            continue
+        yield tag_name.lower()
 
 
 # commands
@@ -204,7 +199,8 @@ def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     album = latest_track_obj["album"]["#text"]
     artist = latest_track_obj["artist"]["#text"]
     track = latest_track_obj["name"]
-    tags = ", ".join(get_tags(artist, track))
+    tag_response = get_lastfm_request("artist.getTopTags", artist=artist)
+    tags = parse_tags(tag_response)
     link = get_short_url(latest_track_obj["url"])
     with suppress(ValueError):
         image = latest_track_obj["image"][2]["#text"]
