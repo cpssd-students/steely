@@ -201,9 +201,9 @@ def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     track = latest_track_obj["name"]
     tags = ", ".join(get_tags(artist, track))
     link = get_short_url(latest_track_obj["url"])
-    # with suppress(ValueError):
-    #     image = latest_track_obj["image"][2]["#text"]
-    #     bot.sendRemoteImage(image, thread_id=thread_id, thread_type=thread_type)
+    with suppress(ValueError):
+        image = latest_track_obj["image"][2]["#text"]
+        bot.sendRemoteImage(image, thread_id=thread_id, thread_type=thread_type)
     is_was = "is" if "@attr" in latest_track_obj and \
         "nowplaying" in latest_track_obj["@attr"] else "was"
     bot.sendMessage("{username} {is_was} playing `{track}` by {artist}\n" \
