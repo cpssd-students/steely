@@ -98,25 +98,6 @@ class SteelyBot(Client):
         if author_id == self.uid:
             return
 
-        message_parts = message.split()
-        if message_parts[0] in ('.list', '.help'):
-            if len(message_parts) == 1:
-                commands = ', '.join((command for command in self.plugins.keys() if command))
-                self.sendMessage(f'available commands: {commands}',
-                    thread_id=thread_id, thread_type=thread_type)
-            else:
-                plugin = message_parts[1]
-                if not plugin.startswith("."):
-                    plugin = "." + plugin
-                if not plugin in self.plugin_helps:
-                    self.sendMessage('help not found for command "{}"'.format(plugin),
-                        thread_id=thread_id, thread_type=thread_type)
-                    return
-
-                self.sendMessage("```\n" + self.plugin_helps[plugin] + "\n```",
-                    thread_type=thread_type, thread_id=thread_id)
-            return
-
         if message == '.reload':
             self.load_plugins()
             self.sendMessage('plugins reloaded', thread_id=thread_id, thread_type=thread_type)
