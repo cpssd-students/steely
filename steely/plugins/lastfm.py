@@ -194,13 +194,11 @@ def send_list(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
 
 
 def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
-    user = USERDB.get(USER.id == author_id)
+    username = USERDB.get(USER.id == author_id)['username']
     if message_parts:
         username = message_parts[0]
-    elif user:
-        username = user['username']
-    else:
-        bot.sendMessage('include username please or use .np set',
+    elif not username:
+        bot.sendMessage('include username or use `.np set`',
                         thread_id=thread_id, thread_type=thread_type)
         return
     latest_track_obj = get_lastfm_request("user.getRecentTracks",
@@ -217,7 +215,7 @@ def send_np(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     is_was = "is" if "@attr" in latest_track_obj and \
         "nowplaying" in latest_track_obj["@attr"] else "was"
     tags_or_no = f"\ntags: {tags}" if tags else ''
-    bot.sendMessage(f"{username} {is_was} playing `{track}` by {artist}" + \
+    bot.sendMessage(f"{username} {is_was} playing _{track}_ by *{artist}*" + \
                     f"{tags_or_no}\n{link}",
                     thread_id=thread_id, thread_type=thread_type)
 
