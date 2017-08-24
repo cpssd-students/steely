@@ -9,7 +9,7 @@ from utils import list_plugins
 
 FILENAME = '../README.md'
 IDENTIFIER = 'creditline'
-START_IDENTIFIER = 'creditstart'
+START_IDENTIFIER = '---------------|'
 
 
 def get_plugin_name(plugin):

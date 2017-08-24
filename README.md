@@ -40,19 +40,39 @@ steely/plugins/linden for an example.
 
 ## credits
 |plugin|author|
-|---|---| creditstart
-|bus|[AlexKraak](https://github.com/AlexKraak)| creditline
-|happy|[AlexKraak](https://github.com/AlexKraak)| creditline
-|ht|[AlexKraak](https://github.com/AlexKraak)| creditline
-|jokes|[EdwardDowling](https://github.com/EdwardDowling)| creditline
-|lastfm|[AlexKraak](https://github.com/AlexKraak)| creditline
-|linden|[CianLR](https://github.com/CianLR), [benmcmahon100](https://github.com/benmcmahon100)| creditline
-|skrrt|[AlexKraak](https://github.com/AlexKraak)| creditline
-|spongemock|[EdwardDowling](https://github.com/EdwardDowling)| creditline
-|train|[izaakf](https://github.com/izaakf)| creditline
-|urbandict|[EdwardDowling](https://github.com/EdwardDowling)| creditline
-|exp|[Byxor](https://github.com/Byxor)| creditline
-|roll|[devoxel](https://github.com/devoxel)| creditline
+|---|---------------|
+|hel|[devoxel](https://github.com/devoxel/)| creditline
+|eight|[sentriz](https://github.com/sentriz/)| creditline
+|cage|[sentriz](https://github.com/sentriz/)| creditline
+|reload|[sentriz](https://github.com/sentriz/)| creditline
+|train|[izaakf](https://github.com/izaakf/)| creditline
+|roll|[devoxel](https://github.com/devoxel/)| creditline
+|xkcd|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
+|ht|[alexkraak](https://github.com/alexkraak/)| creditline
+|nose|[sentriz](https://github.com/sentriz/)| creditline
+|box|[sentriz](https://github.com/sentriz/)| creditline
+|tilda|[alexkraak](https://github.com/alexkraak/)| creditline
+|github|[alexkraak](https://github.com/alexkraak/)| creditline
+|tracker|[sentriz](https://github.com/sentriz/)| creditline
+|lastfm|[alexkraak](https://github.com/alexkraak/), [sentriz](https://github.com/sentriz/)| creditline
+|rpn|[sentriz](https://github.com/sentriz/)| creditline
+|angr|[sentriz](https://github.com/sentriz/)| creditline
+|vapor|[alexkraak](https://github.com/alexkraak/), [sentriz](https://github.com/sentriz/)| creditline
+|lenn|[sentriz](https://github.com/sentriz/)| creditline
+|url|[byxor](https://github.com/byxor/)| creditline
+|jokes|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
+|slag|[devoxel](https://github.com/devoxel/)| creditline
+|ha|[alexkraak](https://github.com/alexkraak/)| creditline
+|stretch|[CianLR](https://github.com/CianLR/)| creditline
+|lim|[byxor](https://github.com/byxor/)| creditline
+|mock|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
+|sentiment|[oskarmcd](https://github.com/oskarmcd/)| creditline
+|linden|[CianLR](https://github.com/CianLR/)| creditline
+|bus|[alexkraak](https://github.com/alexkraak/)| creditline
+|skrrrt|[alexkraak](https://github.com/alexkraak/)| creditline
+|restart|[sentriz](https://github.com/sentriz/)| creditline
+|urban|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
+|define|[alexkraak](https://github.com/alexkraak/)| creditline
 
 ## q&a
 
