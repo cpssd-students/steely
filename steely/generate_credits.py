@@ -13,7 +13,7 @@ START_IDENTIFIER = '---------------|'
 
 
 def get_plugin_name(plugin):
-    return plugin.__name__.rstrip('.py')
+    return plugin.__name__[:-3]
 
 
 def get_plugin_author(plugin):
@@ -34,8 +34,10 @@ def is_multi_author(authors):
 
 def get_credits():
     for plugin in list_plugins():
-        yield get_plugin_name(plugin), \
-              get_plugin_author(plugin)
+        # yield get_plugin_name(plugin), \
+        #       get_plugin_author(plugin)
+        yield plugin.__name__, \
+              plugin.__author__
 
 
 def format_credit_line(name, author):
