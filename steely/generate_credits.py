@@ -8,6 +8,8 @@ from utils import list_plugins
 
 
 FILENAME = '../README.md'
+IDENTIFIER = 'creditline'
+START_IDENTIFIER = 'creditstart'
 
 
 def get_plugin_name(plugin):
@@ -30,18 +32,29 @@ def is_multi_author(authors):
     return any(isinstance(authors, type) for type in valid_types)
 
 
-def get_authors():
+def get_credits():
     for plugin in list_plugins():
         yield get_plugin_name(plugin), \
               get_plugin_author(plugin)
 
 
-def remove_credits():
+def format_credit_line(name, author):
+    return f'|{name}|{author}| {IDENTIFIER}'
+
+def make_new_credits():
+    return '\n'.join(format_credit_line(name, author) \
+                     for name, author in get_credits())
+
+def change_credits():
+    new_credits = make_new_credits()
     for line in fileinput.input(FILENAME, inplace=True):
-        if 'async' in line:
+        if line.rstrip().endswith(START_IDENTIFIER):
+            print(f'{line}{new_credits}')
+        elif line.rstrip().endswith(IDENTIFIER):
             continue
-        print(line, end='')
+        else:
+            print(line, end='')
+
 
 if __name__ == '__main__':
-    # print(*get_authors(), sep='\n')
-    remove_credits()
+    change_credits()
