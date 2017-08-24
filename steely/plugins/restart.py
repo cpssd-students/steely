@@ -1,6 +1,10 @@
 '''reload all user plugins'''
 
 
+import os
+import sys
+
+
 COMMAND = '.restart'
 
 
