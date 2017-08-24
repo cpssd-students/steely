@@ -19,6 +19,7 @@ scrobbles:
 
 from plugins._lastfm_helpers import *
 from plugins import _lastfm_collage
+from plugins import _lastfm_history
 from plugins import _lastfm_list
 from plugins import _lastfm_set
 from plugins import _lastfm_top
@@ -27,6 +28,7 @@ from plugins import _lastfm_np
 
 SUBCOMMANDS = {
     'collage': _lastfm_collage.main,
+    'history': _lastfm_history.main,
     'list':    _lastfm_list.main,
     'set':     _lastfm_set.main,
     'top':     _lastfm_top.main,
