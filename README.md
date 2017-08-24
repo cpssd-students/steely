@@ -41,18 +41,18 @@ steely/plugins/linden for an example.
 ## credits
 |plugin|author|
 |---|---|
-|bus|[AlexKraak](https://github.com/AlexKraak)|
-|happy|[AlexKraak](https://github.com/AlexKraak)|
-|ht|[AlexKraak](https://github.com/AlexKraak)|
-|jokes|[EdwardDowling](https://github.com/EdwardDowling)|
-|lastfm|[AlexKraak](https://github.com/AlexKraak)|
-|linden|[CianLR](https://github.com/CianLR), [benmcmahon100](https://github.com/benmcmahon100)|
-|skrrt|[AlexKraak](https://github.com/AlexKraak)|
-|spongemock|[EdwardDowling](https://github.com/EdwardDowling)|
-|train|[izaakf](https://github.com/izaakf)|
-|urbandict|[EdwardDowling](https://github.com/EdwardDowling)|
-|exp|[Byxor](https://github.com/Byxor)|
-|roll|[devoxel](https://github.com/devoxel)|
+|bus|[AlexKraak](https://github.com/AlexKraak)| pluginline
+|happy|[AlexKraak](https://github.com/AlexKraak)| pluginline
+|ht|[AlexKraak](https://github.com/AlexKraak)| pluginline
+|jokes|[EdwardDowling](https://github.com/EdwardDowling)| pluginline
+|lastfm|[AlexKraak](https://github.com/AlexKraak)| pluginline
+|linden|[CianLR](https://github.com/CianLR), [benmcmahon100](https://github.com/benmcmahon100)| pluginline
+|skrrt|[AlexKraak](https://github.com/AlexKraak)| pluginline
+|spongemock|[EdwardDowling](https://github.com/EdwardDowling)| pluginline
+|train|[izaakf](https://github.com/izaakf)| pluginline
+|urbandict|[EdwardDowling](https://github.com/EdwardDowling)| pluginline
+|exp|[Byxor](https://github.com/Byxor)| pluginline
+|roll|[devoxel](https://github.com/devoxel)| pluginline
 
 ## q&a
 
