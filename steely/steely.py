@@ -5,6 +5,7 @@ from contextlib import suppress
 from fbchat import log, Client
 from tinydb import TinyDB
 from vapor import vapor
+from utils import list_plugins
 import config
 import imp
 import os
@@ -38,13 +39,7 @@ class SteelyBot(Client):
         self.plugin_helps = {
             '.help': HELP_DOC
         }
-        for file in os.listdir('plugins'):
-            if file.startswith("_"):
-                continue
-            elif not file.endswith(".py"):
-                continue
-            plugin_path = os.path.join('plugins', file)
-            plugin = imp.load_source(file, plugin_path)
+        for plugin in list_plugins():
             if plugin.__doc__:
                 self.plugin_helps[plugin.COMMAND.lower()] = plugin.__doc__.strip('\n')
             if plugin.COMMAND:
