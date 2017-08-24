@@ -34,10 +34,8 @@ def is_multi_author(authors):
 
 def get_credits():
     for plugin in list_plugins():
-        # yield get_plugin_name(plugin), \
-        #       get_plugin_author(plugin)
-        yield plugin.__name__, \
-              plugin.__author__
+        yield get_plugin_name(plugin), \
+              get_plugin_author(plugin)
 
 
 def format_credit_line(name, author):

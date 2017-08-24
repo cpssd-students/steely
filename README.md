@@ -41,7 +41,7 @@ steely/plugins/linden for an example.
 ## credits
 |plugin|author|
 |---|---------------|
-|hel|[devoxel](https://github.com/devoxel/)| creditline
+|help|[devoxel](https://github.com/devoxel/)| creditline
 |eight|[sentriz](https://github.com/sentriz/)| creditline
 |cage|[sentriz](https://github.com/sentriz/)| creditline
 |reload|[sentriz](https://github.com/sentriz/)| creditline
@@ -56,15 +56,15 @@ steely/plugins/linden for an example.
 |tracker|[sentriz](https://github.com/sentriz/)| creditline
 |lastfm|[alexkraak](https://github.com/alexkraak/), [sentriz](https://github.com/sentriz/)| creditline
 |rpn|[sentriz](https://github.com/sentriz/)| creditline
-|angr|[sentriz](https://github.com/sentriz/)| creditline
+|angry|[sentriz](https://github.com/sentriz/)| creditline
 |vapor|[alexkraak](https://github.com/alexkraak/), [sentriz](https://github.com/sentriz/)| creditline
-|lenn|[sentriz](https://github.com/sentriz/)| creditline
+|lenny|[sentriz](https://github.com/sentriz/)| creditline
 |url|[byxor](https://github.com/byxor/)| creditline
 |jokes|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
 |slag|[devoxel](https://github.com/devoxel/)| creditline
-|ha|[alexkraak](https://github.com/alexkraak/)| creditline
+|happy|[alexkraak](https://github.com/alexkraak/)| creditline
 |stretch|[CianLR](https://github.com/CianLR/)| creditline
-|lim|[byxor](https://github.com/byxor/)| creditline
+|limp|[byxor](https://github.com/byxor/)| creditline
 |mock|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
 |sentiment|[oskarmcd](https://github.com/oskarmcd/)| creditline
 |linden|[CianLR](https://github.com/CianLR/)| creditline
