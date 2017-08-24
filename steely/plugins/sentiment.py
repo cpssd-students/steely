@@ -13,6 +13,14 @@ FULL_STRINGS = {
 }
 
 
+def sanitized(input):
+    replacements = (('`', ''),
+                    ('\n', ' '))
+    for bad, good in replacements:
+        input = input.replace(bad, good)
+    return input
+
+
 def get_sentiment(string):
     response = requests.post(BASE_URL, f'text={string}')
     data = response.json()
@@ -33,4 +41,5 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if len(last_message) > 150:
         send_message('no')
         return
+    last_message = sanitized(last_message)
     send_message(get_sentiment(last_message))
