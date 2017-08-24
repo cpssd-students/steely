@@ -13,6 +13,7 @@ import re
 import requests
 
 
+__author__ = 'alexkraak'
 COMMAND = '.dbus'
 BASE_URL = "http://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation"
 COLUMNS =  ('route', 'destination', 'duetime')

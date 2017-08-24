@@ -4,6 +4,7 @@
 import requests
 
 
+__author__ = 'alexkraak'
 COMMAND = '.steelygh'
 
 

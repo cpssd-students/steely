@@ -8,6 +8,7 @@ the text must be between 6 and 19 characters.
 import random
 
 
+__author__ = 'sentriz'
 COMMAND = '.box'
 
 

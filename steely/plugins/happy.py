@@ -1,6 +1,7 @@
 '''thanks!'''
 
 
+__author__ = 'alexkraak'
 COMMAND = '.snack'
 
 

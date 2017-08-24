@@ -5,6 +5,7 @@ import requests
 from steely import config
 
 
+__author__ = 'EdwardDowling'
 COMMAND = '.joke'
 
 

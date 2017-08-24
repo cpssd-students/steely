@@ -2,6 +2,7 @@
 import random
 
 
+__author__ = 'EdwardDowling'
 COMMAND = '.mock'
 
 

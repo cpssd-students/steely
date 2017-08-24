@@ -14,6 +14,7 @@ They can be accessed via ~<command_name>, and will output what you put in.
 from tinydb import TinyDB, Query
 
 
+__author__ = 'alexkraak'
 COMMAND = '.define'
 CMD_DB = TinyDB('quote.json')
 CMD = Query()

@@ -3,8 +3,13 @@
 
 expand dat url
 '''
+
+
 from urllib.request import Request, urlopen
 import json
+
+
+__author__ = 'byxorr'
 
 
 def expand(url):

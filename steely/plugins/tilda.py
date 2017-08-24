@@ -4,6 +4,7 @@
 from tinydb import TinyDB, Query
 
 
+__author__ = 'alexkraak'
 COMMAND = None
 CMD_DB = TinyDB('quote.json')
 CMD = Query()

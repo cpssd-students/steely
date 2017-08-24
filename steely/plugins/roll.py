@@ -6,9 +6,13 @@
 for example:
 .roll 2d20 d20 1d100 ...
 '''
+
+
 import random
 import re
 
+
+__author__ = 'devoxel'
 REPATTERN = re.compile('[\ \W]+')
 COMMAND = '.roll'
 NLIMIT, RLIMIT = 30, 10000

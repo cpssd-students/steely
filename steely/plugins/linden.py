@@ -28,6 +28,7 @@ import requests
 import json
 
 
+__author__ = 'CianLR'
 COMMAND = ".linden"
 USERDB = TinyDB("linden.json")
 USER = Query()

@@ -7,6 +7,7 @@ less args, more lennys
 import random
 
 
+__author__ = 'sentriz'
 COMMAND = '.lenny'
 LENNYS = (
     """( ͡° ͜ʖ ͡°)""",

@@ -2,6 +2,7 @@ import random
 from fbchat import MessageReaction, EmojiSize
 
 
+__author__ = 'sentriz'
 COMMAND = None
 
 

@@ -4,6 +4,7 @@
 import random
 
 
+__author__ = 'alexkraak'
 COMMAND = '.ht'
 HEADS_IMG = "http://random-ize.com/coin-flip/us-quarter/us-quarter-front.jpg"
 TAILS_IMG = "http://random-ize.com/coin-flip/us-quarter/us-quarter-back.jpg"

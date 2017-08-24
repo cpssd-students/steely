@@ -5,9 +5,12 @@ find out what that slang means via. urban dictionary.
 
 eg: .ud the kentucky klondike bar
 '''
+
+
 import requests
 
 
+__author__ = 'EdwardDowling'
 COMMAND = '.ud'
 
 

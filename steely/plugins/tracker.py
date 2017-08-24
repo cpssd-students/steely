@@ -10,6 +10,7 @@ import requests
 from operator import itemgetter
 
 
+__author__ = 'sentriz'
 COMMAND = '.tracker'
 BASE = 'https://{tracker}.trackerstatus.info/api/all/'
 TRACKERS = ('ar', 'nwcd', 'btn', 'ptp', 'mtv', 'red', 'ggn')

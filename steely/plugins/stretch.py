@@ -1,11 +1,13 @@
 '''gives the previous message sttrreeetttccchhhheeeeddddd'''
 
+
 import random
 
-COMMAND = '.stretch'
 
-# The larger the stretchier
+__author__ = 'CianLR'
+COMMAND = '.stretch'
 STRETCH_FACTOR = 5
+
 
 def stretch(message):
     if not message:
@@ -19,6 +21,7 @@ def stretch(message):
             count += 1
         out += c * count
     return out
+
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]

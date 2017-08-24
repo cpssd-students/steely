@@ -27,6 +27,7 @@ from plugins import _lastfm_top
 from plugins import _lastfm_np
 
 
+__author__ = ('alexkraak', 'sentriz')
 SUBCOMMANDS = {
     'collage': _lastfm_collage.main,
     'history': _lastfm_history.main,

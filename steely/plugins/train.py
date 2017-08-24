@@ -5,11 +5,13 @@
 get irish rail train state times
 '''
 
+
 import requests
 import re
 from operator import itemgetter
 
 
+__author__ = 'izaakf'
 COMMAND = '.train'
 BASE_URL = 'http://api.irishrail.ie/realtime/realtime.asmx/getStationDataByNameXML?StationDesc='
 

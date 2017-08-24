@@ -3,6 +3,7 @@ import requests
 import json
 
 
+__author__ = 'oskarmcd'
 COMMAND = '.sentiment'
 BASE_URL = 'http://text-processing.com/api/sentiment/'
 FULL_STRINGS = {

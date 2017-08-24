@@ -1,7 +1,10 @@
 '''what's new randall?'''
+
+
 import requests
 
 
+__author__ = 'EdwardDowling'
 COMMAND = '.xkcd'
 
 

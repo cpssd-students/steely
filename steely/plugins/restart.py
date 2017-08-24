@@ -5,6 +5,7 @@ import os
 import sys
 
 
+__author__ = 'sentriz'
 COMMAND = '.restart'
 
 

@@ -20,6 +20,7 @@ I welcome anything (relevant) that has been fully covered by automatic tests and
 import rpn
 
 
+__author__ = 'sentriz'
 COMMAND = '.rpn'
 
 

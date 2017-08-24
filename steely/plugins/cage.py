@@ -4,6 +4,7 @@
 import random
 
 
+__author__ = 'sentriz'
 COMMAND = '.nick'
 NICKS = (
     "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Nicolas_Cage_2011_CC.jpg/220px-Nicolas_Cage_2011_CC.jpg",

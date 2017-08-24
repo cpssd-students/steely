@@ -1,6 +1,7 @@
 '''reload all user plugins'''
 
 
+__author__ = 'sentriz'
 COMMAND = '.reload'
 
 

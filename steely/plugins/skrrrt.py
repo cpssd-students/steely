@@ -2,6 +2,7 @@
 from random import randint
 
 
+__author__ = 'alexkraak'
 COMMAND = '.skrrt'
 
 

@@ -1,4 +1,6 @@
+__author__ = 'devoxel'
 COMMAND = '.help'
+
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message_parts = message.split()

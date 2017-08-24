@@ -1,6 +1,7 @@
 '''gives the previous command ａｅｓｔｈｅｔｉｃ'''
 
 
+__author__ = ('alexkraak', 'sentriz')
 COMMAND = '.vapor'
 
 

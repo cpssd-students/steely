@@ -8,6 +8,7 @@ slags a person in the chat
 import random
 
 
+__author__ = 'devoxel'
 COMMAND='.slag'
 REPLIES = (
     "{} smells like a baby prostitute",
