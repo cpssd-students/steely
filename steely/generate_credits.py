@@ -4,6 +4,7 @@
 import os
 import imp
 import fileinput
+from operator import itemgetter
 from utils import list_plugins
 
 
@@ -41,9 +42,16 @@ def get_credits():
 def format_credit_line(name, author):
     return f'|{name}|{author}| {IDENTIFIER}'
 
+
 def make_new_credits():
+    credits = sorted_credits(get_credits())
     return '\n'.join(format_credit_line(name, author) \
-                     for name, author in get_credits())
+                     for name, author in credits)
+
+def sorted_credits(credits):
+    ''' sort credits by author, then plugin name
+    '''
+    return sorted(credits, key=itemgetter(1, 0))
 
 def change_credits():
     new_credits = make_new_credits()
