@@ -9,7 +9,7 @@ from urllib.request import Request, urlopen
 import json
 
 
-__author__ = 'byxorr'
+__author__ = 'byxor'
 
 
 def expand(url):

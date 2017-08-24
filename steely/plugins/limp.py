@@ -21,7 +21,7 @@ import limp
 import limp.environment
 
 
-__author__ = 'byxorr'
+__author__ = 'byxor'
 COMMAND = '.limp'
 
 
