@@ -46,7 +46,7 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     is_was = "is" if "@attr" in latest_track_obj and \
         "nowplaying" in latest_track_obj["@attr"] else "was"
     tags_or_no = f"\ntags: {tags}" if tags else ''
-    bot.sendMessage(f"{username} {is_was} playing `{track}` by {artist}" + \
+    bot.sendMessage(f"{username} {is_was} playing _{track}_ by *{artist}*" + \
                     f"{tags_or_no}\n{link}",
                     thread_id=thread_id, thread_type=thread_type)
 
