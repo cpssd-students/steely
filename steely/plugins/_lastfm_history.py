@@ -25,8 +25,7 @@ def parsed_response(response):
 
 
 def gen_reply_string(response):
-    response = parsed_response(response)
-    if not list(response):
+    if not response:
         raise KeyError('no tracks found')
     yield '```'
     for time, artist, track in response:
@@ -43,7 +42,9 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
         username = USERDB.get(USER.id == author_id)['username']
     try:
         response = get_lastfm_request('user.getRecentTracks', user=username, limit=8).json()
-        reply_body = '\n'.join(gen_reply_string(response))
+        clean_response = list(parsed_response(response))
+        reply_lines = list(gen_reply_string(clean_response))
+        reply_body = '\n'.join(reply_lines)
         send_message(reply_body)
     except (NameError, KeyError) as exc:
         send_message(exc)
