@@ -199,7 +199,7 @@ def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
 
     try:
         bi = BasicInterpreter(stdout=add_stdout, stderr=add_stderr)
-        bi.add_instructions(source_code.split('\n'))
+        bi.add_instructions(source_code.strip().split('\n'))
     except Exception as error:
         send("There was an error parsing your code. "
              "Ensure it's in the format: LINE# INSTR ARG1 ARG2...")
