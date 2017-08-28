@@ -5,6 +5,9 @@
 ```
 $ git clone this
 $ pip3 install --user -r requirements.txt
+or, if you're in a new py3 virtualenv
+$ pip install -r requirements.txt
+
 ```
 
 ## to run
