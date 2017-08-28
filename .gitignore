@@ -60,6 +60,7 @@ ENV/
 lastfm.json
 linden.json
 quote.json
+stats.json
 
 .idea
 
