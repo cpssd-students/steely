@@ -29,12 +29,19 @@ def get_train_times(station):
               station.find('./realtime:Duein', NAMESPACES).text
 
 
-def gen_reply_string(times):
+def len_longest_string_of(column):
+    return max(len(str(row)) for row in column)
+
+
+def gen_column_widths(times):
+    for column in zip(*times):
+        yield len_longest_string_of(column)
+
+
+def gen_reply_string(times, widths):
+    max_origin, max_destin, max_time = widths
     yield "```"
-    max_origin = max(len(line[0]) for line in times)
-    max_destin = max(len(line[1]) for line in times)
-    max_time = max(len(str(line[2])) for line in times)
-    yield f"{'origin':<{max_origin}} destination"
+    yield f"{'from':<{max_origin}} to"
     for origin, destin, time in times:
         yield f"{origin:<{max_origin}} {destin:<{max_destin}} {time:>{max_time}}min"
     yield "```"
@@ -54,7 +61,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         bot.sendMessage("no results", thread_id=thread_id, thread_type=thread_type)
 
 
-
 if __name__ == "__main__":
     times = list(get_train_times("bayside"))
-    print("\n".join(gen_reply_string(times)))
+    widths = gen_column_widths(times)
+    print("\n".join(gen_reply_string(times, widths)))
