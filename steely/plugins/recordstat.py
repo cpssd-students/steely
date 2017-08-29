@@ -9,25 +9,43 @@ __author__ = 'sentriz'
 COMMAND = None
 CMD_DB = TinyDB('stats.json')
 CMD = Query()
+TILDA_DB = TinyDB('quote.json')
+TILDA = Query()
 
 
-def parsed(message):
+def first_word_of(message):
     if ' ' in message:
         message = message.split()[0]
     return message
 
 
+def is_tilda_command(command):
+    return bool(TILDA_DB.search(TILDA.cmd == command))
+
+
+def looks_like_command(command):
+    identifiers = '.', '~'
+    return any(command.startswith(char) for char in identifiers)
+
+
+def is_command(command, plugins):
+    if not looks_like_command(command):
+        return False
+    elif command in plugins:
+        return True
+    elif is_tilda_command(command):
+        return True
+    return False
+
+
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    if not message.startswith('.'):
+    command = first_word_of(message)
+    plugins = bot.plugins
+    if not is_command(command, plugins):
         return
-    command = parsed(message)
-    if not command in bot.plugins:
-        return
-    search = CMD_DB.get(CMD.command == command)
-    if not search:
-        print(command, 'didnt exist')
+    stat_search = CMD_DB.get(CMD.command == command)
+    if not stat_search:
         CMD_DB.insert({'command': command, 'count': 1})
         return
     else:
-        print(command, 'did exist')
         CMD_DB.update(increment('count'), CMD.command == command)

@@ -1,17 +1,12 @@
 #!/usr/bin/env python3
 
 '''
-.define [`code`] <command_name> <some text ...>
-.define list
-
-.define allows you to add commands which contains text.
-They can be accessed via ~<command_name>, and will output what you put in.
-
-.define code <text> will format the input as code.
+show plugin stats
 '''
 
 
 from tinydb import TinyDB, Query
+from operator import itemgetter
 
 
 __author__ = 'sentriz'
@@ -20,5 +15,21 @@ CMD_DB = TinyDB('stats.json')
 CMD = Query()
 
 
+def parse_stats(stats):
+    for stat in CMD_DB.all():
+        yield stat['command'], stat['count']
+
+
+def sort_stats(stats):
+    return sorted(stats, key=itemgetter(1), reverse=True)
+
+
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    bot.sendMessage(str(CMD_DB.all()), thread_id=thread_id, thread_type=thread_type)
+    clean_stats = list(parse_stats(CMD_DB))
+    max_command = max(len(command) for command, count in clean_stats)
+    sorted_stats = sort_stats(clean_stats)
+    message = '```\n'
+    for command, count in sorted_stats:
+        message += f'{command:<{max_command}} {count:>3,}\n'
+    message += '```'
+    bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
