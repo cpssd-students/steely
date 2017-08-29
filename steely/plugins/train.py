@@ -24,9 +24,16 @@ def get_train_times(station):
     response = requests.get(REALTIME_URL, params=params).text
     response_tree = ElementTree.fromstring(response)
     for station in response_tree.findall('realtime:objStationData', NAMESPACES):
-        yield station.find('./realtime:Origin', NAMESPACES).text, \
-              station.find('./realtime:Destination', NAMESPACES).text, \
-              station.find('./realtime:Duein', NAMESPACES).text
+        yield parse_direction(station.find('./realtime:Direction', NAMESPACES).text), \
+                              station.find('./realtime:Origin', NAMESPACES).text, \
+                              station.find('./realtime:Destination', NAMESPACES).text, \
+                              station.find('./realtime:Duein', NAMESPACES).text
+
+
+def parse_direction(direction):
+    aliases = {'Northbound': '↑',
+               'Southbound': '↓'}
+    return aliases.get(direction, direction)
 
 
 def len_longest_string_of(column):
@@ -39,26 +46,29 @@ def gen_column_widths(times):
 
 
 def gen_reply_string(times, widths):
-    max_origin, max_destin, max_time = widths
+    _, max_origin, max_destin, max_time = widths
     yield "```"
-    yield f"{'from':<{max_origin}} to"
-    for origin, destin, time in times:
-        yield f"{origin:<{max_origin}} {destin:<{max_destin}} {time:>{max_time}}min"
+    yield f"  {'from':<{max_origin}} to"
+    for direction, origin, destin, time in times:
+        yield f"{direction} {origin:<{max_origin}} {destin:<{max_destin}} {time:>{max_time}}min"
     yield "```"
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
+    def send_message(message):
+        bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
     if not message:
-        bot.sendMessage("invalid train station", thread_id=thread_id, thread_type=thread_type)
+        send_message("invalid train station", thread_id=thread_id, thread_type=thread_type)
         return
     try:
-        times = get_train_times(message)
+        times = list(get_train_times(message))
+        widths = gen_column_widths(times)
     except requests.exceptions.RequestException:
-        bot.sendMessage("error retrieving results", thread_id=thread_id, thread_type=thread_type)
+        send_message("error retrieving results")
     if times:
-        bot.sendMessage("\n".join(gen_reply_string(times)), thread_id=thread_id, thread_type=thread_type)
+        send_message("\n".join(gen_reply_string(times, widths)))
     else:
-        bot.sendMessage("no results", thread_id=thread_id, thread_type=thread_type)
+        send_message("no results")
 
 
 if __name__ == "__main__":
