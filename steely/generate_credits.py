@@ -48,10 +48,12 @@ def make_new_credits():
     return '\n'.join(format_credit_line(name, author) \
                      for name, author in credits)
 
+
 def sorted_credits(credits):
     ''' sort credits by author, then plugin name
     '''
     return sorted(credits, key=itemgetter(1, 0))
+
 
 def change_credits():
     new_credits = make_new_credits()
