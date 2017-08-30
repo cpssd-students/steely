@@ -30,7 +30,7 @@ import json
 
 __author__ = 'CianLR'
 COMMAND = ".linden"
-USERDB = TinyDB("linden.json")
+USERDB = TinyDB("databases/linden.json")
 USER = Query()
 
 

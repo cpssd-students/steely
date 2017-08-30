@@ -11,7 +11,7 @@ from operator import itemgetter
 
 __author__ = 'sentriz'
 COMMAND = '.stats'
-CMD_DB = TinyDB('stats.json')
+CMD_DB = TinyDB('databases/stats.json')
 CMD = Query()
 LIMIT = 10
 

@@ -7,9 +7,9 @@ from tinydb.operations import increment
 
 __author__ = 'sentriz'
 COMMAND = None
-CMD_DB = TinyDB('stats.json')
+CMD_DB = TinyDB('databases/stats.json')
 CMD = Query()
-TILDA_DB = TinyDB('quote.json')
+TILDA_DB = TinyDB('databases/quote.json')
 TILDA = Query()
 
 

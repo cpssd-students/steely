@@ -15,7 +15,6 @@ import sys
 import threading
 
 
-CMD_DB = TinyDB('quote.json')
 HELP_DOC = '''help <command>
 
 help syntax:

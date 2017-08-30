@@ -5,7 +5,7 @@ import requests
 
 
 COMMAND = '.np'
-USERDB = TinyDB('lastfm.json')
+USERDB = TinyDB('databases/lastfm.json')
 USER = Query()
 SESSION = FuturesSession(max_workers=100)
 API_BASE = "http://ws.audioscrobbler.com/2.0/"

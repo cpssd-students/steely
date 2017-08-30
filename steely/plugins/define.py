@@ -16,7 +16,7 @@ from tinydb import TinyDB, Query
 
 __author__ = 'alexkraak'
 COMMAND = '.define'
-CMD_DB = TinyDB('quote.json')
+CMD_DB = TinyDB('databases/quote.json')
 CMD = Query()
 LIMIT = 20
 ANGRY_STRING = 'please use in form .define <command_name> <command text>'

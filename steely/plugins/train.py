@@ -12,7 +12,6 @@ from operator import itemgetter
 from xml.etree import ElementTree
 
 
-
 __author__ = 'izaakf'
 COMMAND = '.train'
 NAMESPACES = {'realtime': 'http://api.irishrail.ie/realtime/'}
