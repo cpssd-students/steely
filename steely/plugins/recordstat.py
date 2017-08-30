@@ -46,6 +46,5 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     stat_search = CMD_DB.get(CMD.command == command)
     if not stat_search:
         CMD_DB.insert({'command': command, 'count': 1})
-        return
     else:
         CMD_DB.update(increment('count'), CMD.command == command)
