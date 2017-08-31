@@ -16,8 +16,8 @@ REPLIES = (
     "Shut up {}",
     "Nice wig, {}. What's it made of?",
     "{}, I would unplug your life support to charge my phone",
-    "{}, I wonder if you'd be able to speak more clearly if your parents were seconds cousins instead of first",
-    "{}, you are impossible to understimate",
+    "{}, I wonder if you'd be able to speak more clearly if your parents were second cousins instead of first",
+    "{}, you are impossible to underestimate",
     "I'd insult {} behind their back but my cars only got half a tank of gas",
     "{} you absolute walnut",
     "{} you stupid fucking almond",
@@ -29,6 +29,12 @@ REPLIES = (
     "{}, you're as dumb as a mule and twice as ugly. If a strange man offers you a ride, I say take it.",
     "{}, go play in traffic",
     "{} you are a fucking overdeveloped cumshot. GET OUT OF MY SIGHT.",
+    "{} you wee cashew fuck.",
+    "Please shit on your hand and slap yourself {}.",
+    "Dearest {}, you have a face like a melted willy.",
+    "{}, you couldn't even get into Trinity.",
+    "{}, you're somehow trashier than a night out in Navan.",
+    "You big floppy parsnip {}",
 )
 
 
