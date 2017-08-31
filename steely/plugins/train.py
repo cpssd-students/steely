@@ -26,7 +26,8 @@ def get_train_times(station):
         yield parse_direction(station.find('./realtime:Direction', NAMESPACES).text), \
                               station.find('./realtime:Origin', NAMESPACES).text, \
                               station.find('./realtime:Destination', NAMESPACES).text, \
-                              station.find('./realtime:Duein', NAMESPACES).text
+                              station.find('./realtime:Duein', NAMESPACES).text + \
+                              station.find('./realtime:Late', NAMESPACES).text
 
 
 def parse_direction(direction):
