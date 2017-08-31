@@ -14,7 +14,7 @@ DELAY = 120
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    return if random.random() > CHANCE_OF_SEND
+    if random.random() > CHANCE_OF_SEND: return
     time.sleep(DELAY)
     log_path = os.path.join(LOGFOLDER, thread_type.name, thread_id)
     with open(log_path, 'r') as file:
