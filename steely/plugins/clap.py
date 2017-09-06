@@ -1,5 +1,7 @@
 '''.mock mocks the previous command'''
-import random
+
+
+import re
 
 
 __author__ = 'sentriz'
@@ -7,7 +9,8 @@ COMMAND = '.clap'
 
 
 def mock(string):
-    return string.replace(' ', ' 👏 ')
+    return re.sub(r'(\w)\s(\w)', r'\1 👏 \2', string)
+
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]
