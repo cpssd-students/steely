@@ -20,6 +20,6 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     log_path = os.path.join(LOGFOLDER, thread_type.name, thread_id)
     with open(log_path, 'r') as file:
         log_model = markovify.NewlineText(file.read())
-        new_sentance = log_model.make_sentence(tries=100)
-    if new_sentance:
-        bot.sendMessage(new_sentance, thread_id=thread_id, thread_type=thread_type)
+        new_sentence = log_model.make_sentence(tries=100)
+    if new_sentence:
+        bot.sendMessage(new_sentence, thread_id=thread_id, thread_type=thread_type)
