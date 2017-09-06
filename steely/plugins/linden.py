@@ -40,7 +40,7 @@ class YahooTickerFetcher:
                              'store://datatables.org/alltableswithkeys')
         self.query = ('select Symbol,Ask,Bid '
                       'from yahoo.finance.quotes where symbol in ("{}")')
-    
+
     def GetMultiple(self, tickers):
         if not tickers:
             return []
