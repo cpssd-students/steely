@@ -4,6 +4,7 @@
 import os
 
 
+__author__ = 'sentriz'
 COMMAND = None
 LOGFOLDER = 'logs'
 

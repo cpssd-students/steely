@@ -7,6 +7,7 @@ import markovify
 import time
 
 
+__author__ = 'sentriz'
 COMMAND = None
 LOGFOLDER = 'logs'
 
