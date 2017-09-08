@@ -32,7 +32,7 @@ def get_train_times(station):
 def parse_direction(direction):
     aliases = {'Northbound': '↑',
                'Southbound': '↓'}
-    return aliases.get(direction, direction)
+    return aliases.get(direction, '-')
 
 
 def len_longest_string_of(column):
@@ -41,6 +41,7 @@ def len_longest_string_of(column):
 
 def gen_column_widths(times):
     for column in zip(*times):
+        print(column)
         yield len_longest_string_of(column)
 
 
