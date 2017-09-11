@@ -12,16 +12,16 @@ __author__ = ('alexkraak', 'byxor')
 COMMAND = '.coinflip'
 
 
-PREFIXES = ["good egg", "ok sam", "incredible", "aaaaaaaaaand", "ouch",
+PREFIXES = ("good egg", "ok sam", "incredible", "aaaaaaaaaand", "ouch",
             "damn son", "go on my son", "what a flip",
             "that was a fucking disgrace",
-            "well spread some peanut butter on my asshole and call me michelle"]
-MIDDLES = ["you got", "you landed on", "you managed to flip it onto",
-           "looks like you got", "you bagged yourself"]
-SUFFIXES = ["better luck next time", "that was pretty good",
+            "well spread some peanut butter on my asshole and call me michelle")
+MIDDLES =  ("you got", "you landed on", "you managed to flip it onto",
+            "looks like you got", "you bagged yourself")
+SUFFIXES = ("better luck next time", "that was pretty good",
             "i never want to play this game again", "kill me please",
             "i wonder if linden has been fixed yet",
-            "can i have a snack now?"]
+            "can i have a snack now?")
 PROBABILITY_OF_SUFFIX = 0.1
 
 
