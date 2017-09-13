@@ -4,73 +4,82 @@
 
 Check if a dcu room is free right now
 
-.room <GLA.LG26>
+.room GLA.LG26
 '''
 
 
 import requests
-from datetime import datetime
+import datetime
 import sys
 import bs4
 
 
 __author__ = 'gruunday'
 COMMAND = '.room'
+BASEURL = 'https://www101.dcu.ie/timetables/feed.php'
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     def send_message(message):
         bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
     if not message:
-        send_message('.room <room number>\nCheck if a dcu room is free right now\n.room <GLA.LG26>')
+        send_message(__doc__)
         return
-    booking = check_room(message)
+    room_number = parse_room_number(message)
+    booking, link = get_booking(room_number)
     if booking:
-        send_message(message + ' is not free, there is\n \n' + booking + '\n')
+        send_message(f'{room_number} is not free, there is\n\n' + \
+                     f'{booking}')
     else:
-        send_message(message + " is currently free\n")
+        send_message(f'{room_number} is currently free')
+    send_message(link)
 
 
-def check_room(room):
-    url = get_url(room)
-    # Downloads request from url URL and stores as string in res
-    res = requests.get(url)
-    # Creates Beautiful Soup out of html
-    current_soup = bs4.BeautifulSoup(res.text, "lxml")
-    # Takes all <tr> tags
-    elems = current_soup.select('tr')
-    return elems[14].getText().strip()
+def parse_room_number(room_number):
+    campus_codes = ('GLA.', 'SPD.')
+    default_campus = campus_codes[0]
+    if not any(campus in room_number for campus in campus_codes):
+        room_number = default_campus + room_number
+    return room_number
 
 
-def get_url(room):
-    baseurl = 'https://www101.dcu.ie/timetables/feed.php?'
-    week = get_week()
-    hour = get_hour()
-    day = get_day()
-    template = 'location'
-    return ('%sroom=%s&week1=%s&hour=%s&day=%s&template=%s'
-            % (baseurl, room, week, hour, day, template))
+def get_booking(room, baseurl=None):
+    baseurl = baseurl or BASEURL
+    params = build_request_parameters(room)
+    response = requests.get(baseurl, params=params)
+    current_soup = bs4.BeautifulSoup(response.text, "lxml")
+    elements = current_soup.select('tr')
+    return elements[14].getText().strip(), response.url
 
 
-def get_week():
-    # Stub must replace
-    week_number = 1
-    return week_number
+def build_request_parameters(room_number):
+    now = datetime.datetime.now()
+    return {'room': room_number,
+            'week': academic_week_number(now),
+            'hour': academic_hour(now),
+            'day':  now.isoweekday(),
+            'template': 'location'}
 
 
-def get_day():
-    return datetime.date(datetime.now()).isoweekday()
+def academic_week_number(date):
+    iso_year, iso_week_number, iso_weekday = date.isocalendar()
+    academic_start_week = 36
+    if iso_week_number >= academic_start_week:
+        academic_offset = -academic_start_week
+    else:
+        academic_offset = 52 - academic_start_week
+    academic_week = iso_week_number + academic_offset
+    return academic_week
 
 
-def get_hour():
-    date = datetime.now()
-    hour = str(date).split()[1][0:2]
-    minute = str(date).split()[1][3:5]
-    if int(minute) > 30:
-        inthour = int(hour)
-        inthour += 1
-    return str(inthour - 8)
+def academic_hour(date):
+    hour = date.hour
+    minute = date.minute
+    if minute > 30:
+        hour += 1
+    return hour - 8
 
 
 if __name__ == '__main__':
-    main()
+    print(get_booking('GLA.LG26'))
+    print(get_booking('LG26'))
