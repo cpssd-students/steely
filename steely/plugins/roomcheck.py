@@ -25,7 +25,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if not message:
         send_message(__doc__)
         return
-    room_number = parse_room_number(message)
+    room_number = parse_room_number(message.upper())
     booking, link = get_booking(room_number)
     if booking:
         send_message(f'{room_number} is not free, there is\n\n' + \
