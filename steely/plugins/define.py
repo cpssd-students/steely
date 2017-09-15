@@ -25,7 +25,7 @@ ANGRY_STRING = 'please use in form .define <command_name> <command text>'
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if message == 'list':
         user_cmds = ', '.join((command['cmd'] for command in CMD_DB))
-        bot.sendMessage(user_cmds, thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage(f'```\n{user_cmds}\n```', thread_id=thread_id, thread_type=thread_type)
         return
     if not ' ' in message:
         bot.sendMessage(ANGRY_STRING, thread_id=thread_id, thread_type=thread_type)
