@@ -36,6 +36,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
 
 
 def parse_room_number(room_number):
+    room_number = room_number.upper()
     campus_codes = ('GLA.', 'SPD.')
     default_campus = campus_codes[0]
     if not any(campus in room_number for campus in campus_codes):
