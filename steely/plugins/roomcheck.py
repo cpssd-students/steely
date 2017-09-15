@@ -26,7 +26,10 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         send_message(__doc__)
         return
     room_number = parse_room_number(message.upper())
-    booking, link = get_booking(room_number)
+    try:
+        booking, link = get_booking(room_number)
+    except ValueError:
+        send_message('Building is closed at this time')
     if booking:
         send_message(f'{room_number} is not free, there is\n\n' + \
                      f'{booking}')
@@ -49,6 +52,7 @@ def get_booking(room, baseurl=None):
     response = requests.get(baseurl, params=params)
     current_soup = bs4.BeautifulSoup(response.text, "lxml")
     elements = current_soup.select('tr')
+    print(baseurl, params)
     return elements[14].getText().strip(), response.url
 
 
@@ -74,6 +78,8 @@ def academic_week_number(date):
 
 def academic_hour(date):
     hour = date.hour
+    if hour < 8 or hour > 21:
+        raise ValueError
     minute = date.minute
     if minute > 30:
         hour += 1
