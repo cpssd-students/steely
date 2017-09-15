@@ -52,7 +52,6 @@ def get_booking(room, baseurl=None):
     response = requests.get(baseurl, params=params)
     current_soup = bs4.BeautifulSoup(response.text, "lxml")
     elements = current_soup.select('tr')
-    print(baseurl, params)
     return elements[14].getText().strip(), response.url
 
 
