@@ -29,7 +29,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     try:
         booking, link = get_booking(room_number)
     except ValueError:
-        send_message('Building is closed at this time')
+        send_message('building is closed at this time')
     if booking:
         send_message(f'{room_number} is not free, there is\n\n' + \
                      f'{booking}')
@@ -78,7 +78,7 @@ def academic_week_number(date):
 def academic_hour(date):
     hour = date.hour
     if hour < 8 or hour > 21:
-        raise ValueError
+        raise ValueError('invalid accademic hour')
     minute = date.minute
     if minute > 30:
         hour += 1
