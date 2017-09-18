@@ -25,8 +25,11 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if not message:
         send_message(__doc__)
         return
-    room_number = parse_room_number(message)
-    booking, link = get_booking(room_number)
+    room_number = parse_room_number(message.upper())
+    try:
+        booking, link = get_booking(room_number)
+    except ValueError:
+        send_message('building is closed at this time')
     if booking:
         send_message(f'{room_number} is not free, there is\n\n' + \
                      f'{booking}')
@@ -75,6 +78,8 @@ def academic_week_number(date):
 
 def academic_hour(date):
     hour = date.hour
+    if hour < 8 or hour > 21:
+        raise ValueError('invalid accademic hour')
     minute = date.minute
     if minute > 30:
         hour += 1
