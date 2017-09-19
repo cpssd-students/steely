@@ -6,3 +6,4 @@ tabulate
 nose
 limp==0.2
 markovify
+textstat
