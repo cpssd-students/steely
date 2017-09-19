@@ -10,17 +10,54 @@ from tinydb import TinyDB, Query, where, operations
 __author__ = 'iandioch'
 COMMAND = '.gex'
 CARD_DB = TinyDB('databases/gex_cards.json')
+USER_DB = TinyDB('databases/gex_users.json')
 CARD = Query()
+USER = Query() # not sure if this is needed instead of reusing CARD but w/e
 
-'''
-Set the image url for the card with the given id.
-'''
-def gex_set_image(user, card_id, card_image_url):
+# Utility funcs
+
+def _check_for_card(user, card_id):
     matching_cards = CARD_DB.search(CARD.id == card_id)
     if not len(matching_cards):
         raise RuntimeError('No card exists with the given id.')
     if user not in matching_cards[0]['masters']:
         raise RuntimeError('User is not in masters of this card.')
+    return matching_cards[0]
+
+def _check_user_in_db(user_id):
+    matching_users = USER_DB.search(USER.id == user_id)
+    if len(matching_users):
+        return
+    USER_DB.insert({'id': user_id, 'cards':{}})
+
+def _get_user(user_id):
+    matching_users = USER_DB.search(USER.id == user_id)
+    if not len(matching_users):
+        raise RuntimeError('Could not find user with given id.')
+    return matching_users[0]
+
+# Public API
+
+'''
+Give the specified receiver user the card with the given id.
+'''
+def gex_give(giving_user, card_id, receiving_user):
+    print('giving', giving_user, card_id, receiving_user)
+    _check_for_card(giving_user, card_id)
+    _check_user_in_db(receiving_user)
+    data = _get_user(receiving_user)
+    cards = data['cards']
+    if card_id in cards:
+        cards[card_id] += 1
+    else:
+        cards[card_id] = 1
+    USER_DB.update({'cards':cards}, USER.id == receiving_user)
+
+'''
+Set the image url for the card with the given id.
+'''
+def gex_set_image(user, card_id, card_image_url):
+    _check_for_card(user, card_id)
     CARD_DB.update(operations.set('image', card_image_url), CARD.id == card_id)
 
 '''
@@ -51,6 +88,16 @@ def gex_inspect(card_id):
     return matching_cards[0]
 
 # Private message-based funcs
+
+def _gex_give(bot, args, author_id, thread_id, thread_type):
+    if not args or len(args) != 2:
+        raise RuntimeError('Need to provide command in the form give USER CARD_ID .')
+    user_id = args[0]
+    # TODO(ndonn): Map from real name to user id.
+    # TODO(ndonn): Respond if the given user does not exist in this channel.
+    card_id = args[1]
+    gex_give(author_id, card_id, user_id)
+    # TODO(ndonn): Notify user they got a new card.
 
 def _gex_set_image(bot, args, author_id, thread_id, thread_type):
     if not args or len(args) == 1:
@@ -89,6 +136,7 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
     bot.sendMessage(info, thread_id=thread_id, thread_type=thread_type)
 
 SUBCOMMANDS = {
+    'give': _gex_give,
     'set_image': _gex_set_image,
     'create': _gex_create,
     'inspect': _gex_inspect,
