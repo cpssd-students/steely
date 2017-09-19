@@ -38,7 +38,7 @@ class SteelyBot(Client):
             '.help': HELP_DOC
         }
         for plugin in list_plugins():
-            if plugin.__doc__:
+            if plugin.__doc__ and plugin.COMMAND:
                 self.plugin_helps[plugin.COMMAND.lower()] = plugin.__doc__.strip('\n')
             if plugin.COMMAND:
                 self.plugins[plugin.COMMAND.lower()] = plugin

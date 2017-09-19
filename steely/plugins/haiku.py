@@ -14,6 +14,7 @@ definition of a haiku.
 
 from textstat.textstat import textstat  # wat
 
+
 __author__ = 'CianLR'
 COMMAND = None
 
@@ -32,7 +33,6 @@ def split_by_syllables(syls, words):
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if len(message.split()) > 17:
         return
-
     try:
         words = message.split()
         first, rest = split_by_syllables(5, words)
@@ -40,10 +40,9 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         last, rest = split_by_syllables(5, rest)
         if rest:
             return
-        bot.sendMessage(
-                '\n'.join(map(' '.join, (first, middle, last))),
-                thread_id=thread_id,
-                thread_type=thread_type)
+        bot.sendMessage('\n'.join(map(' '.join, (first, middle, last))),
+                        thread_id=thread_id,
+                        thread_type=thread_type)
     except ValueError:
         pass
 
@@ -52,23 +51,19 @@ if __name__ == '__main__':
     class FakeBot:
         def sendMessage(self, message, *args, **kwargs):
             print(message)
+
     def main_wrapper(message):
         return main(FakeBot(), 123, message, 123, 123)
 
     main_wrapper("""
-    I am first with five
-    Then seven in the middle --
-    Five again to end.""")
-
+                 I am first with five
+                 Then seven in the middle --
+                 Five again to end.""")
     main_wrapper("Hello sam my friend, it has been a long time boy, "
                  "I do miss your spam")
-
     main_wrapper("""
-    Snowman in a field
-    listening to the raindrops
-    wishing him farewell""")
-    
+                 Snowman in a field
+                 listening to the raindrops
+                 wishing him farewell""")
     main_wrapper("Oi mate are you avin a laf?")
-
     main_wrapper("hello there " * 100)
-
