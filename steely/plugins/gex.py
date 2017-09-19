@@ -40,6 +40,10 @@ def _user_name_to_id(bot, name):
     users = bot.searchForUsers(name)
     return users[0].uid
 
+def _user_id_to_name(bot, user_id):
+    user = bot.fetchUserInfo(user_id)[user_id]
+    return user.name
+
 # Public API
 
 '''
@@ -183,7 +187,8 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
     if deets['desc'] is not None:
         info += '_{}_\n\n'.format(deets['desc'])
     # TODO(iandioch): Get user names instead of ID number of masters.
-    info += 'Masters: ' + ', '.join(deets['masters'])
+    masters = [_user_id_to_name(bot, master) for master in deets['masters']]
+    info += 'Masters:\n' + ',\n'.join(masters)
     bot.sendMessage(info, thread_id=thread_id, thread_type=thread_type)
 
 def _gex_flex(bot, args, author_id, thread_id, thread_type):
@@ -192,10 +197,12 @@ def _gex_flex(bot, args, author_id, thread_id, thread_type):
         user_id = _user_name_to_id(bot, args[0])
     cards = gex_flex(user_id)
     total = sum(c[1] for c in cards)
-    output = 'ID: {}\nCards:\n'.format(user_id)
-    output += 'Total cards: {} ({} unique)\n'.format(total, len(cards))
+    name = _user_id_to_name(bot, user_id)
+    output = '*{}*\nID: _{}_\n'.format(name, user_id)
+    output += 'Total cards: _{}_ (_{}_ unique)\n'.format(total, len(cards))
+    output += '\n*Cards*:\n'
     for card, num in cards:
-        output += '{}: {}\n'.format(card, num)
+        output += '`{}`: {}\n'.format(card, num)
     bot.sendMessage(output, thread_id=thread_id, thread_type=thread_type)
 
 
