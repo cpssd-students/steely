@@ -167,7 +167,7 @@ def _gex_give(bot, args, author_id, thread_id, thread_type):
     user_id = _user_name_to_id(bot, args[0])
     card_id = args[1]
     gex_give(author_id, card_id, user_id)
-    # TODO(ndonn): Notify user they got a new card.
+    # TODO(iandioch): Notify user they got a new card.
 
 def _gex_remove(bot, args, author_id, thread_id, thread_type):
     if not args or len(args) != 2:
@@ -175,7 +175,7 @@ def _gex_remove(bot, args, author_id, thread_id, thread_type):
     user_id = _user_name_to_id(bot, args[0])
     card_id = args[1]
     gex_remove(author_id, card_id, user_id)
-    # TODO(ndonn): Notify user they lost a card.
+    # TODO(iandioch): Notify user they lost a card.
 
 def _gex_set_image(bot, args, author_id, thread_id, thread_type):
     if not args or len(args) == 1:
