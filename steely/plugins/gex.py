@@ -165,8 +165,6 @@ def _gex_give(bot, args, author_id, thread_id, thread_type):
     if not args or len(args) != 2:
         raise RuntimeError('Need to provide command in the form give USER CARD_ID .')
     user_id = _user_name_to_id(bot, args[0])
-    # TODO(ndonn): Map from real name to user id.
-    # TODO(ndonn): Respond if the given user does not exist in this channel.
     card_id = args[1]
     gex_give(author_id, card_id, user_id)
     # TODO(ndonn): Notify user they got a new card.
@@ -175,8 +173,6 @@ def _gex_remove(bot, args, author_id, thread_id, thread_type):
     if not args or len(args) != 2:
         raise RuntimeError('Need to provide command in the form remove USER CARD_ID .')
     user_id = _user_name_to_id(bot, args[0])
-    # TODO(ndonn): Map from real name to user id.
-    # TODO(ndonn): Respond if the given user does not exist in this channel.
     card_id = args[1]
     gex_remove(author_id, card_id, user_id)
     # TODO(ndonn): Notify user they lost a card.
@@ -191,7 +187,6 @@ def _gex_set_image(bot, args, author_id, thread_id, thread_type):
     bot.sendRemoteImage(card_image, thread_id=thread_id, thread_type=thread_type)
 
 def _gex_create(bot, args, author_id, thread_id, thread_type):
-    # gex create id desc
     if not args:
         raise RuntimeError('Need to provide command in the form create ID [DESC] .')
         return
@@ -227,7 +222,6 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
     info = '*{}*\n'.format(deets['id'])
     if deets['desc'] is not None:
         info += '_{}_\n\n'.format(deets['desc'])
-    # TODO(iandioch): Get user names instead of ID number of masters.
     masters = [_user_id_to_name(bot, master) for master in deets['masters']]
     info += 'Masters:\n' + ',\n'.join(masters)
     bot.sendMessage(info, thread_id=thread_id, thread_type=thread_type)
