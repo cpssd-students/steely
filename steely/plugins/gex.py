@@ -5,6 +5,7 @@ gex is a TCG-alike for the Followers of Nude Tayne.
 See design doc at: https://docs.google.com/document/d/1HYDU3wrewmk9dwt6wX7MqMcbZfuaGSrfhP6YXsSORBY/edit?usp=sharing
 '''
 
+import time
 from tinydb import TinyDB, Query, where, operations
 
 __author__ = 'iandioch'
@@ -18,6 +19,7 @@ USER = Query() # not sure if this is needed instead of reusing CARD but w/e
 
 def _get_time_millis():
     millis = int(round(time.time()*1000))
+    return millis
 
 def _check_for_card(user, card_id):
     matching_cards = CARD_DB.search(CARD.id == card_id)
@@ -101,8 +103,13 @@ def gex_set_image(user, card_id, card_image_url):
 Create a gex card with the given id, masters list, and description.
 '''
 def gex_create(card_id, card_masters, card_desc=None):
-    # TODO(iandioch): Put time-out in place, so a user must wait 24hrs before
-    # they can create another gex card.
+    time_millis = _get_time_millis()
+    user_data = _get_user(card_masters[0])
+    old_time = 0
+    if 'last_create_time' in user_data and user_data['last_create_time'] is not None:
+        old_time = user_data['last_create_time']
+    if time_millis - old_time < 1000*60*60*24: # millis in 24 hours
+        raise RuntimeError('Can only create a card every 24 hours.')
     if not card_masters or not len(card_masters):
         raise RuntimeError('No master provided for this card.')
     matching_cards = CARD_DB.search(CARD.id == card_id)
@@ -116,6 +123,7 @@ def gex_create(card_id, card_masters, card_desc=None):
         'desc': card_desc,
         'image': None,
     })
+    USER_DB.update({'last_create_time': time_millis}, USER.id == card_masters[0])
 
 '''
 Get a list of all of the cards a user has, sorted by their occurances.
