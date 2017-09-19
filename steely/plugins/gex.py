@@ -36,6 +36,10 @@ def _get_user(user_id):
         raise RuntimeError('Could not find user with given id.')
     return matching_users[0]
 
+def _user_name_to_id(bot, name):
+    users = bot.searchForUsers(name)
+    return users[0].uid
+
 # Public API
 
 '''
@@ -129,7 +133,7 @@ def gex_flex(user_id):
 def _gex_give(bot, args, author_id, thread_id, thread_type):
     if not args or len(args) != 2:
         raise RuntimeError('Need to provide command in the form give USER CARD_ID .')
-    user_id = args[0]
+    user_id = _user_name_to_id(bot, args[0])
     # TODO(ndonn): Map from real name to user id.
     # TODO(ndonn): Respond if the given user does not exist in this channel.
     card_id = args[1]
@@ -139,7 +143,7 @@ def _gex_give(bot, args, author_id, thread_id, thread_type):
 def _gex_remove(bot, args, author_id, thread_id, thread_type):
     if not args or len(args) != 2:
         raise RuntimeError('Need to provide command in the form remove USER CARD_ID .')
-    user_id = args[0]
+    user_id = _user_name_to_id(bot, args[0])
     # TODO(ndonn): Map from real name to user id.
     # TODO(ndonn): Respond if the given user does not exist in this channel.
     card_id = args[1]
@@ -185,7 +189,7 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
 def _gex_flex(bot, args, author_id, thread_id, thread_type):
     user_id = author_id
     if len(args):
-        user_id = args[0]
+        user_id = _user_name_to_id(bot, args[0])
     cards = gex_flex(user_id)
     total = sum(c[1] for c in cards)
     output = 'ID: {}\nCards:\n'.format(user_id)
