@@ -77,7 +77,7 @@ def academic_hour(date):
     minute = date.minute
     if minute > 30:
         hour += 1
-    return hour - 8
+    return (hour - 8) + (hour - 7) 
 
 
 if __name__ == '__main__':
