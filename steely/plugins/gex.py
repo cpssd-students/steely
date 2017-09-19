@@ -16,6 +16,9 @@ USER = Query() # not sure if this is needed instead of reusing CARD but w/e
 
 # Utility funcs
 
+def _get_time_millis():
+    millis = int(round(time.time()*1000))
+
 def _check_for_card(user, card_id):
     matching_cards = CARD_DB.search(CARD.id == card_id)
     if not len(matching_cards):
@@ -28,7 +31,13 @@ def _check_user_in_db(user_id):
     matching_users = USER_DB.search(USER.id == user_id)
     if len(matching_users):
         return
-    USER_DB.insert({'id': user_id, 'cards':{}})
+    time_millis = _get_time_millis()
+    USER_DB.insert({
+        'id': user_id,
+        'cards':{},
+        'last_create_time': time_millis,
+        'last_card': None,
+    })
 
 def _get_user(user_id):
     matching_users = USER_DB.search(USER.id == user_id)
@@ -109,15 +118,6 @@ def gex_create(card_id, card_masters, card_desc=None):
     })
 
 '''
-Get information about the card with the given id.
-'''
-def gex_inspect(card_id):
-    matching_cards = CARD_DB.search(CARD.id == card_id)
-    if not matching_cards:
-        raise RuntimeError('No card exists with the given id.')
-    return matching_cards[0]
-
-'''
 Get a list of all of the cards a user has, sorted by their occurances.
 '''
 def gex_flex(user_id):
@@ -131,6 +131,25 @@ def gex_flex(user_id):
     for c in card_keys:
         card_tuples.append((c, cards[c]))
     return card_tuples
+
+'''
+Get information about the card with the given id.
+'''
+def gex_inspect(card_id):
+    matching_cards = CARD_DB.search(CARD.id == card_id)
+    if not matching_cards:
+        raise RuntimeError('No card exists with the given id.')
+    return matching_cards[0]
+
+'''
+Get a list of all existing cards in alphabetical order.
+'''
+def gex_codex():
+    cards = CARD_DB.search(CARD.id.exists())
+    print(cards)
+    card_ids = [card['id'] for card in cards]
+    card_ids.sort()
+    return card_ids
 
 # Private message-based funcs
 
@@ -175,6 +194,20 @@ def _gex_create(bot, args, author_id, thread_id, thread_type):
     gex_create(card_id, [author_id], card_desc)
     bot.sendMessage('Card {} created.'.format(card_id), thread_id=thread_id, thread_type=thread_type)
 
+def _gex_flex(bot, args, author_id, thread_id, thread_type):
+    user_id = author_id
+    if len(args):
+        user_id = _user_name_to_id(bot, args[0])
+    cards = gex_flex(user_id)
+    total = sum(c[1] for c in cards)
+    name = _user_id_to_name(bot, user_id)
+    output = '*{}*\nID: _{}_\n'.format(name, user_id)
+    output += 'Total cards: _{}_ (_{}_ unique)\n'.format(total, len(cards))
+    output += '\n*Cards*:\n'
+    for card, num in cards:
+        output += '`{}`: {}\n'.format(card, num)
+    bot.sendMessage(output, thread_id=thread_id, thread_type=thread_type)
+
 def _gex_inspect(bot, args, author_id, thread_id, thread_type):
     if not args:
         raise RuntimeError('Need to provide a card id.')
@@ -191,28 +224,19 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
     info += 'Masters:\n' + ',\n'.join(masters)
     bot.sendMessage(info, thread_id=thread_id, thread_type=thread_type)
 
-def _gex_flex(bot, args, author_id, thread_id, thread_type):
-    user_id = author_id
-    if len(args):
-        user_id = _user_name_to_id(bot, args[0])
-    cards = gex_flex(user_id)
-    total = sum(c[1] for c in cards)
-    name = _user_id_to_name(bot, user_id)
-    output = '*{}*\nID: _{}_\n'.format(name, user_id)
-    output += 'Total cards: _{}_ (_{}_ unique)\n'.format(total, len(cards))
-    output += '\n*Cards*:\n'
-    for card, num in cards:
-        output += '`{}`: {}\n'.format(card, num)
-    bot.sendMessage(output, thread_id=thread_id, thread_type=thread_type)
-
+def _gex_codex(bot, args, author_id, thread_id, thread_type):
+    card_ids = gex_codex()
+    message = '\n'.join(card_ids)
+    bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
 
 SUBCOMMANDS = {
     'give': _gex_give,
     'remove': _gex_remove,
     'set_image': _gex_set_image,
     'create': _gex_create,
-    'inspect': _gex_inspect,
     'flex': _gex_flex,
+    'inspect': _gex_inspect,
+    'codex': _gex_codex,
 }
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
