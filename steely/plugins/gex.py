@@ -54,6 +54,26 @@ def gex_give(giving_user, card_id, receiving_user):
     USER_DB.update({'cards':cards}, USER.id == receiving_user)
 
 '''
+Remove the specified card from a certain user.
+'''
+def gex_remove(removing_user, card_id, receiving_user):
+    print('removing', removing_user, card_id, receiving_user)
+    matching_cards = CARD_DB.search(CARD.id == card_id)
+    if not len(matching_cards):
+        raise RuntimeError('No card exists with the given id.')
+    masters = set(matching_cards[0]['masters'])
+    if removing_user not in masters and receiving_user not in masters:
+        raise RuntimeError('Only a card master or the user themselves can remove a card.')
+    _check_user_in_db(receiving_user)
+    user = _get_user(receiving_user)
+    if card_id not in user['cards'] or user['cards'][card_id] <= 0:
+        raise RuntimeError('This user does not own the given card!')
+    user['cards'][card_id] -= 1
+    if user['cards'][card_id] == 0:
+        del user['cards'][card_id]
+    USER_DB.update({'cards':user['cards']}, USER.id == receiving_user)
+
+'''
 Set the image url for the card with the given id.
 '''
 def gex_set_image(user, card_id, card_image_url):
@@ -99,6 +119,16 @@ def _gex_give(bot, args, author_id, thread_id, thread_type):
     gex_give(author_id, card_id, user_id)
     # TODO(ndonn): Notify user they got a new card.
 
+def _gex_remove(bot, args, author_id, thread_id, thread_type):
+    if not args or len(args) != 2:
+        raise RuntimeError('Need to provide command in the form remove USER CARD_ID .')
+    user_id = args[0]
+    # TODO(ndonn): Map from real name to user id.
+    # TODO(ndonn): Respond if the given user does not exist in this channel.
+    card_id = args[1]
+    gex_remove(author_id, card_id, user_id)
+    # TODO(ndonn): Notify user they lost a card.
+
 def _gex_set_image(bot, args, author_id, thread_id, thread_type):
     if not args or len(args) == 1:
         raise RuntimeError('Need to provide command in the form set_image ID URL .')
@@ -137,6 +167,7 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
 
 SUBCOMMANDS = {
     'give': _gex_give,
+    'remove': _gex_remove,
     'set_image': _gex_set_image,
     'create': _gex_create,
     'inspect': _gex_inspect,
@@ -160,5 +191,3 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         return
 
     bot.sendMessage('Could not find command {}! Gex better son.'.format(subcommand), thread_id=thread_id, thread_type=thread_type)
-
-    # no such subcommand found
