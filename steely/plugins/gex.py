@@ -94,6 +94,9 @@ SUBCOMMANDS = {
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if not message:
         # User just typed .gex
+        commands = 'Please use one of the following gex commands, for a low low fee of 5 euroboys:\n' + \
+                '\n'.join(SUBCOMMANDS.keys().sort())
+        bot.sendMessage(commands, thread_id=thread_id, thread_type=thread_type)
         return
     subcommand, *args = message.split()
     if subcommand in SUBCOMMANDS:
@@ -104,5 +107,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         except Exception as e:
             bot.sendMessage('Misc error: {}'.format(e), thread_id=thread_id, thread_type=thread_type)
         return
+
+    bot.sendMessage('Could not find command {}! Gex better son.'.format(subcommand), thread_id=thread_id, thread_type=thread_type)
 
     # no such subcommand found
