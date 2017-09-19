@@ -27,6 +27,8 @@ def gex_set_image(user, card_id, card_image_url):
 Create a gex card with the given id, masters list, and description.
 '''
 def gex_create(card_id, card_masters, card_desc=None):
+    # TODO(iandioch): Put time-out in place, so a user must wait 24hrs before
+    # they can create another gex card.
     if not card_masters or not len(card_masters):
         raise RuntimeError('No master provided for this card.')
     matching_cards = CARD_DB.search(CARD.id == card_id)
@@ -69,6 +71,7 @@ def _gex_create(bot, args, author_id, thread_id, thread_type):
     if len(args) > 1:
         card_desc = ' '.join(args[1:])
     gex_create(card_id, [author_id], card_desc)
+    bot.sendMessage('Card {} created.'.format(card_id), thread_id=thread_id, thread_type=thread_type)
 
 def _gex_inspect(bot, args, author_id, thread_id, thread_type):
     if not args:
