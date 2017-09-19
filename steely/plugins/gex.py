@@ -68,15 +68,22 @@ def _gex_create(bot, args, author_id, thread_id, thread_type):
     card_desc = None
     if len(args) > 1:
         card_desc = ' '.join(args[1:])
-    gex_create(card_id, author_id, card_desc)
+    gex_create(card_id, [author_id], card_desc)
 
 def _gex_inspect(bot, args, author_id, thread_id, thread_type):
     if not args:
         raise RuntimeError('Need to provide a card id.')
     deets = gex_inspect(args[0])
+    print(deets)
     if deets['image'] and deets['image'] is not None:
         print('inspecting image', deets['image'])
         bot.sendRemoteImage(deets['image'], thread_id=thread_id, thread_type=thread_type)
+    info = '*{}*\n'.format(deets['id'])
+    if deets['desc'] is not None:
+        info += '_{}_\n\n'.format(deets['desc'])
+    # TODO(iandioch): Get user names instead of ID number of masters.
+    info += 'Masters: ' + ', '.join(deets['masters'])
+    bot.sendMessage(info, thread_id=thread_id, thread_type=thread_type)
 
 SUBCOMMANDS = {
     'set_image': _gex_set_image,
