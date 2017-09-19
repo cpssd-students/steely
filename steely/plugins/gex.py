@@ -90,7 +90,12 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         return
     subcommand, *args = message.split()
     if subcommand in SUBCOMMANDS:
-        SUBCOMMANDS[subcommand](bot, args, author_id, thread_id, thread_type)
+        try:
+            SUBCOMMANDS[subcommand](bot, args, author_id, thread_id, thread_type)
+        except RuntimeError as e:
+            bot.sendMessage('Error while gexin\': {}'.format(e), thread_id=thread_id, thread_type=thread_type)
+        except Exception as e:
+            bot.sendMessage('Misc error: {}'.format(e), thread_id=thread_id, thread_type=thread_type)
         return
 
     # no such subcommand found
