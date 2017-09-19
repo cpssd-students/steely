@@ -61,8 +61,8 @@ def gex_remove(removing_user, card_id, receiving_user):
     matching_cards = CARD_DB.search(CARD.id == card_id)
     if not len(matching_cards):
         raise RuntimeError('No card exists with the given id.')
-    masters = set(matching_cards[0]['masters'])
-    if removing_user not in masters and receiving_user not in masters:
+    masters = matching_cards[0]['masters']
+    if removing_user not in masters and removing_user != receiving_user:
         raise RuntimeError('Only a card master or the user themselves can remove a card.')
     _check_user_in_db(receiving_user)
     user = _get_user(receiving_user)
@@ -91,6 +91,8 @@ def gex_create(card_id, card_masters, card_desc=None):
     matching_cards = CARD_DB.search(CARD.id == card_id)
     if len(matching_cards):
         raise RuntimeError('A card already exists with this id.')
+    if len(card_id) > 16:
+        raise RuntimeError('A card id may be no longer than 16 chars.')
     CARD_DB.insert({
         'id': card_id,
         'masters': card_masters,
@@ -106,6 +108,21 @@ def gex_inspect(card_id):
     if not matching_cards:
         raise RuntimeError('No card exists with the given id.')
     return matching_cards[0]
+
+'''
+Get a list of all of the cards a user has, sorted by their occurances.
+'''
+def gex_flex(user_id):
+    _check_user_in_db(user_id)
+    data = _get_user(user_id)
+    cards = data['cards']
+    card_keys = list(cards)
+    card_keys.sort()
+    card_keys.sort(key = lambda x: cards[x], reverse=True)
+    card_tuples = []
+    for c in card_keys:
+        card_tuples.append((c, cards[c]))
+    return card_tuples
 
 # Private message-based funcs
 
@@ -165,12 +182,26 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
     info += 'Masters: ' + ', '.join(deets['masters'])
     bot.sendMessage(info, thread_id=thread_id, thread_type=thread_type)
 
+def _gex_flex(bot, args, author_id, thread_id, thread_type):
+    user_id = author_id
+    if len(args):
+        user_id = args[0]
+    cards = gex_flex(user_id)
+    total = sum(c[1] for c in cards)
+    output = 'ID: {}\nCards:\n'.format(user_id)
+    output += 'Total cards: {} ({} unique)\n'.format(total, len(cards))
+    for card, num in cards:
+        output += '{}: {}\n'.format(card, num)
+    bot.sendMessage(output, thread_id=thread_id, thread_type=thread_type)
+
+
 SUBCOMMANDS = {
     'give': _gex_give,
     'remove': _gex_remove,
     'set_image': _gex_set_image,
     'create': _gex_create,
     'inspect': _gex_inspect,
+    'flex': _gex_flex,
 }
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
