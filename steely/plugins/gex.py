@@ -13,7 +13,7 @@ CARD_DB = TinyDB('databases/gex_cards.json')
 CARD = Query()
 
 '''
-Create a gex card with the given id, masters set, and description
+Create a gex card with the given id, masters list, and description
 '''
 def gex_create_card(card_id, card_masters, card_desc=None):
     if not card_masters or not len(card_masters):
@@ -37,7 +37,7 @@ def _gex_create(bot, args, author_id, thread_id, thread_type):
     card_desc = None
     if len(args) > 1:
         card_desc = ' '.join(args[1:])
-    gex_create_card(card_id, set(author_id), card_desc)
+    gex_create_card(card_id, author_id, card_desc)
 
 SUBCOMMANDS = {
     'create': _gex_create,
