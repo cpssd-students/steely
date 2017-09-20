@@ -14,6 +14,7 @@ CARD_DB = TinyDB('databases/gex_cards.json')
 USER_DB = TinyDB('databases/gex_users.json')
 CARD = Query()
 USER = Query() # not sure if this is needed instead of reusing CARD but w/e
+GOD_IDS = set(['100018746416184', '100022169435132', '100003244958231']) # IDs that don't need auth to create cards (ie. Reed)
 
 # Utility funcs
 
@@ -109,6 +110,9 @@ def gex_create(card_id, card_masters, card_desc=None):
     old_time = 0
     if 'last_create_time' in user_data and user_data['last_create_time'] is not None:
         old_time = user_data['last_create_time']
+    if any(user_id in GOD_IDS for user_id in card_masters):
+        # for testing and automated card creations, bots don't need to timeout
+        old_time = 0
     if time_millis - old_time < 1000*60*60: # millis in an hour
         raise RuntimeError('Can only create a card every hour.')
     if not card_masters or not len(card_masters):
@@ -259,8 +263,10 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
             SUBCOMMANDS[subcommand](bot, args, author_id, thread_id, thread_type)
         except RuntimeError as e:
             bot.sendMessage('Error while gexin\': {}'.format(e), thread_id=thread_id, thread_type=thread_type)
+            print(e)
         except Exception as e:
             bot.sendMessage('Misc error: {}'.format(e), thread_id=thread_id, thread_type=thread_type)
+            print(e)
         return
 
     bot.sendMessage('Could not find command {}! Gex better son.'.format(subcommand), thread_id=thread_id, thread_type=thread_type)

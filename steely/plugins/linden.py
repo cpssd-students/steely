@@ -140,9 +140,10 @@ def create_user(id, first_name):
     USERDB.insert(data)
     return data
 
-def handle_gex_sell_badge(user_id, ticker, profit):
-    REED_ID = 100018746416184
-    NOAH_ID = 100003244958231
+def handle_gex_sell_cards(user_id, ticker, profit):
+    REED_ID = '100018746416184'
+    NOAH_ID = '100003244958231'
+    MIN_TICKER_CARD_DELTA = 25
     ticker_cards = [
         ('dcth', 'I traded the meme stock'),
         ('aapl', 'I drank a cupertino of the kool aid'),
@@ -161,12 +162,12 @@ def handle_gex_sell_badge(user_id, ticker, profit):
     for card_id, desc in cards:
         try:
             gex.gex_create(card_id, [REED_ID, NOAH_ID], desc)
-        except RuntimeError:
-            pass
+        except RuntimeError as e:
+            print('Could not create card:', e)
 
     # give ticker cards
     for card_id, desc in ticker_cards:
-        if card_id.upper() == ticker:
+        if card_id.upper() == ticker and abs(profit) >= MIN_TICKER_CARD_DELTA:
             gex.gex_give(REED_ID, card_id, user_id)
 
     # give profit & loss cards
@@ -336,7 +337,7 @@ def invest_sell_cmd(user_id, args):
     USERDB.update({'lindens': user_balance + (qt * bid)}, USER.id == user_id)
 
     profit = qt * (bid - orig_bid)
-    handle_gex_sell_badge(user_id, tic, profit)
+    handle_gex_sell_cards(user_id, tic, profit)
     return "Successfully sold {} shares of ${} for {} Lindens ({:.2f}L profit)".format(
             qt, tic, qt * bid, qt * (bid - orig_bid))
 
