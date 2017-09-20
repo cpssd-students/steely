@@ -110,7 +110,7 @@ def gex_create(card_id, card_masters, card_desc=None):
     if 'last_create_time' in user_data and user_data['last_create_time'] is not None:
         old_time = user_data['last_create_time']
     if time_millis - old_time < 1000*60*60: # millis in an hour
-        raise RuntimeError('Can only create a card every 24 hours.')
+        raise RuntimeError('Can only create a card every hour.')
     if not card_masters or not len(card_masters):
         raise RuntimeError('No master provided for this card.')
     matching_cards = CARD_DB.search(CARD.id == card_id)
