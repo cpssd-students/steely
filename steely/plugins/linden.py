@@ -34,14 +34,6 @@ COMMAND = ".linden"
 USERDB = TinyDB("databases/linden.json")
 USER = Query()
 
-___matching = USERDB.get(USER.id == '100003244958231')
-if ___matching is None:
-    data = {"id": '100003244958231',
-            "first_name": 'Noah',
-            "investments": {},
-            "lindens": 2000}
-    USERDB.insert(data)
-
 
 class YahooTickerFetcher:
     def __init__(self):
