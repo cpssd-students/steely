@@ -37,7 +37,7 @@ def _check_user_in_db(user_id):
     USER_DB.insert({
         'id': user_id,
         'cards':{},
-        'last_create_time': time_millis,
+        'last_create_time': 0,
         'last_card': None,
     })
 
@@ -108,7 +108,7 @@ def gex_create(card_id, card_masters, card_desc=None):
     old_time = 0
     if 'last_create_time' in user_data and user_data['last_create_time'] is not None:
         old_time = user_data['last_create_time']
-    if time_millis - old_time < 1000*60*60*24: # millis in 24 hours
+    if time_millis - old_time < 1000*60*60: # millis in an hour
         raise RuntimeError('Can only create a card every 24 hours.')
     if not card_masters or not len(card_masters):
         raise RuntimeError('No master provided for this card.')
