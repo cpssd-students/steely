@@ -11,12 +11,10 @@ import imp
 import os
 import random
 import requests
-import spell
 import sys
 import threading
 
 
-CMD_DB = TinyDB('quote.json')
 HELP_DOC = '''help <command>
 
 help syntax:
@@ -40,39 +38,38 @@ class SteelyBot(Client):
             '.help': HELP_DOC
         }
         for plugin in list_plugins():
-            if plugin.__doc__:
+            if plugin.__doc__ and plugin.COMMAND:
                 self.plugin_helps[plugin.COMMAND.lower()] = plugin.__doc__.strip('\n')
             if plugin.COMMAND:
                 self.plugins[plugin.COMMAND.lower()] = plugin
             else:
                 self.non_plugins.append(plugin)
-        spell.WORDS = self.plugins.keys()
 
-    def send_command(self, author_id, message, thread_id, thread_type, **kwargs):
-        # run plugins that have a command
+    @staticmethod
+    def parse_command_message(message):
         if " " in message:
             command, message = message.split(' ', 1)
         else:
             command, message = message, ""
-        command = command.lower().strip()
+        clean_command = command.lower().strip()
+        return clean_command, message
+
+    def run_plugin(self, author_id, message, thread_id, thread_type, **kwargs):
+        command, message = self.parse_command_message(message)
         if not command in self.plugins:
-            suggestions = list(enumerate(spell.correction(command)))
-            if not suggestions:
-                return
-            if len(suggestions) == 1:
-                command = suggestions[0][1]
-            else:
-                self.sendMessage('type the number to correct\n' +
-                        ", ".join("{}: {}".format(n, suggestion) for n, suggestion in suggestions),
-                        thread_id=thread_id, thread_type=thread_type)
-                self.last_suggestions = suggestions
-                self.last_message = message
-                return
+            return
         plugin = self.plugins[command]
         thread = threading.Thread(target=plugin.main,
             args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
         thread.deamon = True
         thread.start()
+
+    def run_non_plugins(self, author_id, message, thread_id, thread_type, **kwargs):
+        for plugin in self.non_plugins:
+            thread = threading.Thread(target=plugin.main,
+                args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
+            thread.deamon = True
+            thread.start()
 
     def onEmojiChange(self, author_id, new_emoji, thread_id, thread_type, **kwargs):
         nose = '👃'
@@ -88,30 +85,12 @@ class SteelyBot(Client):
     def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
         self.markAsDelivered(author_id, thread_id)
         self.markAsRead(author_id)
-
         if author_id == self.uid:
             return
-
-        # run plugins that have no command
-        for plugin in self.non_plugins:
-                thread = threading.Thread(target=plugin.main,
-                    args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
-                thread.deamon = True
-                thread.start()
-
-        if message.isdigit():
-            for number, suggestion in self.last_suggestions:
-                if number == int(message):
-                    message = suggestion + " " + self.last_message
-                    self.send_command(author_id, message, thread_id, thread_type, **kwargs)
-                    self.last_message = ""
-                    self.last_suggestions = []
-                    return
-
+        self.run_non_plugins(author_id, message, thread_id, thread_type, **kwargs)
         if not message.startswith("."):
             return
-
-        self.send_command(author_id, message, thread_id, thread_type, **kwargs)
+        self.run_plugin(author_id, message, thread_id, thread_type, **kwargs)
 
 
 if __name__ == '__main__':

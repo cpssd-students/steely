@@ -57,10 +57,9 @@ ENV/
 /site
 .mypy_cache/
 
-lastfm.json
-linden.json
-quote.json
-stats.json
+# steely spcific 
+logs/
+databases/
 
 .idea
 

@@ -22,6 +22,7 @@ invest in the stock market:
 from tinydb import TinyDB, Query, where
 from tinydb.operations import increment
 from datetime import datetime, timedelta
+from plugins import gex
 import tabulate
 import random
 import requests
@@ -30,9 +31,87 @@ import json
 
 __author__ = 'CianLR'
 COMMAND = ".linden"
-USERDB = TinyDB("linden.json")
+USERDB = TinyDB("databases/linden.json")
 USER = Query()
+REED_ID = None
 
+
+class YahooTickerFetcher:
+    def __init__(self):
+        self.base_url = 'https://query.yahooapis.com/v1/public/yql'
+        self.param_string = ('?q={}&format=json&env='
+                             'store://datatables.org/alltableswithkeys')
+        self.query = ('select Symbol,Ask,Bid '
+                      'from yahoo.finance.quotes where symbol in ("{}")')
+
+    def GetMultiple(self, tickers):
+        if not tickers:
+            return []
+
+        filled_q = self.query.format('","'.join(tickers))
+        filled_params = self.param_string.format(filled_q)
+
+        r = requests.get(self.base_url + filled_params)
+        if len(tickers) == 1:
+            # Yahoo for some reson changes the API slightly if you reqest only one ticker.
+            # Wrap the return in a list so we have a consistent API
+            return [json.loads(r.text)['query']['results']['quote']]
+        return json.loads(r.text)['query']['results']['quote']
+
+    def GetSingle(self, ticker):
+        return self.GetMultiple([ticker])[0]
+
+
+class AlphaVantageTickerFetcher:
+    def __init__(self):
+        self.base_url = "https://www.alphavantage.co/query"
+        self.params = ("?function=TIME_SERIES_INTRADAY"
+                       "&symbol={}&interval=1min&apikey={}")
+        self.KEY = "6A98QBQPTOVNV1AD"
+
+    def GetMultiple(self, tickers):
+        return [self.GetSingle(t) for t in tickers]
+
+    def GetSingle(self, ticker):
+        url = self.base_url + self.params.format(ticker, self.KEY)
+
+        r = requests.get(url)
+        resp = json.loads(r.text)
+        if "Error Message" in resp:
+            return {"Symbol": ticker, "Bid": None, "Ask": None}
+
+        most_recent_time = max(resp["Time Series (1min)"])
+        latest = resp["Time Series (1min)"][most_recent_time]
+        return {
+            "Symbol": ticker,
+            "Bid": latest["4. close"],
+            "Ask": latest["4. close"],
+        }
+
+
+class IEXTickerFetcher:
+    def __init__(self):
+        self.base_url = 'https://api.iextrading.com/1.0/tops/last?symbols='
+
+    def GetMultiple(self, tickers):
+        url = self.base_url + ','.join(tickers)
+        r = requests.get(url)
+        res = []
+        for i, quote in enumerate(json.loads(r.text)):
+            if quote is None:
+                res.append({'Symbol': tickers[i], 'Bid': None, 'Ask': None})
+                continue
+            res.append({'Symbol': tickers[i], 'Bid': quote['price'], 'Ask': quote['price']})
+        return res
+
+    def GetSingle(self, ticker):
+        return self.GetMultiple([ticker])[0]
+
+TICKER_FETCHERS = [
+    IEXTickerFetcher(),  # Fast, hopefully robust
+    YahooTickerFetcher(),  # Fast, super flakey
+    AlphaVantageTickerFetcher()  # Slow, little flakey
+]
 
 def user_from_name(name, list):
     for user in list:
@@ -53,6 +132,42 @@ def create_user(id, first_name):
             "lindens": 2000}
     USERDB.insert(data)
     return data
+
+def handle_gex_sell_cards(bot, user_id, ticker, profit):
+    NOAH_ID = '100003244958231'
+    MIN_TICKER_CARD_DELTA = 25
+    ticker_cards = [
+        ('dcth', 'I traded the meme stock'),
+        ('aapl', 'I drank a cupertino of the kool aid'),
+        ('goog', 'I only know like one stock ticker symbol'),
+        ('snap', 'I am the hot dog'),
+        ('nvda', 'Green is the warmest colour'),
+        ('amd', 'The Red Army and Navy and the whole Soviet people must fight for every inch of Soviet soil, fight to the last drop of blood for our towns and villages...onward, to victory!'),
+    ]
+    cards = ticker_cards[:]
+    vals = [2000, 1500, 1000, 750, 500, 250, 100]
+    for v in vals:
+        cards.append(('{}-gain'.format(v), 'I earned {} lindens in one sell xo'.format(v)))
+        cards.append(('{}-loss'.format(v), 'I dropped a bag of {} lindens :('.format(v)))
+
+    # try to create badges if they don't already exist
+    for card_id, desc in cards:
+        try:
+            gex.gex_create(card_id, [REED_ID, NOAH_ID], desc)
+        except RuntimeError as e:
+            print('Could not create card:', e)
+
+    # give ticker cards
+    for card_id, desc in ticker_cards:
+        if card_id.upper() == ticker and abs(profit) >= MIN_TICKER_CARD_DELTA:
+            gex.gex_give(REED_ID, card_id, user_id)
+
+    # give profit & loss cards
+    for val in vals:
+        if profit > val:
+            gex.gex_give(REED_ID, '{}-gain'.format(val), user_id)
+        if profit < -val:
+            gex.gex_give(REED_ID, '{}-loss'.format(val), user_id)
 
 
 def get_balance(user_id):
@@ -106,48 +221,31 @@ def table_cmd(bot, message_parts, author_id, thread_id, thread_type):
 QUOTE_CACHE = {}
 QUOTE_TTL = timedelta(minutes=10)
 
-def invest_get_quotes(tickers):
-    if not tickers:
-        return []
-    base_url = 'https://query.yahooapis.com/v1/public/yql'
-    param_string = '?q={}&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys'
-    query = 'select Symbol,Ask,Bid from yahoo.finance.quotes where symbol in ("{}")'
-
-    filled_q = query.format('","'.join(tickers))
-    filled_params = param_string.format(filled_q)
-
-    r = requests.get(base_url + filled_params)
-    if len(tickers) == 1:
-        # Yahoo for some reson changes the API slightly if you reqest only one ticker.
-        # Wrap the return in a list so we have a consistent API
-        return [json.loads(r.text)['query']['results']['quote']]
-    return json.loads(r.text)['query']['results']['quote']
-
-def invest_get_quote_slow_backup(ticker):
-    base_url = "https://www.alphavantage.co/query"
-    params = "?function=TIME_SERIES_INTRADAY&symbol={}&interval=1min&apikey={}"
-    KEY = "6A98QBQPTOVNV1AD"
-    url = base_url + params.format(ticker, KEY)
-
-    r = requests.get(url)
-    resp = json.loads(r.text)
-    if "Error Message" in resp:
-        return {"Symbol": ticker, "Bid": None, "Ask": None}
-
-    most_recent_time = max(resp["Time Series (1min)"])
-    latest = resp["Time Series (1min)"][most_recent_time]
-    return {
-        "Symbol": ticker,
-        "Bid": latest["4. close"],
-        "Ask": latest["4. close"],
-    }
-
 def invest_check_valid_quote(quote):
     return "Bid" in quote and quote["Bid"] and "Ask" in quote and quote["Ask"]
+
+def invest_get_quotes_multi_source(tickers):
+    # Iterate through each of the fetchers, removing tickers as a quote is
+    # found.
+    if not tickers:
+        return []
+    done = []
+    for source in TICKER_FETCHERS:
+        redo = []
+        for res in source.GetMultiple(tickers):
+            if invest_check_valid_quote(res):
+                done.append(res)
+            else:
+                redo.append(res['Symbol'])
+        if not redo:
+            break
+        tickers = redo
+    return done
 
 def invest_get_quotes_w_cache(tickers):
     cached_quotes = []
     tics_to_get = []
+    # Check for a quote from the cache
     for tic in tickers:
         if tic not in QUOTE_CACHE:
             tics_to_get.append(tic)
@@ -157,10 +255,9 @@ def invest_get_quotes_w_cache(tickers):
             tics_to_get.append(tic)
         else:
             cached_quotes.append(QUOTE_CACHE[tic])
-    new_quotes = invest_get_quotes(tics_to_get)
+    # Get all the new/expired/invalid quotes
+    new_quotes = invest_get_quotes_multi_source(tics_to_get)
     for quote in new_quotes:
-        if not invest_check_valid_quote(quote):
-            quote = invest_get_quote_slow_backup(quote["Symbol"])
         QUOTE_CACHE[quote['Symbol']] = quote
         QUOTE_CACHE[quote['Symbol']]['time'] = datetime.now()
     return cached_quotes + new_quotes
@@ -230,6 +327,9 @@ def invest_sell_cmd(user_id, args):
         del total_holdings[tic]
     USERDB.update({'investments': total_holdings}, USER.id == user_id)
     USERDB.update({'lindens': user_balance + (qt * bid)}, USER.id == user_id)
+
+    profit = qt * (bid - orig_bid)
+    handle_gex_sell_cards(user_id, tic, profit)
     return "Successfully sold {} shares of ${} for {} Lindens ({:.2f}L profit)".format(
             qt, tic, qt * bid, qt * (bid - orig_bid))
 
@@ -337,6 +437,7 @@ SUBCOMMANDS = {
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
+    REED_ID = bot.uid
     if not message:
         bot.sendMessage('you have {:.4f} Linden Dollars™'.format(get_balance(author_id)),
                         thread_id=thread_id, thread_type=thread_type)

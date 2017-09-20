@@ -8,6 +8,7 @@ __author__ = 'sentriz'
 COMMAND = '.8'
 REPLIES = (
     "it is certain",
+    "okay sam",
     "it is decidedly so",
     "without a doubt",
     "yes, definitely",
