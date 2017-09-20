@@ -437,7 +437,7 @@ SUBCOMMANDS = {
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    REED_ID = bot.id
+    REED_ID = bot.uid
     if not message:
         bot.sendMessage('you have {:.4f} Linden Dollars™'.format(get_balance(author_id)),
                         thread_id=thread_id, thread_type=thread_type)
