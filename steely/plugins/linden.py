@@ -22,6 +22,7 @@ invest in the stock market:
 from tinydb import TinyDB, Query, where
 from tinydb.operations import increment
 from datetime import datetime, timedelta
+from plugins import gex
 import tabulate
 import random
 import requests
@@ -32,6 +33,8 @@ __author__ = 'CianLR'
 COMMAND = ".linden"
 USERDB = TinyDB("databases/linden.json")
 USER = Query()
+REED_ID = None
+
 
 class YahooTickerFetcher:
     def __init__(self):
@@ -129,6 +132,42 @@ def create_user(id, first_name):
             "lindens": 2000}
     USERDB.insert(data)
     return data
+
+def handle_gex_sell_cards(bot, user_id, ticker, profit):
+    NOAH_ID = '100003244958231'
+    MIN_TICKER_CARD_DELTA = 25
+    ticker_cards = [
+        ('dcth', 'I traded the meme stock'),
+        ('aapl', 'I drank a cupertino of the kool aid'),
+        ('goog', 'I only know like one stock ticker symbol'),
+        ('snap', 'I am the hot dog'),
+        ('nvda', 'Green is the warmest colour'),
+        ('amd', 'The Red Army and Navy and the whole Soviet people must fight for every inch of Soviet soil, fight to the last drop of blood for our towns and villages...onward, to victory!'),
+    ]
+    cards = ticker_cards[:]
+    vals = [2000, 1500, 1000, 750, 500, 250, 100]
+    for v in vals:
+        cards.append(('{}-gain'.format(v), 'I earned {} lindens in one sell xo'.format(v)))
+        cards.append(('{}-loss'.format(v), 'I dropped a bag of {} lindens :('.format(v)))
+
+    # try to create badges if they don't already exist
+    for card_id, desc in cards:
+        try:
+            gex.gex_create(card_id, [REED_ID, NOAH_ID], desc)
+        except RuntimeError as e:
+            print('Could not create card:', e)
+
+    # give ticker cards
+    for card_id, desc in ticker_cards:
+        if card_id.upper() == ticker and abs(profit) >= MIN_TICKER_CARD_DELTA:
+            gex.gex_give(REED_ID, card_id, user_id)
+
+    # give profit & loss cards
+    for val in vals:
+        if profit > val:
+            gex.gex_give(REED_ID, '{}-gain'.format(val), user_id)
+        if profit < -val:
+            gex.gex_give(REED_ID, '{}-loss'.format(val), user_id)
 
 
 def get_balance(user_id):
@@ -288,6 +327,9 @@ def invest_sell_cmd(user_id, args):
         del total_holdings[tic]
     USERDB.update({'investments': total_holdings}, USER.id == user_id)
     USERDB.update({'lindens': user_balance + (qt * bid)}, USER.id == user_id)
+
+    profit = qt * (bid - orig_bid)
+    handle_gex_sell_cards(user_id, tic, profit)
     return "Successfully sold {} shares of ${} for {} Lindens ({:.2f}L profit)".format(
             qt, tic, qt * bid, qt * (bid - orig_bid))
 
@@ -395,6 +437,7 @@ SUBCOMMANDS = {
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
+    REED_ID = bot.uid
     if not message:
         bot.sendMessage('you have {:.4f} Linden Dollars™'.format(get_balance(author_id)),
                         thread_id=thread_id, thread_type=thread_type)
