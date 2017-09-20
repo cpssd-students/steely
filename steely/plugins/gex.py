@@ -250,7 +250,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if not message:
         # User just typed .gex
         commands = 'Please use one of the following gex commands, for a low low fee of 5 euroboys:\n' + \
-                '\n'.join(list(SUBCOMMANDS.keys()).sort())
+                '\n'.join(sorted(SUBCOMMANDS.keys()))
         bot.sendMessage(commands, thread_id=thread_id, thread_type=thread_type)
         return
     subcommand, *args = message.split()
