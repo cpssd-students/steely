@@ -33,6 +33,7 @@ __author__ = 'CianLR'
 COMMAND = ".linden"
 USERDB = TinyDB("databases/linden.json")
 USER = Query()
+REED_ID = None
 
 
 class YahooTickerFetcher:
@@ -132,8 +133,7 @@ def create_user(id, first_name):
     USERDB.insert(data)
     return data
 
-def handle_gex_sell_cards(user_id, ticker, profit):
-    REED_ID = '100018746416184'
+def handle_gex_sell_cards(bot, user_id, ticker, profit):
     NOAH_ID = '100003244958231'
     MIN_TICKER_CARD_DELTA = 25
     ticker_cards = [
@@ -437,6 +437,7 @@ SUBCOMMANDS = {
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
+    REED_ID = bot.id
     if not message:
         bot.sendMessage('you have {:.4f} Linden Dollars™'.format(get_balance(author_id)),
                         thread_id=thread_id, thread_type=thread_type)
