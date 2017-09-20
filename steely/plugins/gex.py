@@ -183,9 +183,13 @@ def _gex_set_image(bot, args, author_id, thread_id, thread_type):
         raise RuntimeError('Need to provide command in the form set_image ID URL .')
     card_id = args[0]
     card_image = ' '.join(args[1:])
+    try:
+        bot.sendRemoteImage(card_image, thread_id=thread_id, thread_type=thread_type)
+    except Exception:
+        bot.sendMessage('There was an issue sending this image (nsfw?), please choose another.', thread_id=thread_id, thread_type=thread_type)
+        return
     gex_set_image(author_id, card_id, card_image)
     bot.sendMessage('Image successfully set to {}'.format(card_image), thread_id=thread_id, thread_type=thread_type)
-    bot.sendRemoteImage(card_image, thread_id=thread_id, thread_type=thread_type)
 
 def _gex_create(bot, args, author_id, thread_id, thread_type):
     if not args:
