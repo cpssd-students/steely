@@ -103,6 +103,7 @@ def gex_set_image(user, card_id, card_image_url):
 Create a gex card with the given id, masters list, and description.
 '''
 def gex_create(card_id, card_masters, card_desc=None):
+    _check_user_in_db(card_masters[0])
     time_millis = _get_time_millis()
     user_data = _get_user(card_masters[0])
     old_time = 0
