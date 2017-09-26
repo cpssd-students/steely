@@ -15,11 +15,11 @@ BAD_WORDS_URL = ('https://raw.githubusercontent.com/LDNOOBW/'
                  'master/en')
 BAD_WORDS = set(requests.get(BAD_WORDS_URL).text.split('\n'))
 
-card_made = False
 CIAN_ID = '1845973042'
 CARD_NAME = "obscene"
 CARD_DESC = "WARNING: This person is not fit for a christian minecraft server"
 CARD_IMAGE = "https://pics.me.me/this-a-christian-page-swearing-21946873.png"
+card_made = CARD_NAME in gex.gex_codex()
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     global card_made
