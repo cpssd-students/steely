@@ -19,7 +19,9 @@ USER = Query() # not sure if this is needed instead of reusing CARD but w/e
 GOD_IDS = set(['100018746416184', '100022169435132', '100003244958231']) 
 # cache to map facebook user IDs to real names
 ID_TO_NAME = {}
-# A dict mapping card_id to a list of user_ids who possess that card.
+# A dict mapping card_id to a list of tuples, where each is of the form:
+# (user_id, quantity)
+# This is a map of how many of a card each person with that card possesses.
 # This dict is not kept in a DB, but is recalculated on each server init.
 # This makes consistency with USER_DB's data much easier.
 CARD_TO_USER_ID = {}
@@ -72,6 +74,19 @@ def _user_id_to_name(bot, user_id):
     except Exception:
         return 'Zucc'
 
+def _load_card_to_user_id():
+    global CARD_TO_USER_ID
+    CARD_TO_USER_ID = {}
+    users = USER_DB.all()
+    for user in users:
+        user_id = user['id']
+        cards = user['cards']
+        for card_id in cards:
+            if card_id in CARD_TO_USER_ID:
+                CARD_TO_USER_ID[card_id].append((user_id, cards[card_id]))
+            else:
+                CARD_TO_USER_ID[card_id] = [(user_id, cards[card_id])]
+
 # Public API
 
 '''
@@ -89,6 +104,15 @@ def gex_give(giving_user, card_id, receiving_user):
         cards[card_id] = 1
     USER_DB.update({'cards':cards, 'last_card':card_id}, USER.id == receiving_user)
 
+    # Update CARD_TO_USER_ID
+    tups = CARD_TO_USER_ID[card_id]
+    indexes = [i for i in range(len(tups)) if tups[i][0] == receiving_user]
+    if len(indexes):
+        tups[indexes[0]] = (receiving_user, cards[card_id])
+    else:
+        tups.append((receiving_user, cards[card_id]))
+    CARD_TO_USER_ID[card_id] = tups
+
 '''
 Remove the specified card from a certain user.
 '''
@@ -104,10 +128,21 @@ def gex_remove(removing_user, card_id, receiving_user):
     user = _get_user(receiving_user)
     if card_id not in user['cards'] or user['cards'][card_id] <= 0:
         raise RuntimeError('This user does not own the given card!')
+    deleted = False
     user['cards'][card_id] -= 1
     if user['cards'][card_id] == 0:
         del user['cards'][card_id]
+        deleted = True
     USER_DB.update({'cards':user['cards']}, USER.id == receiving_user)
+
+    # Update CARD_TO_USER_ID
+    tups = CARD_TO_USER_ID[card_id]
+    index = [i for i in range(len(tups)) if tups[i][0] == receiving_user][0]
+    if deleted:
+        del tups[index]
+    else:
+        tups[index] = (receiving_user, user['cards'][card_id])
+    CARD_TO_USER_ID[card_id] = tups
 
 '''
 Set the image url for the card with the given id.
@@ -298,6 +333,7 @@ def _gex_codex(bot, args, author_id, thread_id, thread_type):
 
 def _gex_stats(bot, args, author_id, thread_id, thread_type):
     bot.sendMessage('hi', thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(str(CARD_TO_USER_ID), thread_id=thread_id, thread_type=thread_type)
 
 SUBCOMMANDS = {
     'give': _gex_give,
@@ -331,3 +367,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         return
 
     bot.sendMessage('Could not find command {}! Gex better son.'.format(subcommand), thread_id=thread_id, thread_type=thread_type)
+
+# Things to do at bot boot
+
+_load_card_to_user_id()
