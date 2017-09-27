@@ -14,11 +14,16 @@ CARD_DB = TinyDB('databases/gex_cards.json')
 USER_DB = TinyDB('databases/gex_users.json')
 CARD = Query()
 USER = Query() # not sure if this is needed instead of reusing CARD but w/e
-GOD_IDS = set(['100018746416184', '100022169435132', '100003244958231']) # IDs that don't need auth to create cards (ie. Reed)
+
+# IDs that don't need auth to create cards (ie. Reed)
+GOD_IDS = set(['100018746416184', '100022169435132', '100003244958231']) 
 # cache to map facebook user IDs to real names
 ID_TO_NAME = {}
-# a dict mapping card_id to a list of user_ids who possess that card.
+# A dict mapping card_id to a list of user_ids who possess that card.
+# This dict is not kept in a DB, but is recalculated on each server init.
+# This makes consistency with USER_DB's data much easier.
 CARD_TO_USER_ID = {}
+# Maximum length for a card id.
 MAX_CARD_ID_LENGTH = 16
 
 # Utility funcs
