@@ -5,10 +5,7 @@ COMMAND = '.sort'
 
 
 def sort_message(message):
-    if not message:
-        return ""
-    out = ''.join(sorted(message))
-    return out
+    return ''.join(sorted(message))
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]
