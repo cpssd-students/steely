@@ -306,6 +306,10 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
         info += '_{}_\n\n'.format(deets['desc'])
     masters = [_user_id_to_name(bot, master) for master in deets['masters']]
     info += 'Masters:\n' + ',\n'.join(masters)
+    owner_quants = CARD_TO_USER_ID[deets['id']]
+    owner_quants = sorted(owner_quants, key = lambda x: x[1], reverse=True)
+    owners = [_user_id_to_name(bot, owner_quant[0]) for owner_quant in owner_quants]
+    info += '\n\nOwners:\n' + ',\n'.join(owners)
     bot.sendMessage(info, thread_id=thread_id, thread_type=thread_type)
 
 def _gex_decks(bot, args, author_id, thread_id, thread_type):
