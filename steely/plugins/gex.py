@@ -15,6 +15,11 @@ USER_DB = TinyDB('databases/gex_users.json')
 CARD = Query()
 USER = Query() # not sure if this is needed instead of reusing CARD but w/e
 GOD_IDS = set(['100018746416184', '100022169435132', '100003244958231']) # IDs that don't need auth to create cards (ie. Reed)
+# cache to map facebook user IDs to real names
+ID_TO_NAME = {}
+# a dict mapping card_id to a list of user_ids who possess that card.
+CARD_TO_USER_ID = {}
+MAX_CARD_ID_LENGTH = 16
 
 # Utility funcs
 
@@ -53,8 +58,14 @@ def _user_name_to_id(bot, name):
     return users[0].uid
 
 def _user_id_to_name(bot, user_id):
-    user = bot.fetchUserInfo(user_id)[user_id]
-    return user.name
+    if user_id in ID_TO_NAME:
+        return ID_TO_NAME[user_id]
+    try:
+        user = bot.fetchUserInfo(user_id)[user_id]
+        ID_TO_NAME[user_id] = user.name
+        return user.name
+    except Exception:
+        return 'Zucc'
 
 # Public API
 
@@ -71,7 +82,7 @@ def gex_give(giving_user, card_id, receiving_user):
         cards[card_id] += 1
     else:
         cards[card_id] = 1
-    USER_DB.update({'cards':cards}, USER.id == receiving_user)
+    USER_DB.update({'cards':cards, 'last_card':card_id}, USER.id == receiving_user)
 
 '''
 Remove the specified card from a certain user.
@@ -120,8 +131,8 @@ def gex_create(card_id, card_masters, card_desc=None):
     matching_cards = CARD_DB.search(CARD.id == card_id)
     if len(matching_cards):
         raise RuntimeError('A card already exists with this id.')
-    if len(card_id) > 16:
-        raise RuntimeError('A card id may be no longer than 16 chars.')
+    if len(card_id) > MAX_CARD_ID_LENGTH:
+        raise RuntimeError('A card id may be no longer than {} chars.'.format(MAX_CARD_ID_LENGTH))
     CARD_DB.insert({
         'id': card_id,
         'masters': card_masters,
@@ -153,6 +164,28 @@ def gex_inspect(card_id):
     if not matching_cards:
         raise RuntimeError('No card exists with the given id.')
     return matching_cards[0]
+
+'''
+Get a lits of all users, and some data about their cards.
+'''
+def gex_decks():
+    users = USER_DB.all()
+    ans = []
+    for user in users:
+        user_id = user['id']
+        cards = user['cards']
+        unique = len(cards)
+        if unique == 0:
+            continue
+        total = sum(cards.values())
+        last_card = None
+        if 'last_card' in user:
+            last_card = user['last_card']
+        ans.append((user_id, unique, total, last_card))
+    ans.sort(key = lambda x: x[0])
+    ans.sort(key = lambda x: x[2], reverse=True)
+    ans.sort(key = lambda x: x[1], reverse=True)
+    return ans
 
 '''
 Get a list of all existing cards in alphabetical order.
@@ -235,10 +268,31 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
     info += 'Masters:\n' + ',\n'.join(masters)
     bot.sendMessage(info, thread_id=thread_id, thread_type=thread_type)
 
+def _gex_decks(bot, args, author_id, thread_id, thread_type):
+    users = gex_decks()
+    print(users)
+    format_str = '{:<16} {:>4} {:>5} {:>' + str(MAX_CARD_ID_LENGTH) + '}'
+    out_strings = [format_str.format('Name', 'Uniq', 'Total', 'Most recent')]
+    for user_id, unique, total, last_card in users:
+        print('doing', user_id, unique, total)
+        name = _user_id_to_name(bot, user_id)
+        print(name, 'done')
+        if last_card is None:
+            last_card = ''
+        name_line = format_str.format(name[:16], str(unique), str(total), last_card[:MAX_CARD_ID_LENGTH])
+        out_strings.append(name_line)
+    out = '```\n' + '\n'.join(out_strings) + '\n```'
+    print(out)
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
+
+
 def _gex_codex(bot, args, author_id, thread_id, thread_type):
     card_ids = gex_codex()
     message = '\n'.join(card_ids)
     bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
+
+def _gex_stats(bot, args, author_id, thread_id, thread_type):
+    bot.sendMessage('hi', thread_id=thread_id, thread_type=thread_type)
 
 SUBCOMMANDS = {
     'give': _gex_give,
@@ -247,7 +301,9 @@ SUBCOMMANDS = {
     'create': _gex_create,
     'flex': _gex_flex,
     'inspect': _gex_inspect,
+    'decks': _gex_decks,
     'codex': _gex_codex,
+    'stats': _gex_stats,
 }
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
