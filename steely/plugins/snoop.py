@@ -21,7 +21,7 @@ def snoop(text):
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     prev_message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]
-    bot.sendMessage(snoop(prev_message),
+    bot.sendMessage(snoop(prev_message.text),
                     thread_id=thread_id,
                     thread_type=thread_type)
 
