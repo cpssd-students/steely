@@ -6,6 +6,7 @@ See design doc at: https://docs.google.com/document/d/1HYDU3wrewmk9dwt6wX7MqMcbZ
 '''
 
 import time
+import heapq
 from tinydb import TinyDB, Query, where, operations
 
 __author__ = 'iandioch'
@@ -336,8 +337,36 @@ def _gex_codex(bot, args, author_id, thread_id, thread_type):
     bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
 
 def _gex_stats(bot, args, author_id, thread_id, thread_type):
-    bot.sendMessage('hi', thread_id=thread_id, thread_type=thread_type)
-    bot.sendMessage(str(CARD_TO_USER_ID), thread_id=thread_id, thread_type=thread_type)
+    data = CARD_TO_USER_ID
+    number_of_top_cards_to_list = len(data)//5
+    number_of_bottom_cards_to_list = len(data)//10
+    num_owners = {}
+    num_in_circulation = {}
+    for card in data:
+        num_owners[card] = len(data[card])
+        num_in_circulation[card] = sum(q[1] for q in data[card])
+    most_owned_cards = heapq.nlargest(number_of_top_cards_to_list, num_owners, key=lambda x: num_owners[x])
+    most_circulated_cards = heapq.nlargest(number_of_top_cards_to_list, num_in_circulation, key=lambda x: num_in_circulation[x])
+    least_owned_cards = heapq.nsmallest(number_of_bottom_cards_to_list, num_owners, key=lambda x: num_owners[x])
+    least_circulated_cards = heapq.nsmallest(number_of_bottom_cards_to_list, num_in_circulation, key=lambda x: num_in_circulation[x])
+    out = 'Cards owned by the most people (top 20%):'
+    for card in most_owned_cards:
+        out += '\n{} ({})'.format(card, num_owners[card])
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
+    out = 'Cards with the most copies in circulation (top 20%):'
+    for card in most_circulated_cards:
+        out += '\n{} ({})'.format(card, num_in_circulation[card])
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
+    out = 'Cards owned by the fewest people (bottom 10%):'
+    for card in least_owned_cards:
+        out += '\n{} ({})'.format(card, num_owners[card])
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
+    out = 'Cards with the fewest copies in circulation (bottom 10%):'
+    for card in least_circulated_cards:
+        out += '\n{} ({})'.format(card, num_in_circulation[card])
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
+
+    
 
 SUBCOMMANDS = {
     'give': _gex_give,
