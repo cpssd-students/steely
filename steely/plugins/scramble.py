@@ -2,22 +2,20 @@
 
 import random
 
+
 __author__ = 'iandioch'
 COMMAND = '.scramble'
 
+
 def scramble(message):
-    words = message.split()
-    if len(words) == 0:
+    split_message = message.split()
+    if len(split_message) == 0:
         return ""
-    elif len(words) > 250:
+    elif len(split_message) > 250:
         return "You can't zucc me"
-    out = random.choice(words)
-    words.remove(out)
-    while len(words):
-        word = random.choice(words)
-        words.remove(word)
-        out += ' ' + word
-    return out
+    random.shuffle(split_message)
+    return " ".join(split_message)
+
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]
