@@ -28,6 +28,8 @@ ID_TO_NAME = {}
 CARD_TO_USER_ID = {}
 # Maximum length for a card id.
 MAX_CARD_ID_LENGTH = 16
+# Scrabble scores for each letter.
+SCRABBLE_SCORES = {"a": 1, "c": 3, "b": 3, "e": 1, "d": 2, "g": 2, "f": 4, "i": 1, "h": 4, "k": 5, "j": 8, "m": 3, "l": 1, "o": 1, "n": 1, "q": 10, "p": 3, "s": 1, "r": 1, "u": 1, "t": 1, "w": 4, "v": 4, "y": 4, "x": 8, "z": 10}
 
 # Utility funcs
 
@@ -87,6 +89,17 @@ def _load_card_to_user_id():
                 CARD_TO_USER_ID[card_id].append((user_id, cards[card_id]))
             else:
                 CARD_TO_USER_ID[card_id] = [(user_id, cards[card_id])]
+
+def _get_scrabble_score(s):
+    ans = 0
+    for c in s.lower():
+        if not c.isalpha():
+            continue
+        if c in SCRABBLE_SCORES:
+            ans += SCRABBLE_SCORES[c]
+        else:
+            ans += 2
+    return ans
 
 # Public API
 
@@ -349,6 +362,7 @@ def _gex_stats(bot, args, author_id, thread_id, thread_type):
     most_circulated_cards = heapq.nlargest(number_of_top_cards_to_list, num_in_circulation, key=lambda x: num_in_circulation[x])
     least_owned_cards = heapq.nsmallest(number_of_bottom_cards_to_list, num_owners, key=lambda x: num_owners[x])
     least_circulated_cards = heapq.nsmallest(number_of_bottom_cards_to_list, num_in_circulation, key=lambda x: num_in_circulation[x])
+    highest_scrabble_scores = heapq.nlargest(number_of_top_cards_to_list, data, key=lambda x: _get_scrabble_score(x))
     out = 'Cards owned by the most people (top 20%):'
     for card in most_owned_cards:
         out += '\n{} ({})'.format(card, num_owners[card])
@@ -365,7 +379,10 @@ def _gex_stats(bot, args, author_id, thread_id, thread_type):
     for card in least_circulated_cards:
         out += '\n{} ({})'.format(card, num_in_circulation[card])
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
-
+    out = 'Cards with the highest scrabble score for their ID (top 20%):'
+    for card in highest_scrabble_scores:
+        out += '\n{} ({})'.format(card, _get_scrabble_score(card))
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
     
 
 SUBCOMMANDS = {
