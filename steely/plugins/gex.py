@@ -329,19 +329,15 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
 
 def _gex_decks(bot, args, author_id, thread_id, thread_type):
     users = gex_decks()
-    print(users)
     format_str = '{:<16} {:>4} {:>5} {:>' + str(MAX_CARD_ID_LENGTH) + '}'
     out_strings = [format_str.format('Name', 'Uniq', 'Total', 'Most recent')]
     for user_id, unique, total, last_card in users:
-        print('doing', user_id, unique, total)
         name = _user_id_to_name(bot, user_id)
-        print(name, 'done')
         if last_card is None:
             last_card = ''
         name_line = format_str.format(name[:16], str(unique), str(total), last_card[:MAX_CARD_ID_LENGTH])
         out_strings.append(name_line)
     out = '```\n' + '\n'.join(out_strings) + '\n```'
-    print(out)
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
 
 
