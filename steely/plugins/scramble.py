@@ -1,4 +1,4 @@
-'''message -> aeegmss'''
+'''"hey add me on kik" -> "kik me add hey on"'''
 
 import random
 
