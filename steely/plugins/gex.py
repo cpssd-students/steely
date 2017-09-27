@@ -255,7 +255,7 @@ def _gex_flex(bot, args, author_id, thread_id, thread_type):
     output += 'Total cards: _{}_ (_{}_ unique)\n'.format(total, len(cards))
     output += '\n*Cards*:\n'
     for card, num in cards:
-        output += '`{}`: {}\n'.format(card, num)
+        output += '`{}`: {}\n'.format(card[:MAX_CARD_ID_LENGTH], num)
     bot.sendMessage(output, thread_id=thread_id, thread_type=thread_type)
 
 def _gex_inspect(bot, args, author_id, thread_id, thread_type):
@@ -292,7 +292,7 @@ def _gex_decks(bot, args, author_id, thread_id, thread_type):
 
 
 def _gex_codex(bot, args, author_id, thread_id, thread_type):
-    card_ids = gex_codex()
+    card_ids = [c[:MAX_CARD_ID_LENGTH] for c in gex_codex()]
     message = '\n'.join(card_ids)
     bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
 
