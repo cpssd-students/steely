@@ -5,11 +5,9 @@ COMMAND = '.sort'
 
 
 def sort_message(message):
-    print(message)
     if not message:
         return ""
     out = ''.join(sorted(message))
-    print(out)
     return out
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
