@@ -7,6 +7,7 @@ See design doc at: https://docs.google.com/document/d/1HYDU3wrewmk9dwt6wX7MqMcbZ
 
 import time
 import heapq
+import difflib
 from tinydb import TinyDB, Query, where, operations
 
 __author__ = 'iandioch'
@@ -384,6 +385,10 @@ def _gex_stats(bot, args, author_id, thread_id, thread_type):
         out += '\n{} ({})'.format(card, _get_scrabble_score(card))
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
     
+def _gex_help(bot, args, author_id, thread_id, thread_type):
+    commands = 'Please use one of the following gex commands, for a low low fee of 5 euroboys:\n' + \
+        '\n'.join(sorted(SUBCOMMANDS.keys()))
+    bot.sendMessage(commands, thread_id=thread_id, thread_type=thread_type)
 
 SUBCOMMANDS = {
     'give': _gex_give,
@@ -395,16 +400,18 @@ SUBCOMMANDS = {
     'decks': _gex_decks,
     'codex': _gex_codex,
     'stats': _gex_stats,
+    'help': _gex_help,
 }
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if not message:
         # User just typed .gex
-        commands = 'Please use one of the following gex commands, for a low low fee of 5 euroboys:\n' + \
-                '\n'.join(sorted(SUBCOMMANDS.keys()))
-        bot.sendMessage(commands, thread_id=thread_id, thread_type=thread_type)
-        return
+        message = 'help'
     subcommand, *args = message.split()
+    if subcommand not in SUBCOMMANDS:
+        best_guess = max(SUBCOMMANDS, key=lambda x:difflib.SequenceMatcher(None, x, subcommand).ratio())
+        bot.sendMessage('Autocorrecting {} to {}'.format(subcommand, best_guess), thread_id=thread_id, thread_type=thread_type)
+        subcommand = best_guess
     if subcommand in SUBCOMMANDS:
         try:
             SUBCOMMANDS[subcommand](bot, args, author_id, thread_id, thread_type)
