@@ -40,6 +40,8 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     stats = zip(list(onlines), usernames, list(playcounts))
     message = "```\n"
     for online, username, playcount in sorted(stats, key=itemgetter(0, 2), reverse=True):
+        if playcount == 0:
+            continue
         online_str = " ♬"[online]
         message += f"{online_str} {username:<{max_username}} {playcount:>6,}\n"
     message += "```"

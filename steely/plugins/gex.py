@@ -6,6 +6,8 @@ See design doc at: https://docs.google.com/document/d/1HYDU3wrewmk9dwt6wX7MqMcbZ
 '''
 
 import time
+import heapq
+import difflib
 from tinydb import TinyDB, Query, where, operations
 
 __author__ = 'iandioch'
@@ -14,7 +16,21 @@ CARD_DB = TinyDB('databases/gex_cards.json')
 USER_DB = TinyDB('databases/gex_users.json')
 CARD = Query()
 USER = Query() # not sure if this is needed instead of reusing CARD but w/e
-GOD_IDS = set(['100018746416184', '100022169435132', '100003244958231']) # IDs that don't need auth to create cards (ie. Reed)
+
+# IDs that don't need auth to create cards (ie. Reed)
+GOD_IDS = set(['100018746416184', '100022169435132', '100003244958231']) 
+# cache to map facebook user IDs to real names
+ID_TO_NAME = {}
+# A dict mapping card_id to a list of tuples, where each is of the form:
+# (user_id, quantity)
+# This is a map of how many of a card each person with that card possesses.
+# This dict is not kept in a DB, but is recalculated on each server init.
+# This makes consistency with USER_DB's data much easier.
+CARD_TO_USER_ID = {}
+# Maximum length for a card id.
+MAX_CARD_ID_LENGTH = 16
+# Scrabble scores for each letter.
+SCRABBLE_SCORES = {"a": 1, "c": 3, "b": 3, "e": 1, "d": 2, "g": 2, "f": 4, "i": 1, "h": 4, "k": 5, "j": 8, "m": 3, "l": 1, "o": 1, "n": 1, "q": 10, "p": 3, "s": 1, "r": 1, "u": 1, "t": 1, "w": 4, "v": 4, "y": 4, "x": 8, "z": 10}
 
 # Utility funcs
 
@@ -53,8 +69,38 @@ def _user_name_to_id(bot, name):
     return users[0].uid
 
 def _user_id_to_name(bot, user_id):
-    user = bot.fetchUserInfo(user_id)[user_id]
-    return user.name
+    if user_id in ID_TO_NAME:
+        return ID_TO_NAME[user_id]
+    try:
+        user = bot.fetchUserInfo(user_id)[user_id]
+        ID_TO_NAME[user_id] = user.name
+        return user.name
+    except Exception:
+        return 'Zucc'
+
+def _load_card_to_user_id():
+    global CARD_TO_USER_ID
+    CARD_TO_USER_ID = {}
+    users = USER_DB.all()
+    for user in users:
+        user_id = user['id']
+        cards = user['cards']
+        for card_id in cards:
+            if card_id in CARD_TO_USER_ID:
+                CARD_TO_USER_ID[card_id].append((user_id, cards[card_id]))
+            else:
+                CARD_TO_USER_ID[card_id] = [(user_id, cards[card_id])]
+
+def _get_scrabble_score(s):
+    ans = 0
+    for c in s.lower():
+        if not c.isalpha():
+            continue
+        if c in SCRABBLE_SCORES:
+            ans += SCRABBLE_SCORES[c]
+        else:
+            ans += 2
+    return ans
 
 # Public API
 
@@ -71,7 +117,16 @@ def gex_give(giving_user, card_id, receiving_user):
         cards[card_id] += 1
     else:
         cards[card_id] = 1
-    USER_DB.update({'cards':cards}, USER.id == receiving_user)
+    USER_DB.update({'cards':cards, 'last_card':card_id}, USER.id == receiving_user)
+
+    # Update CARD_TO_USER_ID
+    tups = CARD_TO_USER_ID[card_id]
+    indexes = [i for i in range(len(tups)) if tups[i][0] == receiving_user]
+    if len(indexes):
+        tups[indexes[0]] = (receiving_user, cards[card_id])
+    else:
+        tups.append((receiving_user, cards[card_id]))
+    CARD_TO_USER_ID[card_id] = tups
 
 '''
 Remove the specified card from a certain user.
@@ -88,10 +143,21 @@ def gex_remove(removing_user, card_id, receiving_user):
     user = _get_user(receiving_user)
     if card_id not in user['cards'] or user['cards'][card_id] <= 0:
         raise RuntimeError('This user does not own the given card!')
+    deleted = False
     user['cards'][card_id] -= 1
     if user['cards'][card_id] == 0:
         del user['cards'][card_id]
+        deleted = True
     USER_DB.update({'cards':user['cards']}, USER.id == receiving_user)
+
+    # Update CARD_TO_USER_ID
+    tups = CARD_TO_USER_ID[card_id]
+    index = [i for i in range(len(tups)) if tups[i][0] == receiving_user][0]
+    if deleted:
+        del tups[index]
+    else:
+        tups[index] = (receiving_user, user['cards'][card_id])
+    CARD_TO_USER_ID[card_id] = tups
 
 '''
 Set the image url for the card with the given id.
@@ -120,8 +186,8 @@ def gex_create(card_id, card_masters, card_desc=None):
     matching_cards = CARD_DB.search(CARD.id == card_id)
     if len(matching_cards):
         raise RuntimeError('A card already exists with this id.')
-    if len(card_id) > 16:
-        raise RuntimeError('A card id may be no longer than 16 chars.')
+    if len(card_id) > MAX_CARD_ID_LENGTH:
+        raise RuntimeError('A card id may be no longer than {} chars.'.format(MAX_CARD_ID_LENGTH))
     CARD_DB.insert({
         'id': card_id,
         'masters': card_masters,
@@ -153,6 +219,28 @@ def gex_inspect(card_id):
     if not matching_cards:
         raise RuntimeError('No card exists with the given id.')
     return matching_cards[0]
+
+'''
+Get a lits of all users, and some data about their cards.
+'''
+def gex_decks():
+    users = USER_DB.all()
+    ans = []
+    for user in users:
+        user_id = user['id']
+        cards = user['cards']
+        unique = len(cards)
+        if unique == 0:
+            continue
+        total = sum(cards.values())
+        last_card = None
+        if 'last_card' in user:
+            last_card = user['last_card']
+        ans.append((user_id, unique, total, last_card))
+    ans.sort(key = lambda x: x[0])
+    ans.sort(key = lambda x: x[2], reverse=True)
+    ans.sort(key = lambda x: x[1], reverse=True)
+    return ans
 
 '''
 Get a list of all existing cards in alphabetical order.
@@ -217,7 +305,7 @@ def _gex_flex(bot, args, author_id, thread_id, thread_type):
     output += 'Total cards: _{}_ (_{}_ unique)\n'.format(total, len(cards))
     output += '\n*Cards*:\n'
     for card, num in cards:
-        output += '`{}`: {}\n'.format(card, num)
+        output += '`{}`: {}\n'.format(card[:MAX_CARD_ID_LENGTH], num)
     bot.sendMessage(output, thread_id=thread_id, thread_type=thread_type)
 
 def _gex_inspect(bot, args, author_id, thread_id, thread_type):
@@ -233,12 +321,70 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
         info += '_{}_\n\n'.format(deets['desc'])
     masters = [_user_id_to_name(bot, master) for master in deets['masters']]
     info += 'Masters:\n' + ',\n'.join(masters)
+    owner_quants = CARD_TO_USER_ID[deets['id']]
+    owner_quants = sorted(owner_quants, key = lambda x: x[1], reverse=True)
+    owners = [_user_id_to_name(bot, owner_quant[0]) for owner_quant in owner_quants]
+    info += '\n\nOwners:\n' + ',\n'.join(owners)
     bot.sendMessage(info, thread_id=thread_id, thread_type=thread_type)
 
+def _gex_decks(bot, args, author_id, thread_id, thread_type):
+    users = gex_decks()
+    format_str = '{:<16} {:>4} {:>5} {:>' + str(MAX_CARD_ID_LENGTH) + '}'
+    out_strings = [format_str.format('Name', 'Uniq', 'Total', 'Most recent')]
+    for user_id, unique, total, last_card in users:
+        name = _user_id_to_name(bot, user_id)
+        if last_card is None:
+            last_card = ''
+        name_line = format_str.format(name[:16], str(unique), str(total), last_card[:MAX_CARD_ID_LENGTH])
+        out_strings.append(name_line)
+    out = '```\n' + '\n'.join(out_strings) + '\n```'
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
+
+
 def _gex_codex(bot, args, author_id, thread_id, thread_type):
-    card_ids = gex_codex()
+    card_ids = [c[:MAX_CARD_ID_LENGTH] for c in gex_codex()]
     message = '\n'.join(card_ids)
     bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
+
+def _gex_stats(bot, args, author_id, thread_id, thread_type):
+    data = CARD_TO_USER_ID
+    number_of_top_cards_to_list = len(data)//5
+    number_of_bottom_cards_to_list = len(data)//10
+    num_owners = {}
+    num_in_circulation = {}
+    for card in data:
+        num_owners[card] = len(data[card])
+        num_in_circulation[card] = sum(q[1] for q in data[card])
+    most_owned_cards = heapq.nlargest(number_of_top_cards_to_list, num_owners, key=lambda x: num_owners[x])
+    most_circulated_cards = heapq.nlargest(number_of_top_cards_to_list, num_in_circulation, key=lambda x: num_in_circulation[x])
+    least_owned_cards = heapq.nsmallest(number_of_bottom_cards_to_list, num_owners, key=lambda x: num_owners[x])
+    least_circulated_cards = heapq.nsmallest(number_of_bottom_cards_to_list, num_in_circulation, key=lambda x: num_in_circulation[x])
+    highest_scrabble_scores = heapq.nlargest(number_of_top_cards_to_list, data, key=lambda x: _get_scrabble_score(x))
+    out = 'Cards owned by the most people (top 20%):'
+    for card in most_owned_cards:
+        out += '\n{} ({})'.format(card, num_owners[card])
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
+    out = 'Cards with the most copies in circulation (top 20%):'
+    for card in most_circulated_cards:
+        out += '\n{} ({})'.format(card, num_in_circulation[card])
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
+    out = 'Cards owned by the fewest people (bottom 10%):'
+    for card in least_owned_cards:
+        out += '\n{} ({})'.format(card, num_owners[card])
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
+    out = 'Cards with the fewest copies in circulation (bottom 10%):'
+    for card in least_circulated_cards:
+        out += '\n{} ({})'.format(card, num_in_circulation[card])
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
+    out = 'Cards with the highest scrabble score for their ID (top 20%):'
+    for card in highest_scrabble_scores:
+        out += '\n{} ({})'.format(card, _get_scrabble_score(card))
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
+    
+def _gex_help(bot, args, author_id, thread_id, thread_type):
+    commands = 'Please use one of the following gex commands, for a low low fee of 5 euroboys:\n' + \
+        '\n'.join(sorted(SUBCOMMANDS.keys()))
+    bot.sendMessage(commands, thread_id=thread_id, thread_type=thread_type)
 
 SUBCOMMANDS = {
     'give': _gex_give,
@@ -247,17 +393,21 @@ SUBCOMMANDS = {
     'create': _gex_create,
     'flex': _gex_flex,
     'inspect': _gex_inspect,
+    'decks': _gex_decks,
     'codex': _gex_codex,
+    'stats': _gex_stats,
+    'help': _gex_help,
 }
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if not message:
         # User just typed .gex
-        commands = 'Please use one of the following gex commands, for a low low fee of 5 euroboys:\n' + \
-                '\n'.join(sorted(SUBCOMMANDS.keys()))
-        bot.sendMessage(commands, thread_id=thread_id, thread_type=thread_type)
-        return
+        message = 'help'
     subcommand, *args = message.split()
+    if subcommand not in SUBCOMMANDS:
+        best_guess = max(SUBCOMMANDS, key=lambda x:difflib.SequenceMatcher(None, x, subcommand).ratio())
+        bot.sendMessage('Autocorrecting {} to {}'.format(subcommand, best_guess), thread_id=thread_id, thread_type=thread_type)
+        subcommand = best_guess
     if subcommand in SUBCOMMANDS:
         try:
             SUBCOMMANDS[subcommand](bot, args, author_id, thread_id, thread_type)
@@ -270,3 +420,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         return
 
     bot.sendMessage('Could not find command {}! Gex better son.'.format(subcommand), thread_id=thread_id, thread_type=thread_type)
+
+# Things to do at bot boot
+
+_load_card_to_user_id()

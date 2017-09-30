@@ -33,7 +33,7 @@ def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
         send(f'{info} {full_error_message}')
     try:
         environment = limp.environment.create_standard()
-        environment['send'] = send
+        environment.define('send', send)
         result = limp.evaluate(source_code, environment)
         send(result)
     except (SyntaxError, NameError) as error:
