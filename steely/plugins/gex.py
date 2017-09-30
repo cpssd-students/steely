@@ -9,6 +9,8 @@ import time
 import heapq
 import difflib
 from tinydb import TinyDB, Query, where, operations
+import plugins._gex_util as gex_util
+from plugins import _gex_battle
 
 __author__ = 'iandioch'
 COMMAND = '.gex'
@@ -63,20 +65,6 @@ def _get_user(user_id):
     if not len(matching_users):
         raise RuntimeError('Could not find user with given id.')
     return matching_users[0]
-
-def _user_name_to_id(bot, name):
-    users = bot.searchForUsers(name)
-    return users[0].uid
-
-def _user_id_to_name(bot, user_id):
-    if user_id in ID_TO_NAME:
-        return ID_TO_NAME[user_id]
-    try:
-        user = bot.fetchUserInfo(user_id)[user_id]
-        ID_TO_NAME[user_id] = user.name
-        return user.name
-    except Exception:
-        return 'Zucc'
 
 def _load_card_to_user_id():
     global CARD_TO_USER_ID
@@ -257,7 +245,7 @@ def gex_codex():
 def _gex_give(bot, args, author_id, thread_id, thread_type):
     if not args or len(args) != 2:
         raise RuntimeError('Need to provide command in the form give USER CARD_ID .')
-    user_id = _user_name_to_id(bot, args[0])
+    user_id = gex_util.user_name_to_id(bot, args[0])
     card_id = args[1]
     gex_give(author_id, card_id, user_id)
     # TODO(iandioch): Notify user they got a new card.
@@ -265,7 +253,7 @@ def _gex_give(bot, args, author_id, thread_id, thread_type):
 def _gex_remove(bot, args, author_id, thread_id, thread_type):
     if not args or len(args) != 2:
         raise RuntimeError('Need to provide command in the form remove USER CARD_ID .')
-    user_id = _user_name_to_id(bot, args[0])
+    user_id = gex_util.user_name_to_id(bot, args[0])
     card_id = args[1]
     gex_remove(author_id, card_id, user_id)
     # TODO(iandioch): Notify user they lost a card.
@@ -297,10 +285,10 @@ def _gex_create(bot, args, author_id, thread_id, thread_type):
 def _gex_flex(bot, args, author_id, thread_id, thread_type):
     user_id = author_id
     if len(args):
-        user_id = _user_name_to_id(bot, args[0])
+        user_id = gex_util.user_name_to_id(bot, args[0])
     cards = gex_flex(user_id)
     total = sum(c[1] for c in cards)
-    name = _user_id_to_name(bot, user_id)
+    name = gex_util.user_id_to_name(bot, user_id)
     output = '*{}*\nID: _{}_\n'.format(name, user_id)
     output += 'Total cards: _{}_ (_{}_ unique)\n'.format(total, len(cards))
     output += '\n*Cards*:\n'
@@ -319,11 +307,11 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
     info = '*{}*\n'.format(deets['id'])
     if deets['desc'] is not None:
         info += '_{}_\n\n'.format(deets['desc'])
-    masters = [_user_id_to_name(bot, master) for master in deets['masters']]
+    masters = [gex_util.user_id_to_name(bot, master) for master in deets['masters']]
     info += 'Masters:\n' + ',\n'.join(masters)
     owner_quants = CARD_TO_USER_ID[deets['id']]
     owner_quants = sorted(owner_quants, key = lambda x: x[1], reverse=True)
-    owners = [_user_id_to_name(bot, owner_quant[0]) for owner_quant in owner_quants]
+    owners = [gex_util.user_id_to_name(bot, owner_quant[0]) for owner_quant in owner_quants]
     info += '\n\nOwners:\n' + ',\n'.join(owners)
     bot.sendMessage(info, thread_id=thread_id, thread_type=thread_type)
 
@@ -332,7 +320,7 @@ def _gex_decks(bot, args, author_id, thread_id, thread_type):
     format_str = '{:<16} {:>4} {:>5} {:>' + str(MAX_CARD_ID_LENGTH) + '}'
     out_strings = [format_str.format('Name', 'Uniq', 'Total', 'Most recent')]
     for user_id, unique, total, last_card in users:
-        name = _user_id_to_name(bot, user_id)
+        name = gex_util.user_id_to_name(bot, user_id)
         if last_card is None:
             last_card = ''
         name_line = format_str.format(name[:16], str(unique), str(total), last_card[:MAX_CARD_ID_LENGTH])
@@ -397,6 +385,7 @@ SUBCOMMANDS = {
     'codex': _gex_codex,
     'stats': _gex_stats,
     'help': _gex_help,
+    'battle': _gex_battle.battle,
 }
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
