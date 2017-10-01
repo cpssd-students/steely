@@ -8,11 +8,15 @@ BATTLE = Query()
 
 # The number of cards coming up in the deck that users can see.
 NUM_UPCOMING_CARDS_TO_DISPLAY = 5
+# The amount of power each user starts with in a battle.
+STARTING_POWER_AMOUNT = 50
 
 def _get_participant_info(bot, data):
     name = gex_util.user_id_to_name(bot, data['id'])
     deck = data['deck']
-    return (name, deck)
+    ready = data['ready']
+    power = data['power']
+    return (name, deck, ready, power)
 
 '''Get a permutation of a user's cards.'''
 def _get_shuffled_deck(user_id):
@@ -24,9 +28,13 @@ def _get_shuffled_deck(user_id):
     return cards
 
 def _generate_battle_id():
-    _id = uuid.uuid4().hex[:4]
-    print(_id)
-    return _id
+    while True:
+        _id = uuid.uuid4().hex[:4]
+        matching_battles = BATTLE_DB.search(BATTLE.id == _id)
+        if len(matching_battles) > 0:
+            continue
+        print('Started battle with id {}'.format(_id))
+        return _id
 
 def battle_info(bot, args, author_id, thread_id, thread_type):
     if len(args) == 0:
@@ -41,11 +49,12 @@ def battle_info(bot, args, author_id, thread_id, thread_type):
     attacker = battle['attacker']
     defender = battle['defender']
     attacker_info = _get_participant_info(bot, attacker)
-    out = 'Attacker: {}\nDeck:'.format(attacker_info[0])
+    out = '*Battle {}*'.format(battle_id)
+    out += '\nAttacker: {}\n{} ⚡\nDeck:'.format(attacker_info[0], attacker_info[3])
     for i in range(min(NUM_UPCOMING_CARDS_TO_DISPLAY, len(attacker_info[1]))):
         out  += '\n`{}` ({})'.format(attacker_info[1][i], 1) # TODO: replace with card power
     defender_info = _get_participant_info(bot, defender)
-    out += '\nDefender: {}\nDeck:'.format(defender_info[0])
+    out += '\n\nDefender: {}\n{} ⚡\nDeck:'.format(defender_info[0], defender_info[3])
     for i in range(min(NUM_UPCOMING_CARDS_TO_DISPLAY, len(defender_info[1]))):
         out  += '\n`{}` ({})'.format(defender_info[1][i], 1) # TODO: replace with card power
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
@@ -67,11 +76,13 @@ def battle_start(bot, args, author_id, thread_id, thread_type):
             'id': attacker_id,
             'deck': _get_shuffled_deck(attacker_id),
             'ready': False,
+            'power': STARTING_POWER_AMOUNT,
         },
         'defender': {
             'id': defender_id,
             'deck': _get_shuffled_deck(defender_id),
             'ready': False,
+            'power': STARTING_POWER_AMOUNT,
         },
         'id': battle_id,
     }
