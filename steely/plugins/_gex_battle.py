@@ -1,6 +1,7 @@
 from random import shuffle
 import uuid
 from tinydb import TinyDB, Query
+from fbchat.models import ThreadType
 import plugins._gex_util as gex_util
 
 BATTLE_DB = TinyDB('databases/gex_battles.json')
@@ -53,10 +54,18 @@ def battle_info(bot, args, author_id, thread_id, thread_type):
     out += '\nAttacker: {}\n{} ⚡\nDeck:'.format(attacker_info[0], attacker_info[3])
     for i in range(min(NUM_UPCOMING_CARDS_TO_DISPLAY, len(attacker_info[1]))):
         out  += '\n`{}` ({})'.format(attacker_info[1][i], 1) # TODO: replace with card power
+    if attacker_info[2]:
+        out += '\n_Ready to fight._'
+    else:
+        out += '\n_Not ready._'
     defender_info = _get_participant_info(bot, defender)
     out += '\n\nDefender: {}\n{} ⚡\nDeck:'.format(defender_info[0], defender_info[3])
     for i in range(min(NUM_UPCOMING_CARDS_TO_DISPLAY, len(defender_info[1]))):
         out  += '\n`{}` ({})'.format(defender_info[1][i], 1) # TODO: replace with card power
+    if defender_info[2]:
+        out += '\n_Ready to fight._'
+    else:
+        out += '\n_Not ready._'
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
 
 def battle_start(bot, args, author_id, thread_id, thread_type):
@@ -85,14 +94,36 @@ def battle_start(bot, args, author_id, thread_id, thread_type):
             'power': STARTING_POWER_AMOUNT,
         },
         'id': battle_id,
+        'thread_id': thread_id,
+        'is_group_thread': (thread_type == ThreadType.GROUP),
     }
     print(data)
     BATTLE_DB.insert(data)
     bot.sendMessage('Started battle {}.'.format(battle_id), thread_id=thread_id, thread_type=thread_type)
 
+def battle_ready(bot, args, author_id, thread_id, thread_type):
+    if len(args) == 0:
+        bot.sendMessage('Please provide a battle ID.', thread_id=thread_id, thread_type=thread_type)
+        return
+    battle_id = args[0]
+    matching_battles = BATTLE_DB.search(BATTLE.id == battle_id)
+    if len(matching_battles) == 0:
+        bot.sendMessage('No battle found with given ID.', thread_id=thread_id, thread_type=thread_type)
+        return
+    battle = matching_battles[0]
+    if author_id == battle['attacker']['id']:
+        battle['attacker']['ready'] = True
+    elif author_id == battle['defender']['id']:
+        battle['defender']['ready'] = True
+    else:
+        bot.sendMessage('This user is not a part of this battle.', thread_id=thread_id, thread_type=thread_type)
+        return
+    BATTLE_DB.update(battle, BATTLE.id == battle_id)
+
 subcommands = {
     'info': battle_info,
     'start': battle_start,
+    'ready': battle_ready,
 }
 
 def battle(bot, args, author_id, thread_id, thread_type):
