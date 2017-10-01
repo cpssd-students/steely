@@ -1,5 +1,7 @@
-import plugins._gex_util as gex_util
+from random import shuffle
+import uuid
 from tinydb import TinyDB, Query
+import plugins._gex_util as gex_util
 
 BATTLE_DB = TinyDB('databases/gex_battles.json')
 BATTLE = Query()
@@ -8,6 +10,20 @@ def _get_participant_info(bot, data):
     name = gex_util.user_id_to_name(bot, data['id'])
     deck = data['deck']
     return (name, deck)
+
+'''Get a permutation of a user's cards.'''
+def _get_shuffled_deck(user_id):
+    user_data = gex_util.get_user(user_id)
+    cards = []
+    for card in user_data['cards']:
+        cards.extend([card]*(user_data['cards'][card]))
+    shuffle(cards)
+    return cards
+
+def _generate_battle_id():
+    _id = uuid.uuid4().hex[:4]
+    print(_id)
+    return _id
 
 def battle_info(bot, args, author_id, thread_id, thread_type):
     if len(args) == 0:
@@ -31,18 +47,23 @@ def battle_start(bot, args, author_id, thread_id, thread_type):
         bot.sendMessage('Please choose someone to battle xo', thread_id=thread_id, thread_type=thread_type)
         return
     defender_name = args[0]
+    print(defender_name)
     defender_id = gex_util.user_name_to_id(bot, defender_name)
+    gex_util.check_user_in_db(attacker_id)
+    gex_util.check_user_in_db(defender_id)
+    print(defender_id)
     data = {
         'attacker': {
             'id': attacker_id,
-            'deck': [],
+            'deck': _get_shuffled_deck(attacker_id),
         },
         'defender': {
             'id': defender_id,
-            'deck': [],
+            'deck': _get_shuffled_deck(defender_id),
         },
-        'id': 'ohshit',
+        'id': _generate_battle_id(),
     }
+    print(data)
     BATTLE_DB.insert(data)
 
 subcommands = {

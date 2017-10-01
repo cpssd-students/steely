@@ -21,8 +21,6 @@ USER = Query() # not sure if this is needed instead of reusing CARD but w/e
 
 # IDs that don't need auth to create cards (ie. Reed)
 GOD_IDS = set(['100018746416184', '100022169435132', '100003244958231']) 
-# cache to map facebook user IDs to real names
-ID_TO_NAME = {}
 # A dict mapping card_id to a list of tuples, where each is of the form:
 # (user_id, quantity)
 # This is a map of how many of a card each person with that card possesses.
@@ -35,36 +33,6 @@ MAX_CARD_ID_LENGTH = 16
 SCRABBLE_SCORES = {"a": 1, "c": 3, "b": 3, "e": 1, "d": 2, "g": 2, "f": 4, "i": 1, "h": 4, "k": 5, "j": 8, "m": 3, "l": 1, "o": 1, "n": 1, "q": 10, "p": 3, "s": 1, "r": 1, "u": 1, "t": 1, "w": 4, "v": 4, "y": 4, "x": 8, "z": 10}
 
 # Utility funcs
-
-def _get_time_millis():
-    millis = int(round(time.time()*1000))
-    return millis
-
-def _check_for_card(user, card_id):
-    matching_cards = CARD_DB.search(CARD.id == card_id)
-    if not len(matching_cards):
-        raise RuntimeError('No card exists with the given id.')
-    if user not in matching_cards[0]['masters']:
-        raise RuntimeError('User is not in masters of this card.')
-    return matching_cards[0]
-
-def _check_user_in_db(user_id):
-    matching_users = USER_DB.search(USER.id == user_id)
-    if len(matching_users):
-        return
-    time_millis = _get_time_millis()
-    USER_DB.insert({
-        'id': user_id,
-        'cards':{},
-        'last_create_time': 0,
-        'last_card': None,
-    })
-
-def _get_user(user_id):
-    matching_users = USER_DB.search(USER.id == user_id)
-    if not len(matching_users):
-        raise RuntimeError('Could not find user with given id.')
-    return matching_users[0]
 
 def _load_card_to_user_id():
     global CARD_TO_USER_ID
@@ -97,9 +65,9 @@ Give the specified receiver user the card with the given id.
 '''
 def gex_give(giving_user, card_id, receiving_user):
     print('giving', giving_user, card_id, receiving_user)
-    _check_for_card(giving_user, card_id)
-    _check_user_in_db(receiving_user)
-    data = _get_user(receiving_user)
+    gex_util.check_for_card(giving_user, card_id)
+    gex_util.check_user_in_db(receiving_user)
+    data = gex_util.get_user(receiving_user)
     cards = data['cards']
     if card_id in cards:
         cards[card_id] += 1
@@ -127,8 +95,8 @@ def gex_remove(removing_user, card_id, receiving_user):
     masters = matching_cards[0]['masters']
     if removing_user not in masters and removing_user != receiving_user:
         raise RuntimeError('Only a card master or the user themselves can remove a card.')
-    _check_user_in_db(receiving_user)
-    user = _get_user(receiving_user)
+    gex_util.check_user_in_db(receiving_user)
+    user = gex_util.get_user(receiving_user)
     if card_id not in user['cards'] or user['cards'][card_id] <= 0:
         raise RuntimeError('This user does not own the given card!')
     deleted = False
@@ -151,16 +119,16 @@ def gex_remove(removing_user, card_id, receiving_user):
 Set the image url for the card with the given id.
 '''
 def gex_set_image(user, card_id, card_image_url):
-    _check_for_card(user, card_id)
+    gex_util.check_for_card(user, card_id)
     CARD_DB.update(operations.set('image', card_image_url), CARD.id == card_id)
 
 '''
 Create a gex card with the given id, masters list, and description.
 '''
 def gex_create(card_id, card_masters, card_desc=None):
-    _check_user_in_db(card_masters[0])
-    time_millis = _get_time_millis()
-    user_data = _get_user(card_masters[0])
+    gex_util.check_user_in_db(card_masters[0])
+    time_millis = gex_util.get_time_millis()
+    user_data = gex_util.get_user(card_masters[0])
     old_time = 0
     if 'last_create_time' in user_data and user_data['last_create_time'] is not None:
         old_time = user_data['last_create_time']
@@ -183,13 +151,14 @@ def gex_create(card_id, card_masters, card_desc=None):
         'image': None,
     })
     USER_DB.update({'last_create_time': time_millis}, USER.id == card_masters[0])
+    CARD_TO_USER_ID[card_id] = []
 
 '''
 Get a list of all of the cards a user has, sorted by their occurances.
 '''
 def gex_flex(user_id):
-    _check_user_in_db(user_id)
-    data = _get_user(user_id)
+    gex_util.check_user_in_db(user_id)
+    data = gex_util.get_user(user_id)
     cards = data['cards']
     card_keys = list(cards)
     card_keys.sort()
