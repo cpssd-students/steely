@@ -6,6 +6,9 @@ import plugins._gex_util as gex_util
 BATTLE_DB = TinyDB('databases/gex_battles.json')
 BATTLE = Query()
 
+# The number of cards coming up in the deck that users can see.
+NUM_UPCOMING_CARDS_TO_DISPLAY = 5
+
 def _get_participant_info(bot, data):
     name = gex_util.user_id_to_name(bot, data['id'])
     deck = data['deck']
@@ -38,8 +41,14 @@ def battle_info(bot, args, author_id, thread_id, thread_type):
     attacker = battle['attacker']
     defender = battle['defender']
     attacker_info = _get_participant_info(bot, attacker)
-    print(attacker_info)
-    bot.sendMessage(str(attacker_info), thread_id=thread_id, thread_type=thread_type)
+    out = 'Attacker: {}\nDeck:'.format(attacker_info[0])
+    for i in range(min(NUM_UPCOMING_CARDS_TO_DISPLAY, len(attacker_info[1]))):
+        out  += '\n`{}` ({})'.format(attacker_info[1][i], 1) # TODO: replace with card power
+    defender_info = _get_participant_info(bot, defender)
+    out += '\nDefender: {}\nDeck:'.format(defender_info[0])
+    for i in range(min(NUM_UPCOMING_CARDS_TO_DISPLAY, len(defender_info[1]))):
+        out  += '\n`{}` ({})'.format(defender_info[1][i], 1) # TODO: replace with card power
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
 
 def battle_start(bot, args, author_id, thread_id, thread_type):
     attacker_id = author_id
@@ -52,19 +61,23 @@ def battle_start(bot, args, author_id, thread_id, thread_type):
     gex_util.check_user_in_db(attacker_id)
     gex_util.check_user_in_db(defender_id)
     print(defender_id)
+    battle_id = _generate_battle_id()
     data = {
         'attacker': {
             'id': attacker_id,
             'deck': _get_shuffled_deck(attacker_id),
+            'ready': False,
         },
         'defender': {
             'id': defender_id,
             'deck': _get_shuffled_deck(defender_id),
+            'ready': False,
         },
-        'id': _generate_battle_id(),
+        'id': battle_id,
     }
     print(data)
     BATTLE_DB.insert(data)
+    bot.sendMessage('Started battle {}.'.format(battle_id), thread_id=thread_id, thread_type=thread_type)
 
 subcommands = {
     'info': battle_info,
