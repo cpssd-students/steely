@@ -14,18 +14,22 @@ START_IDENTIFIER = '---------------|'
 
 
 def get_plugin_name(plugin):
-    return plugin.__name__[:-3]
+    return markdown_plugin_of(plugin.__name__)
 
 
 def get_plugin_author(plugin):
     author_s = plugin.__author__
     if is_multi_author(author_s):
-        return ', '.join(map(markdown_link_of, author_s))
-    return markdown_link_of(author_s)
+        return ', '.join(map(markdown_author_of, author_s))
+    return markdown_author_of(author_s)
 
 
-def markdown_link_of(author):
+def markdown_author_of(author):
     return f'[{author}](https://github.com/{author}/)'
+
+
+def markdown_plugin_of(plugin):
+    return f'[{plugin[:-3]}](steely/plugins/{plugin})'
 
 
 def is_multi_author(authors):
