@@ -1,4 +1,4 @@
-'''.mock mocks the previous command'''
+'''searches the previous message'''
 
 import re
 
