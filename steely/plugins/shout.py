@@ -1,4 +1,4 @@
-'''gives the previous command ａｅｓｔｈｅｔｉｃ'''
+'''THE BEST PLUGIN!!!1!'''
 
 
 import random
