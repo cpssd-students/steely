@@ -6,5 +6,11 @@ __author__ = 'EdwardDowling'
 COMMAND = '.search'
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    prev_message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]
-    bot.sendMessage(str(re.search(message, prev_message)), thread_id=thread_id, thread_type=thread_type)
+    def send_message(message):
+        bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
+    prev_message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1].text
+    match = re.search(message, prev_message)
+    if match:
+        send_message(match.group(0))
+    else:
+        send_message("no match idiot")
