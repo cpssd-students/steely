@@ -120,7 +120,9 @@ def gex_give(giving_user, card_id, receiving_user):
     USER_DB.update({'cards':cards, 'last_card':card_id}, USER.id == receiving_user)
 
     # Update CARD_TO_USER_ID
-    tups = CARD_TO_USER_ID[card_id]
+    tups = []
+    if card_id in CARD_TO_USER_ID:
+        tups = CARD_TO_USER_ID[card_id]
     indexes = [i for i in range(len(tups)) if tups[i][0] == receiving_user]
     if len(indexes):
         tups[indexes[0]] = (receiving_user, cards[card_id])
@@ -195,6 +197,7 @@ def gex_create(card_id, card_masters, card_desc=None):
         'image': None,
     })
     USER_DB.update({'last_create_time': time_millis}, USER.id == card_masters[0])
+    CARD_TO_USER_ID[card_id] = []
 
 '''
 Get a list of all of the cards a user has, sorted by their occurances.
@@ -321,10 +324,11 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
         info += '_{}_\n\n'.format(deets['desc'])
     masters = [_user_id_to_name(bot, master) for master in deets['masters']]
     info += 'Masters:\n' + ',\n'.join(masters)
-    owner_quants = CARD_TO_USER_ID[deets['id']]
-    owner_quants = sorted(owner_quants, key = lambda x: x[1], reverse=True)
-    owners = [_user_id_to_name(bot, owner_quant[0]) for owner_quant in owner_quants]
-    info += '\n\nOwners:\n' + ',\n'.join(owners)
+    if deets['id'] in CARD_TO_USER_ID:
+        owner_quants = CARD_TO_USER_ID[deets['id']]
+        owner_quants = sorted(owner_quants, key = lambda x: x[1], reverse=True)
+        owners = [_user_id_to_name(bot, owner_quant[0]) for owner_quant in owner_quants]
+        info += '\n\nOwners:\n' + ',\n'.join(owners)
     bot.sendMessage(info, thread_id=thread_id, thread_type=thread_type)
 
 def _gex_decks(bot, args, author_id, thread_id, thread_type):
