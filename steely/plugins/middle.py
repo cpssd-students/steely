@@ -13,6 +13,8 @@ def shuffle(string):
 
 
 def shuffle_middle(string):
+    if len(string) <= 3:
+        return string
     return string[0] + shuffle(string[1:-1]) + string[-1]
 
 
