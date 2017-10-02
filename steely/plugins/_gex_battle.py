@@ -37,6 +37,9 @@ def _generate_battle_id():
         print('Started battle with id {}'.format(_id))
         return _id
 
+def _perform_battle_round(bot, battle_id):
+    pass
+
 def battle_info(bot, args, author_id, thread_id, thread_type):
     if len(args) == 0:
         bot.sendMessage('Please provide a battle ID!', thread_id=thread_id, thread_type=thread_type)
@@ -119,6 +122,8 @@ def battle_ready(bot, args, author_id, thread_id, thread_type):
         bot.sendMessage('This user is not a part of this battle.', thread_id=thread_id, thread_type=thread_type)
         return
     BATTLE_DB.update(battle, BATTLE.id == battle_id)
+    if (battle['attacker']['ready'] and battle['defender']['ready']):
+        _perform_battle_round(bot, battle_id)
 
 subcommands = {
     'info': battle_info,
