@@ -44,7 +44,10 @@ steely/plugins/linden for an example.
 ## credits
 |plugin|author|
 |---|---------------|
+|haiku|[CianLR](https://github.com/CianLR/)| creditline
 |linden|[CianLR](https://github.com/CianLR/)| creditline
+|obscene|[CianLR](https://github.com/CianLR/)| creditline
+|snoop|[CianLR](https://github.com/CianLR/)| creditline
 |stretch|[CianLR](https://github.com/CianLR/)| creditline
 |jokes|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
 |mock|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
@@ -61,17 +64,27 @@ steely/plugins/linden for an example.
 |vapor|[alexkraak](https://github.com/alexkraak/), [sentriz](https://github.com/sentriz/)| creditline
 |limp|[byxor](https://github.com/byxor/)| creditline
 |url|[byxor](https://github.com/byxor/)| creditline
+|basic_interpreter|[cianlr](https://github.com/cianlr/)| creditline
 |help|[devoxel](https://github.com/devoxel/)| creditline
 |roll|[devoxel](https://github.com/devoxel/)| creditline
 |slag|[devoxel](https://github.com/devoxel/)| creditline
+|roomcheck|[gruunday](https://github.com/gruunday/)| creditline
+|gex|[iandioch](https://github.com/iandioch/)| creditline
+|scramble|[iandioch](https://github.com/iandioch/)| creditline
+|sort|[iandioch](https://github.com/iandioch/)| creditline
+|hello|[izaakf](https://github.com/izaakf/)| creditline
 |train|[izaakf](https://github.com/izaakf/)| creditline
+|vowel|[izaakf](https://github.com/izaakf/)| creditline
 |sentiment|[oskarmcd](https://github.com/oskarmcd/)| creditline
 |angry|[sentriz](https://github.com/sentriz/)| creditline
 |box|[sentriz](https://github.com/sentriz/)| creditline
+|ca|[sentriz](https://github.com/sentriz/)| creditline
 |cage|[sentriz](https://github.com/sentriz/)| creditline
 |eight|[sentriz](https://github.com/sentriz/)| creditline
+|leet|[sentriz](https://github.com/sentriz/)| creditline
 |lenny|[sentriz](https://github.com/sentriz/)| creditline
 |markov|[sentriz](https://github.com/sentriz/)| creditline
+|middle|[sentriz](https://github.com/sentriz/)| creditline
 |nose|[sentriz](https://github.com/sentriz/)| creditline
 |recordmarkov|[sentriz](https://github.com/sentriz/)| creditline
 |recordstat|[sentriz](https://github.com/sentriz/)| creditline
