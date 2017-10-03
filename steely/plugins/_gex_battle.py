@@ -125,10 +125,35 @@ def battle_ready(bot, args, author_id, thread_id, thread_type):
     if (battle['attacker']['ready'] and battle['defender']['ready']):
         _perform_battle_round(bot, battle_id)
 
+def battle_list(bot, args, author_id, thread_id, thread_type):
+    user_id = author_id
+    if len(args) != 0:
+        user_id = gex_util.user_name_to_id(bot, ' '.join(args))
+    user_name = gex_util.user_id_to_name(bot, user_id)
+
+    out = ''
+    matching_battles = BATTLE_DB.search(BATTLE.defender.id == user_id)
+    if len(matching_battles) > 0:
+        out = 'Battles in which {} is defending:'.format(user_name)
+        for battle in matching_battles:
+            opponent_id = battle['attacker']['id']
+            opponent_name = gex_util.user_id_to_name(bot, opponent_id)
+            out += '\n' + '`{}` (against _{}_)'.format(battle['id'], opponent_name)
+    matching_battles = BATTLE_DB.search(BATTLE.attacker.id == user_id)
+    if len(matching_battles) > 0:
+        out += '\nBattles in which {} is attacking:'.format(user_name)
+        for battle in matching_battles:
+            opponent_id = battle['defender']['id']
+            opponent_name = gex_util.user_id_to_name(bot, opponent_id)
+            out += '\n' + '`{}` (against _{}_)'.format(battle['id'], opponent_name)
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
+
+
 subcommands = {
     'info': battle_info,
     'start': battle_start,
     'ready': battle_ready,
+    'list': battle_list,
 }
 
 def battle(bot, args, author_id, thread_id, thread_type):
