@@ -52,3 +52,7 @@ def check_user_in_db(user_id):
         'last_create_time': 0,
         'last_card': None,
     })
+
+'''Get the power of this card in a battle'''
+def get_card_value(card_id):
+    return len(card_id)

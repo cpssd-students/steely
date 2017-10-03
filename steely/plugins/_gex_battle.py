@@ -111,7 +111,7 @@ def battle_info(bot, args, author_id, thread_id, thread_type):
     out = '*Battle {}*'.format(battle_id)
     out += '\nAttacker: {}\n{} ⚡\nDeck:'.format(attacker_info[0], attacker_info[3])
     for i in range(min(NUM_UPCOMING_CARDS_TO_DISPLAY, len(attacker_info[1]))):
-        out  += '\n`{}` ({})'.format(attacker_info[1][i], 1) # TODO: replace with card power
+        out  += '\n`{}` ({})'.format(attacker_info[1][i], gex_util.get_card_value(attacker_info[1][i]))
     if attacker_info[2]:
         out += '\n_Ready to fight._'
     else:
@@ -119,7 +119,7 @@ def battle_info(bot, args, author_id, thread_id, thread_type):
     defender_info = _get_participant_info(bot, defender)
     out += '\n\nDefender: {}\n{} ⚡\nDeck:'.format(defender_info[0], defender_info[3])
     for i in range(min(NUM_UPCOMING_CARDS_TO_DISPLAY, len(defender_info[1]))):
-        out  += '\n`{}` ({})'.format(defender_info[1][i], 1) # TODO: replace with card power
+        out  += '\n`{}` ({})'.format(defender_info[1][i], gex_util.get_card_value(defender_info[1][i]))
     if defender_info[2]:
         out += '\n_Ready to fight._'
     else:
