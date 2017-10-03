@@ -12,6 +12,10 @@ NUM_UPCOMING_CARDS_TO_DISPLAY = 5
 # The amount of power each user starts with in a battle.
 STARTING_POWER_AMOUNT = 50
 
+BATTLE_COMMANDS = {
+    '!SWAP': 5,
+}
+
 def _get_participant_info(bot, data):
     name = gex_util.user_id_to_name(bot, data['id'])
     deck = data['deck']
@@ -38,7 +42,58 @@ def _generate_battle_id():
         return _id
 
 def _perform_battle_round(bot, battle_id):
-    pass
+    matching_battles = BATTLE_DB.search(BATTLE.id == battle_id)
+    if len(matching_battles) == 0:
+        raise RuntimeError('No such battle id to perform round in!')
+    battle = matching_battles[0]
+    keys = ('attacker', 'defender')
+    for key in keys:
+        if 'commands' not in battle[key]:
+            continue
+        commands = battle[key]['commands']
+        # Do not assume all commands are valid.
+        for command in commands:
+            if command == '!SWAP':
+                if len(battle[key][deck]) < 2:
+                    raise RuntimeError('User did not have enough cards to swap!')
+                elif battle[key]['power'] < BATTLE_COMMANDS['!SWAP']:
+                    raise RuntimeError('User did not have enough ⚡ to swap!')
+                battle[key][deck][0], battle[key][deck][1] = battle[key][deck][1], battle[key][deck][0]
+    attacker_card = battle['attacker']['deck'].pop(0)
+    defender_card = battle['defender']['deck'].pop(0)
+    
+    def lost_round(key):
+        battle[key]['power'] -= 10
+        print(key, 'lost')
+
+    if gex_util.get_card_value(attacker_card) >= gex_util.get_card_value(defender_card):
+        lost_round('defender')
+    else:
+        lost_round('attacker')
+    battle['attacker']['ready'] = False
+    battle['defender']['ready'] = False
+    BATTLE_DB.update(battle, BATTLE.id == battle_id)
+
+def _check_for_battle_finish(bot, battle_id):
+    matching_battles = BATTLE_DB.search(BATTLE.id == battle_id)
+    battle = matching_battles[0]
+    winner, loser = None, None
+    if battle['attacker']['power'] <= 0 or len(battle['attacker']['deck']) == 0:
+        # attacker lost
+        winner = battle['defender']['id']
+        loser = battle['attacker']['id']
+    elif battle['defender']['power'] <= 0 or len(battle['defender']['deck']) == 0:
+        # defender lost
+        winner = battle['attacker']['id']
+        loser = battle['defender']['id']
+    else:
+        return
+    winner_name = gex_util.user_id_to_name(bot, winner)
+    loser_name = gex_util.user_id_to_name(bot, loser)
+    thread_id = battle['thread_id']
+    thread_type = ThreadType.GROUP if battle['is_group_thread'] else ThreadType.USER
+    out = '_{}_ won battle `{}` against _{}_'.format(winner_name, battle_id, loser_name)
+    bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
 
 def battle_info(bot, args, author_id, thread_id, thread_type):
     if len(args) == 0:
@@ -89,12 +144,14 @@ def battle_start(bot, args, author_id, thread_id, thread_type):
             'deck': _get_shuffled_deck(attacker_id),
             'ready': False,
             'power': STARTING_POWER_AMOUNT,
+            'commands': [],
         },
         'defender': {
             'id': defender_id,
             'deck': _get_shuffled_deck(defender_id),
             'ready': False,
             'power': STARTING_POWER_AMOUNT,
+            'commands': [],
         },
         'id': battle_id,
         'thread_id': thread_id,
@@ -124,6 +181,7 @@ def battle_ready(bot, args, author_id, thread_id, thread_type):
     BATTLE_DB.update(battle, BATTLE.id == battle_id)
     if (battle['attacker']['ready'] and battle['defender']['ready']):
         _perform_battle_round(bot, battle_id)
+        _check_for_battle_finish(bot, battle_id)
 
 def battle_list(bot, args, author_id, thread_id, thread_type):
     user_id = author_id
