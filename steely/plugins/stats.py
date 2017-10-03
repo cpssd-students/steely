@@ -29,8 +29,10 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     clean_stats = list(parse_stats(CMD_DB))
     sorted_stats = sort_stats(clean_stats)[:LIMIT]
     max_command = max(len(command) for command, count in sorted_stats)
-    message = f'```\ntop {LIMIT}\n――――――\n'
+    message = f'```\ntop {LIMIT}\n――――――\n'british speak
     for command, count in sorted_stats:
+        if count == 100:
+            count = '💯'
         message += f'{command:<{max_command}} {count:>3,}\n'
     message += '```'
     bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
