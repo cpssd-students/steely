@@ -44,43 +44,56 @@ steely/plugins/linden for an example.
 ## credits
 |plugin|author|
 |---|---------------|
-|linden|[CianLR](https://github.com/CianLR/)| creditline
-|stretch|[CianLR](https://github.com/CianLR/)| creditline
-|jokes|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
-|mock|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
-|urban|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
-|xkcd|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
-|bus|[alexkraak](https://github.com/alexkraak/)| creditline
-|define|[alexkraak](https://github.com/alexkraak/)| creditline
-|github|[alexkraak](https://github.com/alexkraak/)| creditline
-|happy|[alexkraak](https://github.com/alexkraak/)| creditline
-|skrrrt|[alexkraak](https://github.com/alexkraak/)| creditline
-|tilda|[alexkraak](https://github.com/alexkraak/)| creditline
-|coinflip|[alexkraak](https://github.com/alexkraak/), [byxor](https://github.com/byxor/)| creditline
-|lastfm|[alexkraak](https://github.com/alexkraak/), [sentriz](https://github.com/sentriz/)| creditline
-|vapor|[alexkraak](https://github.com/alexkraak/), [sentriz](https://github.com/sentriz/)| creditline
-|limp|[byxor](https://github.com/byxor/)| creditline
-|url|[byxor](https://github.com/byxor/)| creditline
-|help|[devoxel](https://github.com/devoxel/)| creditline
-|roll|[devoxel](https://github.com/devoxel/)| creditline
-|slag|[devoxel](https://github.com/devoxel/)| creditline
-|train|[izaakf](https://github.com/izaakf/)| creditline
-|sentiment|[oskarmcd](https://github.com/oskarmcd/)| creditline
-|angry|[sentriz](https://github.com/sentriz/)| creditline
-|box|[sentriz](https://github.com/sentriz/)| creditline
-|cage|[sentriz](https://github.com/sentriz/)| creditline
-|eight|[sentriz](https://github.com/sentriz/)| creditline
-|lenny|[sentriz](https://github.com/sentriz/)| creditline
-|markov|[sentriz](https://github.com/sentriz/)| creditline
-|nose|[sentriz](https://github.com/sentriz/)| creditline
-|recordmarkov|[sentriz](https://github.com/sentriz/)| creditline
-|recordstat|[sentriz](https://github.com/sentriz/)| creditline
-|reload|[sentriz](https://github.com/sentriz/)| creditline
-|restart|[sentriz](https://github.com/sentriz/)| creditline
-|rpn|[sentriz](https://github.com/sentriz/)| creditline
-|stats|[sentriz](https://github.com/sentriz/)| creditline
-|tracker|[sentriz](https://github.com/sentriz/)| creditline
-|clap|[sentriz](https://github.com/sentriz/), [devoxel](https://github.com/devoxel/)| creditline
+|[haiku](steely/plugins/haiku.py)|[CianLR](https://github.com/CianLR/)| creditline
+|[linden](steely/plugins/linden.py)|[CianLR](https://github.com/CianLR/)| creditline
+|[obscene](steely/plugins/obscene.py)|[CianLR](https://github.com/CianLR/)| creditline
+|[snoop](steely/plugins/snoop.py)|[CianLR](https://github.com/CianLR/)| creditline
+|[stretch](steely/plugins/stretch.py)|[CianLR](https://github.com/CianLR/)| creditline
+|[jokes](steely/plugins/jokes.py)|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
+|[mock](steely/plugins/mock.py)|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
+|[urban](steely/plugins/urban.py)|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
+|[xkcd](steely/plugins/xkcd.py)|[EdwardDowling](https://github.com/EdwardDowling/)| creditline
+|[bus](steely/plugins/bus.py)|[alexkraak](https://github.com/alexkraak/)| creditline
+|[define](steely/plugins/define.py)|[alexkraak](https://github.com/alexkraak/)| creditline
+|[github](steely/plugins/github.py)|[alexkraak](https://github.com/alexkraak/)| creditline
+|[happy](steely/plugins/happy.py)|[alexkraak](https://github.com/alexkraak/)| creditline
+|[skrrrt](steely/plugins/skrrrt.py)|[alexkraak](https://github.com/alexkraak/)| creditline
+|[tilda](steely/plugins/tilda.py)|[alexkraak](https://github.com/alexkraak/)| creditline
+|[coinflip](steely/plugins/coinflip.py)|[alexkraak](https://github.com/alexkraak/), [byxor](https://github.com/byxor/)| creditline
+|[lastfm](steely/plugins/lastfm.py)|[alexkraak](https://github.com/alexkraak/), [sentriz](https://github.com/sentriz/)| creditline
+|[vapor](steely/plugins/vapor.py)|[alexkraak](https://github.com/alexkraak/), [sentriz](https://github.com/sentriz/)| creditline
+|[limp](steely/plugins/limp.py)|[byxor](https://github.com/byxor/)| creditline
+|[url](steely/plugins/url.py)|[byxor](https://github.com/byxor/)| creditline
+|[basic_interpreter](steely/plugins/basic_interpreter.py)|[cianlr](https://github.com/cianlr/)| creditline
+|[help](steely/plugins/help.py)|[devoxel](https://github.com/devoxel/)| creditline
+|[roll](steely/plugins/roll.py)|[devoxel](https://github.com/devoxel/)| creditline
+|[slag](steely/plugins/slag.py)|[devoxel](https://github.com/devoxel/)| creditline
+|[roomcheck](steely/plugins/roomcheck.py)|[gruunday](https://github.com/gruunday/)| creditline
+|[gex](steely/plugins/gex.py)|[iandioch](https://github.com/iandioch/)| creditline
+|[scramble](steely/plugins/scramble.py)|[iandioch](https://github.com/iandioch/)| creditline
+|[sort](steely/plugins/sort.py)|[iandioch](https://github.com/iandioch/)| creditline
+|[hello](steely/plugins/hello.py)|[izaakf](https://github.com/izaakf/)| creditline
+|[train](steely/plugins/train.py)|[izaakf](https://github.com/izaakf/)| creditline
+|[vowel](steely/plugins/vowel.py)|[izaakf](https://github.com/izaakf/)| creditline
+|[sentiment](steely/plugins/sentiment.py)|[oskarmcd](https://github.com/oskarmcd/)| creditline
+|[angry](steely/plugins/angry.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[box](steely/plugins/box.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[ca](steely/plugins/ca.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[cage](steely/plugins/cage.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[eight](steely/plugins/eight.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[leet](steely/plugins/leet.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[lenny](steely/plugins/lenny.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[markov](steely/plugins/markov.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[middle](steely/plugins/middle.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[nose](steely/plugins/nose.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[recordmarkov](steely/plugins/recordmarkov.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[recordstat](steely/plugins/recordstat.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[reload](steely/plugins/reload.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[restart](steely/plugins/restart.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[rpn](steely/plugins/rpn.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[stats](steely/plugins/stats.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[tracker](steely/plugins/tracker.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[clap](steely/plugins/clap.py)|[sentriz](https://github.com/sentriz/), [devoxel](https://github.com/devoxel/)| creditline
 
 ## q&a
 

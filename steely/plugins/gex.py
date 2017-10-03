@@ -76,7 +76,9 @@ def gex_give(giving_user, card_id, receiving_user):
     USER_DB.update({'cards':cards, 'last_card':card_id}, USER.id == receiving_user)
 
     # Update CARD_TO_USER_ID
-    tups = CARD_TO_USER_ID[card_id]
+    tups = []
+    if card_id in CARD_TO_USER_ID:
+        tups = CARD_TO_USER_ID[card_id]
     indexes = [i for i in range(len(tups)) if tups[i][0] == receiving_user]
     if len(indexes):
         tups[indexes[0]] = (receiving_user, cards[card_id])
@@ -278,10 +280,11 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
         info += '_{}_\n\n'.format(deets['desc'])
     masters = [gex_util.user_id_to_name(bot, master) for master in deets['masters']]
     info += 'Masters:\n' + ',\n'.join(masters)
-    owner_quants = CARD_TO_USER_ID[deets['id']]
-    owner_quants = sorted(owner_quants, key = lambda x: x[1], reverse=True)
-    owners = [gex_util.user_id_to_name(bot, owner_quant[0]) for owner_quant in owner_quants]
-    info += '\n\nOwners:\n' + ',\n'.join(owners)
+    if deets['id'] in CARD_TO_USER_ID:
+        owner_quants = CARD_TO_USER_ID[deets['id']]
+        owner_quants = sorted(owner_quants, key = lambda x: x[1], reverse=True)
+        owners = [gex_util.user_id_to_name(bot, owner_quant[0]) for owner_quant in owner_quants]
+        info += '\n\nOwners:\n' + ',\n'.join(owners)
     bot.sendMessage(info, thread_id=thread_id, thread_type=thread_type)
 
 def _gex_decks(bot, args, author_id, thread_id, thread_type):
@@ -358,6 +361,7 @@ SUBCOMMANDS = {
 }
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
+    print('Running main.')
     if not message:
         # User just typed .gex
         message = 'help'
@@ -367,8 +371,10 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         bot.sendMessage('Autocorrecting {} to {}'.format(subcommand, best_guess), thread_id=thread_id, thread_type=thread_type)
         subcommand = best_guess
     if subcommand in SUBCOMMANDS:
+        print('Running command', subcommand)
         try:
             SUBCOMMANDS[subcommand](bot, args, author_id, thread_id, thread_type)
+            print('done')
         except RuntimeError as e:
             bot.sendMessage('Error while gexin\': {}'.format(e), thread_id=thread_id, thread_type=thread_type)
             print(e)

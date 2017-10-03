@@ -68,12 +68,15 @@ Based on code for the Kattis problem:
 https://open.kattis.com/problems/basicinterpreter
 '''
 
+__author__ = "cianlr"
 import operator
 import threading
 import traceback
 from collections import defaultdict
 
+
 COMMAND = '.basic'
+
 
 class BasicInterpreter:
     def __init__(self, stdout=print, stderr=print):
@@ -181,16 +184,17 @@ class BasicInterpreter:
 THREAD_TIMEOUT = 1
 MAX_OUTPUT = 1500
 
+
 def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
     def send(message):
         bot.sendMessage(str(message), thread_id=thread_id, thread_type=thread_type)
-    
+
     global stdout
     stdout = ''
     def add_stdout(s):
         global stdout
         stdout += s
-    
+
     global stderr
     stderr = ''
     def add_stderr(s):
@@ -221,4 +225,3 @@ def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
         send(stdout[:MAX_OUTPUT] + '\nOutput trimmed to' + str(MAX_OUTPUT))
     else:
         send(stdout)
-
