@@ -60,6 +60,9 @@ def _get_scrabble_score(s):
 
 # Public API
 
+def get_card_to_user_id():
+    return CARD_TO_USER_ID
+
 '''
 Give the specified receiver user the card with the given id.
 '''
@@ -367,6 +370,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         message = 'help'
     subcommand, *args = message.split()
     if subcommand not in SUBCOMMANDS:
+        print('subcommand not there', subcommand)
         best_guess = max(SUBCOMMANDS, key=lambda x:difflib.SequenceMatcher(None, x, subcommand).ratio())
         bot.sendMessage('Autocorrecting {} to {}'.format(subcommand, best_guess), thread_id=thread_id, thread_type=thread_type)
         subcommand = best_guess
