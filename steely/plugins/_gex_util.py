@@ -54,20 +54,15 @@ def check_user_in_db(user_id):
         'last_card': None,
     })
 
-'''Get the power of this card in a battle'''
-def get_card_value(card_id, user_id=None):
-    MAX = 100
+'''Get the attack power of a card.'''
+def get_card_attack(card_id):
     card_to_user_id = gex.get_card_to_user_id()
-    num_in_circulation = {card: 0 for card in card_to_user_id}
-    num_in_circulation[card_id] = 0
-    if card_id in card_to_user_id:
-        tups = card_to_user_id[card_id]
-        for tup in tups:
-            if tup[0] != user_id:
-                num_in_circulation[card_id] += tup[1]
-                print(num_in_circulation)
-    print(card_id)
-    print(num_in_circulation)
-    if num_in_circulation[card_id] == 0:
-        return MAX/4
-    return MAX/num_in_circulation[card_id]
+    d = {card:sum(t[1] for t in card_to_user_id[card]) for card in card_to_user_id}
+    vals = sorted(d)
+    vals = sorted(vals, key = lambda x: d[x])
+    pos = vals.index(card_id) + 1
+    return int(1000*pos/len(vals))
+
+'''Get the defence power of a card.'''
+def get_card_defence(card_id):
+    return 1000 - get_card_attack(card_id)

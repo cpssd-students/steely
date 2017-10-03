@@ -67,6 +67,7 @@ def get_card_to_user_id():
 Give the specified receiver user the card with the given id.
 '''
 def gex_give(giving_user, card_id, receiving_user):
+    global CARD_TO_USER_ID
     print('giving', giving_user, card_id, receiving_user)
     gex_util.check_for_card(giving_user, card_id)
     gex_util.check_user_in_db(receiving_user)
@@ -93,6 +94,7 @@ def gex_give(giving_user, card_id, receiving_user):
 Remove the specified card from a certain user.
 '''
 def gex_remove(removing_user, card_id, receiving_user):
+    global CARD_TO_USER_ID
     print('removing', removing_user, card_id, receiving_user)
     matching_cards = CARD_DB.search(CARD.id == card_id)
     if not len(matching_cards):

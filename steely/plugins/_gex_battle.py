@@ -26,6 +26,7 @@ def _get_participant_info(bot, data):
 '''Get a permutation of a user's cards.'''
 def _get_shuffled_deck(user_id):
     user_data = gex_util.get_user(user_id)
+    print(user_data)
     cards = []
     for card in user_data['cards']:
         cards.extend([card]*(user_data['cards'][card]))
@@ -66,7 +67,7 @@ def _perform_battle_round(bot, battle_id):
         battle[key]['power'] -= 10
         print(key, 'lost')
 
-    if gex_util.get_card_value(attacker_card, battle['attacker']['id']) >= gex_util.get_card_value(defender_card, battle['defender']['id']):
+    if gex_util.get_card_attack(attacker_card) >= gex_util.get_card_defence(defender_card):
         lost_round('defender')
     else:
         lost_round('attacker')
@@ -100,6 +101,7 @@ def battle_info(bot, args, author_id, thread_id, thread_type):
         bot.sendMessage('Please provide a battle ID!', thread_id=thread_id, thread_type=thread_type)
         return
     battle_id = args[0]
+    print('Getting info for battle', battle_id)
     matching_battles = BATTLE_DB.search(BATTLE.id == battle_id)
     if len(matching_battles) == 0:
         bot.sendMessage('No battle found with the given ID :(', thread_id=thread_id, thread_type=thread_type)
@@ -107,20 +109,26 @@ def battle_info(bot, args, author_id, thread_id, thread_type):
     battle = matching_battles[0]
     attacker = battle['attacker']
     defender = battle['defender']
-    attacker_info = _get_participant_info(bot, attacker)
+    name, deck, ready, power = _get_participant_info(bot, attacker)
     out = '*Battle {}*'.format(battle_id)
-    out += '\nAttacker: {}\n{} ⚡\nDeck:'.format(attacker_info[0], attacker_info[3])
-    for i in range(min(NUM_UPCOMING_CARDS_TO_DISPLAY, len(attacker_info[1]))):
-        out  += '\n`{}` ({})'.format(attacker_info[1][i], gex_util.get_card_value(attacker_info[1][i], attacker['id']))
-    if attacker_info[2]:
+    out += '\nAttacker: {}\n{} ⚡\nDeck:'.format(name, power)
+    for i in range(min(NUM_UPCOMING_CARDS_TO_DISPLAY, len(deck))):
+        card = deck[i]
+        attack = gex_util.get_card_attack(card)
+        defence = gex_util.get_card_defence(card)
+        out += '\n`{}` ({} atk, {} def)'.format(card, attack, defence)
+    if ready:
         out += '\n_Ready to fight._'
     else:
         out += '\n_Not ready._'
-    defender_info = _get_participant_info(bot, defender)
-    out += '\n\nDefender: {}\n{} ⚡\nDeck:'.format(defender_info[0], defender_info[3])
-    for i in range(min(NUM_UPCOMING_CARDS_TO_DISPLAY, len(defender_info[1]))):
-        out  += '\n`{}` ({})'.format(defender_info[1][i], gex_util.get_card_value(defender_info[1][i], defender['id']))
-    if defender_info[2]:
+    name, deck, ready, power = _get_participant_info(bot, defender)
+    out += '\n\nDefender: {}\n{} ⚡\nDeck:'.format(name, power)
+    for i in range(min(NUM_UPCOMING_CARDS_TO_DISPLAY, len(deck))):
+        card = deck[i]
+        attack = gex_util.get_card_attack(card)
+        defence = gex_util.get_card_defence(card)
+        out += '\n`{}` ({} atk, {} def)'.format(card, attack, defence)
+    if ready:
         out += '\n_Ready to fight._'
     else:
         out += '\n_Not ready._'
