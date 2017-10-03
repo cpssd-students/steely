@@ -66,7 +66,7 @@ def _perform_battle_round(bot, battle_id):
         battle[key]['power'] -= 10
         print(key, 'lost')
 
-    if gex_util.get_card_value(attacker_card) >= gex_util.get_card_value(defender_card):
+    if gex_util.get_card_value(attacker_card, battle['attacker']['id']) >= gex_util.get_card_value(defender_card, battle['defender']['id']):
         lost_round('defender')
     else:
         lost_round('attacker')
@@ -111,7 +111,7 @@ def battle_info(bot, args, author_id, thread_id, thread_type):
     out = '*Battle {}*'.format(battle_id)
     out += '\nAttacker: {}\n{} ⚡\nDeck:'.format(attacker_info[0], attacker_info[3])
     for i in range(min(NUM_UPCOMING_CARDS_TO_DISPLAY, len(attacker_info[1]))):
-        out  += '\n`{}` ({})'.format(attacker_info[1][i], gex_util.get_card_value(attacker_info[1][i]))
+        out  += '\n`{}` ({})'.format(attacker_info[1][i], gex_util.get_card_value(attacker_info[1][i], attacker['id']))
     if attacker_info[2]:
         out += '\n_Ready to fight._'
     else:
@@ -119,7 +119,7 @@ def battle_info(bot, args, author_id, thread_id, thread_type):
     defender_info = _get_participant_info(bot, defender)
     out += '\n\nDefender: {}\n{} ⚡\nDeck:'.format(defender_info[0], defender_info[3])
     for i in range(min(NUM_UPCOMING_CARDS_TO_DISPLAY, len(defender_info[1]))):
-        out  += '\n`{}` ({})'.format(defender_info[1][i], gex_util.get_card_value(defender_info[1][i]))
+        out  += '\n`{}` ({})'.format(defender_info[1][i], gex_util.get_card_value(defender_info[1][i], defender['id']))
     if defender_info[2]:
         out += '\n_Ready to fight._'
     else:

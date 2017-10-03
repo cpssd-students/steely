@@ -1,5 +1,6 @@
 import time
 from tinydb import TinyDB, Query
+from plugins import gex
 
 USER_DB = TinyDB('databases/gex_users.json')
 USER = Query()
@@ -54,5 +55,19 @@ def check_user_in_db(user_id):
     })
 
 '''Get the power of this card in a battle'''
-def get_card_value(card_id):
-    return len(card_id)
+def get_card_value(card_id, user_id=None):
+    MAX = 100
+    card_to_user_id = gex.get_card_to_user_id()
+    num_in_circulation = {card: 0 for card in card_to_user_id}
+    num_in_circulation[card_id] = 0
+    if card_id in card_to_user_id:
+        tups = card_to_user_id[card_id]
+        for tup in tups:
+            if tup[0] != user_id:
+                num_in_circulation[card_id] += tup[1]
+                print(num_in_circulation)
+    print(card_id)
+    print(num_in_circulation)
+    if num_in_circulation[card_id] == 0:
+        return MAX/4
+    return MAX/num_in_circulation[card_id]
