@@ -3,6 +3,7 @@ import uuid
 from tinydb import TinyDB, Query
 from fbchat.models import ThreadType
 import plugins._gex_util as gex_util
+import plugins._gex_action as gex_action
 
 BATTLE_DB = TinyDB('databases/gex_battles.json')
 BATTLE = Query()
@@ -215,12 +216,18 @@ def battle_list(bot, args, author_id, thread_id, thread_type):
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
 
 
+def battle_action(bot, action, args, author_id, thread_id, thread_type):
+    bot.sendMessage(action, thread_id=thread_id, thread_type=thread_type)
+
+
 subcommands = {
     'info': battle_info,
     'start': battle_start,
     'ready': battle_ready,
     'list': battle_list,
 }
+
+actions = gex_action.get_actions()
 
 def battle(bot, args, author_id, thread_id, thread_type):
     # Should be in format .gex battle <subcommand>.
@@ -233,5 +240,12 @@ def battle(bot, args, author_id, thread_id, thread_type):
             subcommands[subcommand](bot, args[1:], author_id, thread_id, thread_type)
         except Exception as e:
             bot.sendMessage('Battle error: {}'.format(e), thread_id=thread_id, thread_type=thread_type)
+            print(e)
+    elif subcommand in actions:
+        try:
+            battle_action(bot, subcommand, args, author_id, thread_id, thread_type)
+        except Exception as e:
+            bot.sendMessage('Battle action error: {}'.format(e), thread_id=thread_id, thread_type=thread_type)
+            print(e)
     else:
         bot.sendMessage('No such subcommand >:(', thread_id=thread_id, thread_type=thread_type)
