@@ -1,4 +1,4 @@
-'''Get te fuck ye taigy bastardst'''
+'''Get te fuck ye taigy bastards'''
 
 
 __author__ = 'iandioch'
