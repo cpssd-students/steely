@@ -11,7 +11,7 @@ FLIP_TRANS = str.maketrans(NORMAL, FLIPPED)
 
 
 def flip(string):
-    return string.translate(FLIP_TRANS)[::-1]
+    return '\u200F' + string.translate(FLIP_TRANS)[::-1]
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
