@@ -20,7 +20,6 @@ def encode(string):
 
 
 def help():
-
     line_separated = lambda strings: "\n".join(strings)
 
     def code_block(contents):
@@ -33,5 +32,4 @@ def help():
     ]))
 
 
-import sys
-sys.modules[__name__].__doc__ = help()
+__doc__ = help()
