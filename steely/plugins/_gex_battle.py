@@ -52,15 +52,16 @@ def _perform_battle_round(bot, battle_id):
     for key in keys:
         if 'commands' not in battle[key]:
             continue
-        commands = battle[key]['commands']
+        requested_actions = battle[key]['commands']
         # Do not assume all commands are valid.
-        for command in commands:
-            if command == '!SWAP':
-                if len(battle[key][deck]) < 2:
-                    raise RuntimeError('User did not have enough cards to swap!')
-                elif battle[key]['power'] < BATTLE_COMMANDS['!SWAP']:
-                    raise RuntimeError('User did not have enough ⚡ to swap!')
-                battle[key][deck][0], battle[key][deck][1] = battle[key][deck][1], battle[key][deck][0]
+        for action_name in requested_actions:
+            action = actions[action_name]
+            if action.is_possible(battle[key]):
+                battle[key] = action.execute(battle[key])
+            else:
+                bot.sendMessage('Could not perform all requested actions', thread_id=battle[key]['id'], thread_type=ThreadType.USER)
+                break
+        battle[key]['commands'] = []
     attacker_card = battle['attacker']['deck'].pop(0)
     defender_card = battle['defender']['deck'].pop(0)
     
@@ -218,6 +219,23 @@ def battle_list(bot, args, author_id, thread_id, thread_type):
 
 def battle_action(bot, action, args, author_id, thread_id, thread_type):
     bot.sendMessage(action, thread_id=thread_id, thread_type=thread_type)
+    if len(args) == 0:
+        bot.sendMessage('Please provide a battle ID.', thread_id=thread_id, thread_type=thread_type)
+        return
+    print(args)
+    battle_id = args[0]
+    matching_battles = BATTLE_DB.search(BATTLE.id == battle_id)
+    if len(matching_battles) == 0:
+        bot.sendMessage('No battle found with given ID.', thread_id=thread_id, thread_type=thread_type)
+        return
+    battle = matching_battles[0]
+    for key in ('attacker', 'defender'):
+        if battle[key]['id'] == author_id:
+            if battle[key]['ready']:
+                bot.sendMessage('User already declared themselves as ready!', thread_id=thread_id, thread_type=thread_type)
+            else:
+                battle[key]['commands'].append(action)
+    BATTLE_DB.update(battle, BATTLE.id == battle_id)
 
 
 subcommands = {
@@ -243,7 +261,7 @@ def battle(bot, args, author_id, thread_id, thread_type):
             print(e)
     elif subcommand in actions:
         try:
-            battle_action(bot, subcommand, args, author_id, thread_id, thread_type)
+            battle_action(bot, subcommand, args[1:], author_id, thread_id, thread_type)
         except Exception as e:
             bot.sendMessage('Battle action error: {}'.format(e), thread_id=thread_id, thread_type=thread_type)
             print(e)

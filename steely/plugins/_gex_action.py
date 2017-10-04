@@ -9,6 +9,7 @@ class BattleAction:
         return competitor_data['power'] >= self.get_cost()
 
     def execute(self, competitor_data):
+        competitor_data['power'] -= self.get_cost()
         return competitor_data
 
     def get_cost(self):
@@ -22,9 +23,10 @@ class SwapAction(BattleAction):
     def is_possible(self, competitor_data):
         if not super().is_possible(competitor_data):
             return False
-        return len(competitor_data['deck'] >= 2)
+        return len(competitor_data['deck']) >= 2
 
     def execute(self, competitor_data):
+        competitor_data = super().execute(competitor_data)
         d = competitor_data['deck'] 
         d[0], d[1] = d[1], d[0]
         competitor_data['deck'] = d
