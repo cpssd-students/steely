@@ -20,16 +20,12 @@ def encode(string):
 
 
 def help():
-    line_separated = lambda strings: "\n".join(strings)
 
     def code_block(contents):
         tag = "```"
         return tag + contents + tag
     
-    return code_block(line_separated([
-        COMMAND,
-        encode("will transform the previous message into something a bit more exciting."),
-    ]))
+    return code_block(f"{COMMAND} {encode('will transform the previous message into something a bit more exciting.')}",)
 
 
 __doc__ = help()
