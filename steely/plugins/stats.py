@@ -31,6 +31,8 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     max_command = max(len(command) for command, count in sorted_stats)
     message = f'```\ntop {LIMIT}\n――――――\n'
     for command, count in sorted_stats:
+        if count == 100:
+            count = '💯'
         message += f'{command:<{max_command}} {count:>3,}\n'
     message += '```'
     bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
