@@ -16,11 +16,12 @@ https://tech.yandex.com/translate/doc/dg/concepts/api-overview-docpage/
 
 import requests
 
+from steely import config
+
 __author__ = 'CianLR'
 COMMAND = '.translate'
 
 # Key can be obtained from https://translate.yandex.com/developers/keys
-APIKEY = ''
 URL = 'https://translate.yandex.net/api/v1.5/tr.json/translate'
 
 
@@ -31,7 +32,7 @@ def translate(lang, text):
         'text': text,
         'lang': lang,
         'format': 'text',
-        'key': APIKEY,
+        'key': config.TRANSLATE_API_KEY,
     }
     response = requests.post(URL, data=data).json()
     if response['code'] != 200:
