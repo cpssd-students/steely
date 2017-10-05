@@ -18,8 +18,8 @@ REGULAR_URL = f'{PROTOCOL}://{DOMAIN}/{REPOSITORY}'
 
 def handle_prs():
     pulls = requests.get(f'{API_URL}/pulls').json()
-    message = f'Senan, you have {len(pulls)} fucken pr\'s to merge.'
-    message += '\n{REGULAR_URL}/pulls'
+    message = f'Senan, you have {len(pulls)} fucken pr\'s to merge.' + \
+              f'\n{REGULAR_URL}/pulls'
     return message
 
 
