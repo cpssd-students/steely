@@ -1,17 +1,10 @@
+__author__ = 'byxor'
 COMMAND = '.b'
-__author__ = ('byxor',)
 
 
-def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    last_message = lambda: bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]
-    send = lambda message: bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
-
-    send(encode(last_message()))
-
-    
-REPLACEABLE = [character for character in 'PpBbGg']
+REPLACEABLE = 'PpBbGg'
 REPLACEMENT = '🅱️'
-    
+
 
 def encode(string):
     for sequence in REPLACEABLE:
@@ -20,12 +13,17 @@ def encode(string):
 
 
 def help():
-
     def code_block(contents):
         tag = "```"
         return tag + contents + tag
-    
+
     return code_block(f"{COMMAND} {encode('will transform the previous message into something a bit more exciting.')}",)
+
+
+def main(bot, author_id, message, thread_id, thread_type, **kwargs):
+    last_message = lambda: bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1].text
+    send = lambda message: bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
+    send(encode(last_message()))
 
 
 __doc__ = help()
