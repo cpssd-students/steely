@@ -5,8 +5,8 @@ __author__ = 'iandioch'
 COMMAND = '.flip'
 
 
-NORMAL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZɐqɔpǝⅎƃɥᴉɾʞʅɯuodbɹsʇnʌʍxʎz∀ꓭϽᗡƎᖵ⅁HIᒋꓘ⅂ꟽNOԀꝹꓤSꓕՈɅϺX⅄Z'
-FLIPPED = 'ɐqɔpǝⅎƃɥᴉɾʞʅɯuodbɹsʇnʌʍxʎz∀ꓭϽᗡƎᖵ⅁HIᒋꓘ⅂ꟽNOԀꝹꓤSꓕՈɅϺX⅄ZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+NORMAL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZɐɔǝⅎƃɥᴉɾʞʅɯɹʇʌʍʎ∀ꓭϽᗡƎᖵ⅁ᒋꓘ⅂ꟽԀꝹꓤꓕՈɅϺ⅄'
+FLIPPED = 'ɐqɔpǝⅎƃɥᴉɾʞʅɯuodbɹsʇnʌʍxʎz∀ꓭϽᗡƎᖵ⅁HIᒋꓘ⅂ꟽNOԀꝹꓤSꓕՈɅϺX⅄ZacefghijklmrtvwyABCDEFGJKLMPQRTUVWY'
 FLIP_TRANS = str.maketrans(NORMAL, FLIPPED)
 
 
