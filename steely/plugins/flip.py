@@ -4,10 +4,12 @@
 __author__ = 'iandioch'
 COMMAND = '.flip'
 
+NORMAL =  'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+FLIPPED = 'ɐqɔpǝⅎƃɥᴉɾʞʅɯuodbɹsʇnʌʍxʎz∀ꓭϽᗡƎᖵ⅁HIᒋꓘ⅂ꟽNOԀꝹꓤSꓕՈɅϺX⅄Z'
 
-NORMAL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZɐɔǝⅎƃɥᴉɾʞʅɯɹʇʌʍʎ∀ꓭϽᗡƎᖵ⅁ᒋꓘ⅂ꟽԀꝹꓤꓕՈɅϺ⅄'
-FLIPPED = 'ɐqɔpǝⅎƃɥᴉɾʞʅɯuodbɹsʇnʌʍxʎz∀ꓭϽᗡƎᖵ⅁HIᒋꓘ⅂ꟽNOԀꝹꓤSꓕՈɅϺX⅄ZacefghijklmrtvwyABCDEFGJKLMPQRTUVWY'
-FLIP_TRANS = str.maketrans(NORMAL, FLIPPED)
+FROM = NORMAL + FLIPPED
+TO = FLIPPED + NORMAL
+FLIP_TRANS = str.maketrans(FROM, TO)
 
 
 def flip(string):
