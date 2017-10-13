@@ -10,6 +10,7 @@ import requests
 import re
 from operator import itemgetter
 from xml.etree import ElementTree
+from formatting import *
 
 
 __author__ = 'izaakf'
@@ -47,11 +48,9 @@ def gen_column_widths(times):
 
 def gen_reply_string(times, widths):
     _, max_origin, max_destin, max_time = widths
-    yield "```"
     yield f"  {'from':<{max_origin}} to"
     for direction, origin, destin, time in times:
         yield f"{direction} {origin:<{max_origin}} {destin:<{max_destin}} {time:>{max_time}}min"
-    yield "```"
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
@@ -66,7 +65,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     except requests.exceptions.RequestException:
         send_message("error retrieving results")
     if times:
-        send_message("\n".join(gen_reply_string(times, widths)))
+        send_message(code_block("\n".join(gen_reply_string(times, widths))))
     else:
         send_message("no results")
 

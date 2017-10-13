@@ -27,7 +27,8 @@ REPLIES = (
     "my reply is no",
     "my sources say no",
     "outlook not so good",
-    "very doubtful"
+    "very doubtful",
+    "i have no idea",
 )
 
 

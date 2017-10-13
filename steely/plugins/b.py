@@ -1,3 +1,5 @@
+from formatting import *
+
 __author__ = 'byxor'
 COMMAND = '.b'
 
@@ -13,10 +15,6 @@ def encode(string):
 
 
 def help():
-    def code_block(contents):
-        tag = "```"
-        return tag + contents + tag
-
     return code_block(f"{COMMAND} {encode('will transform the previous message into something a bit more exciting.')}",)
 
 
