@@ -16,8 +16,7 @@ def get(host):
 
     req = requests.get(API + host)
     if req.status_code != 200:
-        print('geoip.py: Invalid request for',
-              host, 'status:', req.status_code)
+        print('geoip.py: bad request for', host, 'status:', req.status_code)
         return None
 
     return build_output(req.json())
@@ -33,16 +32,15 @@ def build_output(info):
         ('zip_code', 'Zip: '),
         ('time_zone', 'Time zone: '),
     ]
+    def valid_info(k): return k in info and info[k]
 
-    def ok(k): return k in info and info[k]
     out = []
     for (k, o) in builder:
-        if ok(k):
+        if valid_info(k):
             out.append(o + str(info[k]))
-
     # since lat and long are on the same line they're a special case
-    if ok('latitude') and ok('longitude'):
-        out.append('{}°N, {}°E'.format(info['latitude'], info['longitude']))
+    if valid_info('latitude') and valid_info('longitude'):
+        out.append(f'{info["latitude"]}°N, {info["longitude"]}°E')
 
     return '\n'.join(out)
 
@@ -54,7 +52,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     o = get(message)
     if not o:
         return
-    bot.sendMessage(o)
+    bot.sendMessage(o, thread_id=thread_id, thread_type=thread_type)
 
 
 if __name__ == '__main__':
