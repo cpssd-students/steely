@@ -1,3 +1,6 @@
+from formatting import *
+
+
 __author__ = 'devoxel'
 COMMAND = '.help'
 
@@ -16,5 +19,5 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         if not plugin in bot.plugin_helps:
             send_message(f'help not found for command {plugin!r}')
             return
-        send_message(f"```\n{bot.plugin_helps[plugin]}\n```")
+        send_message(code_block(bot.plugin_helps[plugin]))
     return
