@@ -169,7 +169,13 @@ def battle_start(bot, args, author_id, thread_id, thread_type):
     }
     print(data)
     BATTLE_DB.insert(data)
-    bot.sendMessage('Started battle {}.'.format(battle_id), thread_id=thread_id, thread_type=thread_type)
+
+    # Send battle ID in its own message, so it is easy to copy and paste on mobile.
+    attacker_name = gex_util.user_id_to_name(bot, attacker_id)
+    defender_name = gex_util.user_id_to_name(bot, defender_id)
+    message = 'Started battle! {} is attacking {}.\nBattle id: {}'.format(attacker_name, defender_name, battle_id)
+    bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(battle_id, thread_id=thread_id, thread_type=thread_type) 
 
 def battle_ready(bot, args, author_id, thread_id, thread_type):
     if len(args) == 0:
