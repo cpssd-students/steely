@@ -23,6 +23,7 @@ from tinydb import TinyDB, Query, where
 from tinydb.operations import increment
 from datetime import datetime, timedelta
 from plugins import gex
+from formatting import *
 import tabulate
 import random
 import requests
@@ -208,14 +209,13 @@ def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
 def table_cmd(bot, message_parts, author_id, thread_id, thread_type):
     max_lindens = len(str(max(user['lindens'] for user in USERDB.all())))
     max_name = len(max((user['first_name'] for user in USERDB.all()), key=len))
-    string = '```'
+    string = ''
     for user in sorted(USERDB.all(), key=lambda user: user['lindens'], reverse=True):
         string += '\n{name:<{max_name}} {lindens:>{max_lindens}.3f}L$'.format(name=user['first_name'],
                                                                          lindens=user['lindens'],
                                                                          max_name=max_name,
                                                                          max_lindens=max_lindens + 4)
-    string += '\n```'
-    bot.sendMessage(string, thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(code_block(string), thread_id=thread_id, thread_type=thread_type)
 
 
 QUOTE_CACHE = {}
@@ -339,7 +339,7 @@ def invest_list_cmd(user_id, args):
     if user_balance is None:
         return "User does not exist, poke Senan"
     user = USERDB.get(USER.id == user_id)
-    out = "```\n{}: {:.2f}L$ Cash\n\n".format(user['first_name'], user['lindens'])
+    out = "{}: {:.2f}L$ Cash\n\n".format(user['first_name'], user['lindens'])
     total_assets = float(user['lindens'])
     tics = list(user['investments'])
     quotes = invest_get_quotes_w_cache(tics)
@@ -362,8 +362,8 @@ def invest_list_cmd(user_id, args):
         total_profit += (quant * bid) - orig_value
     out += tabulate.tabulate(table, headers=("ticker", "quant", "value", "% profit"), tablefmt="plain", floatfmt=".4f")
     out += "\nCurrent Profit: {:.2f}L$".format(total_profit)
-    out += "\nTotal Assets: {:.2f}L$\n```".format(total_assets)
-    return out
+    out += "\nTotal Assets: {:.2f}L$".format(total_assets)
+    return code_block(out)
 
 
 def invest_quote_cmd(user_id, args):

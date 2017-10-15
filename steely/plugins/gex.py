@@ -11,6 +11,7 @@ import difflib
 from tinydb import TinyDB, Query, where, operations
 import plugins._gex_util as gex_util
 from plugins import _gex_battle
+from formatting import *
 
 __author__ = 'iandioch'
 COMMAND = '.gex'
@@ -265,11 +266,11 @@ def _gex_flex(bot, args, author_id, thread_id, thread_type):
     cards = gex_flex(user_id)
     total = sum(c[1] for c in cards)
     name = gex_util.user_id_to_name(bot, user_id)
-    output = '*{}*\nID: _{}_\n'.format(name, user_id)
+    output = '{}\nID: _{}_\n'.format(bold(name), user_id)
     output += 'Total cards: _{}_ (_{}_ unique)\n'.format(total, len(cards))
-    output += '\n*Cards*:\n'
+    output += f'\n{bold(Cards)}:\n'
     for card, num in cards:
-        output += '`{}`: {}\n'.format(card[:MAX_CARD_ID_LENGTH], num)
+        output += '{}: {}\n'.format(monospace(card[:MAX_CARD_ID_LENGTH]), num)
     bot.sendMessage(output, thread_id=thread_id, thread_type=thread_type)
 
 def _gex_inspect(bot, args, author_id, thread_id, thread_type):
@@ -280,9 +281,9 @@ def _gex_inspect(bot, args, author_id, thread_id, thread_type):
     if deets['image'] and deets['image'] is not None:
         print('inspecting image', deets['image'])
         bot.sendRemoteImage(deets['image'], thread_id=thread_id, thread_type=thread_type)
-    info = '*{}*\n'.format(deets['id'])
+    info = '*{}*\n'.format(bold(deets['id']))
     if deets['desc'] is not None:
-        info += '_{}_\n\n'.format(deets['desc'])
+        info += '{}\n\n'.format(italic(deets['desc']))
     masters = [gex_util.user_id_to_name(bot, master) for master in deets['masters']]
     info += 'Masters:\n' + ',\n'.join(masters)
     if deets['id'] in CARD_TO_USER_ID:
@@ -302,7 +303,7 @@ def _gex_decks(bot, args, author_id, thread_id, thread_type):
             last_card = ''
         name_line = format_str.format(name[:16], str(unique), str(total), last_card[:MAX_CARD_ID_LENGTH])
         out_strings.append(name_line)
-    out = '```\n' + '\n'.join(out_strings) + '\n```'
+    out = code_block('\n'.join(out_strings))
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
 
 
@@ -326,24 +327,25 @@ def _gex_stats(bot, args, author_id, thread_id, thread_type):
     least_circulated_cards = heapq.nsmallest(number_of_bottom_cards_to_list, num_in_circulation, key=lambda x: num_in_circulation[x])
     highest_scrabble_scores = heapq.nlargest(number_of_top_cards_to_list, data, key=lambda x: _get_scrabble_score(x))
     out = 'Cards owned by the most people (top 20%):'
+    FORMAT = '\n{} ({})'
     for card in most_owned_cards:
-        out += '\n{} ({})'.format(card, num_owners[card])
+        out += FORMAT.format(card, num_owners[card])
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
     out = 'Cards with the most copies in circulation (top 20%):'
     for card in most_circulated_cards:
-        out += '\n{} ({})'.format(card, num_in_circulation[card])
+        out += FORMAT.format(card, num_in_circulation[card])
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
     out = 'Cards owned by the fewest people (bottom 10%):'
     for card in least_owned_cards:
-        out += '\n{} ({})'.format(card, num_owners[card])
+        out += FORMAT.format(card, num_owners[card])
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
     out = 'Cards with the fewest copies in circulation (bottom 10%):'
     for card in least_circulated_cards:
-        out += '\n{} ({})'.format(card, num_in_circulation[card])
+        out += FORMAT.format(card, num_in_circulation[card])
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
     out = 'Cards with the highest scrabble score for their ID (top 20%):'
     for card in highest_scrabble_scores:
-        out += '\n{} ({})'.format(card, _get_scrabble_score(card))
+        out += FORMAT.format(card, _get_scrabble_score(card))
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
     
 def _gex_help(bot, args, author_id, thread_id, thread_type):

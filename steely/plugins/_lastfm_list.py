@@ -1,5 +1,6 @@
 from plugins._lastfm_helpers import *
 from operator import itemgetter
+from formatting import *
 
 
 def parse_onlines(async_responses):
@@ -38,11 +39,10 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     usernames = [user["username"] for user in USERDB.all()]
     max_username = max(len(username) for username in usernames)
     stats = zip(list(onlines), usernames, list(playcounts))
-    message = "```\n"
+    message = ""
     for online, username, playcount in sorted(stats, key=itemgetter(0, 2), reverse=True):
         if playcount == 0:
             continue
         online_str = " ♬"[online]
         message += f"{online_str} {username:<{max_username}} {playcount:>6,}\n"
-    message += "```"
-    bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(code_block(message), thread_id=thread_id, thread_type=thread_type)
