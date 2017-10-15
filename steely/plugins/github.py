@@ -8,13 +8,23 @@ __author__ = 'alexkraak'
 COMMAND = '.steelygh'
 
 
+PROTOCOL = 'https'
+DOMAIN = 'github.com'
+REPOSITORY = 'sentriz/steely'
+
+API_URL = f'{PROTOCOL}://api.{DOMAIN}/repos/{REPOSITORY}'
+REGULAR_URL = f'{PROTOCOL}://{DOMAIN}/{REPOSITORY}'
+
+
 def handle_prs():
-    pulls = requests.get('https://api.github.com/repos/sentriz/steely/pulls').json()
-    return 'Senan, you have {} fucken pr\'s to merge'.format(len(pulls))
+    pulls = requests.get(f'{API_URL}/pulls').json()
+    message = f'Senan, you have {len(pulls)} fucken pr\'s to merge.' + \
+              f'\n{REGULAR_URL}/pulls'
+    return message
 
 
 def handle_last():
-    url = 'https://api.github.com/repos/sentriz/steely/commits'
+    url = f'{API_URL}/commits'
     commits = requests.get(url).json()
     return 'Last commit was "{}" by {}'.format(commits[0]['commit']['message'],
                                              commits[0]['commit']['author']['name'])

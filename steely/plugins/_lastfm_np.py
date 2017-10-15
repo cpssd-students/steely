@@ -1,11 +1,11 @@
 from plugins._lastfm_helpers import *
 import json
 from contextlib import suppress
+from formatting import *
 
 
 def parse_tags(response):
-    ''' parse artist.getTopTags and return the top 3 tags
-    '''
+    ''' parse artist.getTopTags and return the top 3 tags '''
     for tag in response.json()['toptags']['tag'][:3]:
         tag_name = tag['name']
         if tag_name in ('seen live', ):
@@ -46,7 +46,7 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     is_was = "is" if "@attr" in latest_track_obj and \
         "nowplaying" in latest_track_obj["@attr"] else "was"
     tags_or_no = f"\ntags: {tags}" if tags else ''
-    bot.sendMessage(f"{username} {is_was} playing _{track}_ by *{artist}*" + \
+    bot.sendMessage(f"{username} {is_was} playing {italic(track)} by {bold(artist)}" + \
                     f"{tags_or_no}\n{link}",
                     thread_id=thread_id, thread_type=thread_type)
 

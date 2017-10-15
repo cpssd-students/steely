@@ -8,6 +8,7 @@
 
 import requests
 from operator import itemgetter
+from formatting import *
 
 
 __author__ = 'sentriz'
@@ -28,10 +29,10 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     response = requests.get(BASE.format(tracker=message)).json()
     max_service = max(len(key) for key in response)
     max_latency = max(len(info["Latency"]) for info in response.values())
-    string = "```\n"
+    string = ""
     for service, info in sorted(response.items(), key=itemgetter(0)):
         print(service, info)
         string += "{service:<{max_service}} {latency:>{max_latency}}\n".format(
             latency=info["Latency"], **locals())
-    bot.sendMessage(string + "```",
+    bot.sendMessage(code_block(string),
                     thread_id=thread_id, thread_type=thread_type)
