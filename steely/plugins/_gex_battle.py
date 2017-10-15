@@ -4,6 +4,7 @@ from tinydb import TinyDB, Query
 from fbchat.models import ThreadType
 import plugins._gex_util as gex_util
 import plugins._gex_action as gex_action
+from plugins import gex
 
 BATTLE_DB = TinyDB('databases/gex_battles.json')
 BATTLE = Query()
@@ -93,6 +94,22 @@ def _check_for_battle_finish(bot, battle_id):
     thread_type = ThreadType.GROUP if battle['is_group_thread'] else ThreadType.USER
     out = '_{}_ won battle `{}` against _{}_'.format(winner_name, battle_id, loser_name)
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
+
+    # Assign cards for winning and losing.
+    NOAH_ID = '100003244958231'
+    MASTERS = [bot.uid, NOAH_ID]
+    #TODO(iandioch): Make it possible to assume a card exists.
+    try:
+        gex.gex_create('battle_won', MASTERS, 'I won a gex battle!')
+    except Exception as e:
+        pass
+    try:
+        gex.gex_create('battle_lost', MASTERS, 'I lost a gex battle >:(')
+    except Exception as e:
+        pass
+    print('Giving gex cards for winning and losing battle.')
+    gex.gex_give(bot.uid, 'battle_won', winner)
+    gex.gex_give(bot.uid, 'battle_lost', loser)
 
 def battle_info(bot, args, author_id, thread_id, thread_type):
     if len(args) == 0:
