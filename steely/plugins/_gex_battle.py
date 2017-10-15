@@ -13,10 +13,6 @@ NUM_UPCOMING_CARDS_TO_DISPLAY = 5
 # The amount of power each user starts with in a battle.
 STARTING_POWER_AMOUNT = 50
 
-BATTLE_COMMANDS = {
-    '!SWAP': 5,
-}
-
 def _get_participant_info(bot, data):
     name = gex_util.user_id_to_name(bot, data['id'])
     deck = data['deck']
@@ -244,20 +240,56 @@ def battle_action(bot, action, args, author_id, thread_id, thread_type):
     BATTLE_DB.update(battle, BATTLE.id == battle_id)
 
 
+def battle_help(bot, args, author_id, thread_id, thread_type):
+    message = 'Should run command in the form .gex battle SUBCOMMAND .\n'
+    message += 'The possible subcommands are:'
+    for subcommand in subcommands:
+        message += '\n' + subcommand
+    message += '\nThere are also the following actions that may be taken in a battle:'
+    for action in actions:
+        message += '\n' + action
+    bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
+    message = 'Gex battling is a way of pitting your gex card deck against others for glory.'
+    message += '\nYou can challenge someone to a battle with .gex battle start CianRuane'
+    message += '\nWhen you start a battle with someone, you will be told the battle ID. '
+    message += 'This is used to specify the battle in all other commands. '
+    message += '(You can be in multiple battles at the same time, even with the same person)'
+    message += '\n.gex battle list will show you the IDs of all battles you are engaged in.'
+    message += '\nIf you type .gex battle info BATTLE_ID, you will see the state of that battle. '
+    message += 'The list of the upcoming cards of each competitor is visible to everyone. '
+    message += 'When you are ready for the round to start, send .gex battle ready BATTLE_ID.'
+    message += '\nThe round will be executed once both players have declared that they are ready. '
+    message += 'When the round is executed, the attack and defence values of the respective '
+    message += 'player\'s next card will be compared, and the winner of that round will be decided.'
+    message += '\nEach player in the battle has a \u26A1 value. The loser of a battle is the '
+    message += 'first player to run out of cards, or have this value reach zero. '
+    message += 'If a player loses a round of a battle, they lose some \u26A1.'
+    message += '\nBefore a player declares they are ready, they can spend some \u26A1 '
+    message += 'to perform some actions.\nEg: .gex battle swap BATTLE_ID swaps the order of '
+    message += 'your upcoming cards in exchange for a small amount of \u26A1.'
+    message += '\nYou can send your actions in a private message to Reed so that your competitor '
+    message += 'won\'t see them xoxo'
+    message += '\nIf you have any more questions about gex battles, just ask your friendly '
+    message += 'neighbourhood Reed!'
+    bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
+
+
 subcommands = {
     'info': battle_info,
     'start': battle_start,
     'ready': battle_ready,
     'list': battle_list,
+    'help': battle_help,
 }
 
+
 actions = gex_action.get_actions()
+
 
 def battle(bot, args, author_id, thread_id, thread_type):
     # Should be in format .gex battle <subcommand>.
     if len(args) == 0:
-        bot.sendMessage('Should be run in form .gex battle SUBCOMMAND .', thread_id=thread_id, thread_type=thread_type)
-        return
+        args = ['help']
     subcommand = args[0]
     if subcommand in subcommands:
         try:
