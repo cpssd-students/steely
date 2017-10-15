@@ -45,6 +45,8 @@ def _perform_battle_round(bot, battle_id):
     if len(matching_battles) == 0:
         raise RuntimeError('No such battle id to perform round in!')
     battle = matching_battles[0]
+    if 'finished' in battle and battle['finished']:
+        return
     keys = ('attacker', 'defender')
     for key in keys:
         if 'commands' not in battle[key]:
@@ -77,6 +79,8 @@ def _perform_battle_round(bot, battle_id):
 def _check_for_battle_finish(bot, battle_id):
     matching_battles = BATTLE_DB.search(BATTLE.id == battle_id)
     battle = matching_battles[0]
+    if 'finished' in battle and battle['finished']:
+        return
     winner, loser = None, None
     if battle['attacker']['power'] <= 0 or len(battle['attacker']['deck']) == 0:
         # attacker lost
@@ -94,6 +98,10 @@ def _check_for_battle_finish(bot, battle_id):
     thread_type = ThreadType.GROUP if battle['is_group_thread'] else ThreadType.USER
     out = '_{}_ won battle `{}` against _{}_'.format(winner_name, battle_id, loser_name)
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
+
+    # Set battle as finished.
+    battle['finished'] = True
+    BATTLE_DB.update(battle, BATTLE.id == battle_id)
 
     # Assign cards for winning and losing.
     NOAH_ID = '100003244958231'
@@ -147,6 +155,9 @@ def battle_info(bot, args, author_id, thread_id, thread_type):
         out += '\n_Ready to fight._'
     else:
         out += '\n_Not ready._'
+
+    if 'finished' in battle and battle['finished']:
+        out += '\nBattle is finished!'
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
 
 def battle_start(bot, args, author_id, thread_id, thread_type):
@@ -179,6 +190,7 @@ def battle_start(bot, args, author_id, thread_id, thread_type):
         'id': battle_id,
         'thread_id': thread_id,
         'is_group_thread': (thread_type == ThreadType.GROUP),
+        'finished': False,
     }
     print(data)
     BATTLE_DB.insert(data)
@@ -266,6 +278,10 @@ def battle_help(bot, args, author_id, thread_id, thread_type):
     for action in actions:
         message += '\n' + action
     bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
+    print(args)
+    if len(args) == 1:
+        # There was a dummy value put in from ".gex battle", so quit.
+        return
     message = 'Gex battling is a way of pitting your gex card deck against others for glory.'
     message += '\nYou can challenge someone to a battle with .gex battle start CianRuane'
     message += '\nWhen you start a battle with someone, you will be told the battle ID. '
@@ -306,7 +322,7 @@ actions = gex_action.get_actions()
 def battle(bot, args, author_id, thread_id, thread_type):
     # Should be in format .gex battle <subcommand>.
     if len(args) == 0:
-        args = ['help']
+        args = ['help', 'NO_FULL_HELP_PLS']
     subcommand = args[0]
     if subcommand in subcommands:
         try:
