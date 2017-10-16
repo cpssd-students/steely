@@ -268,7 +268,7 @@ def _gex_flex(bot, args, author_id, thread_id, thread_type):
     name = gex_util.user_id_to_name(bot, user_id)
     output = '{}\nID: _{}_\n'.format(bold(name), user_id)
     output += 'Total cards: _{}_ (_{}_ unique)\n'.format(total, len(cards))
-    output += f'\n{bold(Cards)}:\n'
+    output += '\n' + bold('Cards') + ':\n'
     for card, num in cards:
         output += '{}: {}\n'.format(monospace(card[:MAX_CARD_ID_LENGTH]), num)
     bot.sendMessage(output, thread_id=thread_id, thread_type=thread_type)
