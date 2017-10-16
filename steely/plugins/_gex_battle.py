@@ -14,6 +14,7 @@ NUM_UPCOMING_CARDS_TO_DISPLAY = 5
 # The amount of power each user starts with in a battle.
 STARTING_POWER_AMOUNT = 50
 
+
 def _get_participant_info(bot, data):
     name = gex_util.user_id_to_name(bot, data['id'])
     deck = data['deck']
@@ -22,14 +23,17 @@ def _get_participant_info(bot, data):
     return (name, deck, ready, power)
 
 '''Get a permutation of a user's cards.'''
+
+
 def _get_shuffled_deck(user_id):
     user_data = gex_util.get_user(user_id)
     print(user_data)
     cards = []
     for card in user_data['cards']:
-        cards.extend([card]*(user_data['cards'][card]))
+        cards.extend([card] * (user_data['cards'][card]))
     shuffle(cards)
     return cards
+
 
 def _generate_battle_id():
     while True:
@@ -39,6 +43,7 @@ def _generate_battle_id():
             continue
         print('Started battle with id {}'.format(_id))
         return _id
+
 
 def _perform_battle_round(bot, battle_id):
     matching_battles = BATTLE_DB.search(BATTLE.id == battle_id)
@@ -58,12 +63,13 @@ def _perform_battle_round(bot, battle_id):
             if action.is_possible(battle[key]):
                 battle[key] = action.execute(battle[key])
             else:
-                bot.sendMessage('Could not perform all requested actions', thread_id=battle[key]['id'], thread_type=ThreadType.USER)
+                bot.sendMessage('Could not perform all requested actions', thread_id=battle[
+                                key]['id'], thread_type=ThreadType.USER)
                 break
         battle[key]['commands'] = []
     attacker_card = battle['attacker']['deck'].pop(0)
     defender_card = battle['defender']['deck'].pop(0)
-    
+
     def lost_round(key):
         battle[key]['power'] -= 10
         print(key, 'lost')
@@ -75,6 +81,7 @@ def _perform_battle_round(bot, battle_id):
     battle['attacker']['ready'] = False
     battle['defender']['ready'] = False
     BATTLE_DB.update(battle, BATTLE.id == battle_id)
+
 
 def _check_for_battle_finish(bot, battle_id):
     matching_battles = BATTLE_DB.search(BATTLE.id == battle_id)
@@ -95,8 +102,10 @@ def _check_for_battle_finish(bot, battle_id):
     winner_name = gex_util.user_id_to_name(bot, winner)
     loser_name = gex_util.user_id_to_name(bot, loser)
     thread_id = battle['thread_id']
-    thread_type = ThreadType.GROUP if battle['is_group_thread'] else ThreadType.USER
-    out = '_{}_ won battle `{}` against _{}_'.format(winner_name, battle_id, loser_name)
+    thread_type = ThreadType.GROUP if battle[
+        'is_group_thread'] else ThreadType.USER
+    out = '_{}_ won battle `{}` against _{}_'.format(
+        winner_name, battle_id, loser_name)
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
 
     # Set battle as finished.
@@ -106,7 +115,7 @@ def _check_for_battle_finish(bot, battle_id):
     # Assign cards for winning and losing.
     NOAH_ID = '100003244958231'
     MASTERS = [bot.uid, NOAH_ID]
-    #TODO(iandioch): Make it possible to assume a card exists.
+    # TODO(iandioch): Make it possible to assume a card exists.
     try:
         gex.gex_create('battle_won', MASTERS, 'I won a gex battle!')
     except Exception as e:
@@ -119,15 +128,18 @@ def _check_for_battle_finish(bot, battle_id):
     gex.gex_give(bot.uid, 'battle_won', winner)
     gex.gex_give(bot.uid, 'battle_lost', loser)
 
+
 def battle_info(bot, args, author_id, thread_id, thread_type):
     if len(args) == 0:
-        bot.sendMessage('Please provide a battle ID!', thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage('Please provide a battle ID!',
+                        thread_id=thread_id, thread_type=thread_type)
         return
     battle_id = args[0]
     print('Getting info for battle', battle_id)
     matching_battles = BATTLE_DB.search(BATTLE.id == battle_id)
     if len(matching_battles) == 0:
-        bot.sendMessage('No battle found with the given ID :(', thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage('No battle found with the given ID :(',
+                        thread_id=thread_id, thread_type=thread_type)
         return
     battle = matching_battles[0]
     attacker = battle['attacker']
@@ -160,10 +172,12 @@ def battle_info(bot, args, author_id, thread_id, thread_type):
         out += '\nBattle is finished!'
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
 
+
 def battle_start(bot, args, author_id, thread_id, thread_type):
     attacker_id = author_id
     if len(args) == 0:
-        bot.sendMessage('Please choose someone to battle xo', thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage('Please choose someone to battle xo',
+                        thread_id=thread_id, thread_type=thread_type)
         return
     defender_name = args[0]
     print(defender_name)
@@ -195,21 +209,26 @@ def battle_start(bot, args, author_id, thread_id, thread_type):
     print(data)
     BATTLE_DB.insert(data)
 
-    # Send battle ID in its own message, so it is easy to copy and paste on mobile.
+    # Send battle ID in its own message, so it is easy to copy and paste on
+    # mobile.
     attacker_name = gex_util.user_id_to_name(bot, attacker_id)
     defender_name = gex_util.user_id_to_name(bot, defender_id)
-    message = 'Started battle! {} is attacking {}.\nBattle id: {}'.format(attacker_name, defender_name, battle_id)
+    message = 'Started battle! {} is attacking {}.\nBattle id: {}'.format(
+        attacker_name, defender_name, battle_id)
     bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
-    bot.sendMessage(battle_id, thread_id=thread_id, thread_type=thread_type) 
+    bot.sendMessage(battle_id, thread_id=thread_id, thread_type=thread_type)
+
 
 def battle_ready(bot, args, author_id, thread_id, thread_type):
     if len(args) == 0:
-        bot.sendMessage('Please provide a battle ID.', thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage('Please provide a battle ID.',
+                        thread_id=thread_id, thread_type=thread_type)
         return
     battle_id = args[0]
     matching_battles = BATTLE_DB.search(BATTLE.id == battle_id)
     if len(matching_battles) == 0:
-        bot.sendMessage('No battle found with given ID.', thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage('No battle found with given ID.',
+                        thread_id=thread_id, thread_type=thread_type)
         return
     battle = matching_battles[0]
     if author_id == battle['attacker']['id']:
@@ -217,12 +236,14 @@ def battle_ready(bot, args, author_id, thread_id, thread_type):
     elif author_id == battle['defender']['id']:
         battle['defender']['ready'] = True
     else:
-        bot.sendMessage('This user is not a part of this battle.', thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage('This user is not a part of this battle.',
+                        thread_id=thread_id, thread_type=thread_type)
         return
     BATTLE_DB.update(battle, BATTLE.id == battle_id)
     if (battle['attacker']['ready'] and battle['defender']['ready']):
         _perform_battle_round(bot, battle_id)
         _check_for_battle_finish(bot, battle_id)
+
 
 def battle_list(bot, args, author_id, thread_id, thread_type):
     user_id = author_id
@@ -237,33 +258,38 @@ def battle_list(bot, args, author_id, thread_id, thread_type):
         for battle in matching_battles:
             opponent_id = battle['attacker']['id']
             opponent_name = gex_util.user_id_to_name(bot, opponent_id)
-            out += '\n' + '`{}` (against _{}_)'.format(battle['id'], opponent_name)
+            out += '\n' + \
+                '`{}` (against _{}_)'.format(battle['id'], opponent_name)
     matching_battles = BATTLE_DB.search(BATTLE.attacker.id == user_id)
     if len(matching_battles) > 0:
         out += '\nBattles in which {} is attacking:'.format(user_name)
         for battle in matching_battles:
             opponent_id = battle['defender']['id']
             opponent_name = gex_util.user_id_to_name(bot, opponent_id)
-            out += '\n' + '`{}` (against _{}_)'.format(battle['id'], opponent_name)
+            out += '\n' + \
+                '`{}` (against _{}_)'.format(battle['id'], opponent_name)
     bot.sendMessage(out, thread_id=thread_id, thread_type=thread_type)
 
 
 def battle_action(bot, action, args, author_id, thread_id, thread_type):
     bot.sendMessage(action, thread_id=thread_id, thread_type=thread_type)
     if len(args) == 0:
-        bot.sendMessage('Please provide a battle ID.', thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage('Please provide a battle ID.',
+                        thread_id=thread_id, thread_type=thread_type)
         return
     print(args)
     battle_id = args[0]
     matching_battles = BATTLE_DB.search(BATTLE.id == battle_id)
     if len(matching_battles) == 0:
-        bot.sendMessage('No battle found with given ID.', thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage('No battle found with given ID.',
+                        thread_id=thread_id, thread_type=thread_type)
         return
     battle = matching_battles[0]
     for key in ('attacker', 'defender'):
         if battle[key]['id'] == author_id:
             if battle[key]['ready']:
-                bot.sendMessage('User already declared themselves as ready!', thread_id=thread_id, thread_type=thread_type)
+                bot.sendMessage('User already declared themselves as ready!',
+                                thread_id=thread_id, thread_type=thread_type)
             else:
                 battle[key]['commands'].append(action)
     BATTLE_DB.update(battle, BATTLE.id == battle_id)
@@ -326,15 +352,20 @@ def battle(bot, args, author_id, thread_id, thread_type):
     subcommand = args[0]
     if subcommand in subcommands:
         try:
-            subcommands[subcommand](bot, args[1:], author_id, thread_id, thread_type)
+            subcommands[subcommand](
+                bot, args[1:], author_id, thread_id, thread_type)
         except Exception as e:
-            bot.sendMessage('Battle error: {}'.format(e), thread_id=thread_id, thread_type=thread_type)
+            bot.sendMessage('Battle error: {}'.format(
+                e), thread_id=thread_id, thread_type=thread_type)
             print(e)
     elif subcommand in actions:
         try:
-            battle_action(bot, subcommand, args[1:], author_id, thread_id, thread_type)
+            battle_action(bot, subcommand, args[
+                          1:], author_id, thread_id, thread_type)
         except Exception as e:
-            bot.sendMessage('Battle action error: {}'.format(e), thread_id=thread_id, thread_type=thread_type)
+            bot.sendMessage('Battle action error: {}'.format(
+                e), thread_id=thread_id, thread_type=thread_type)
             print(e)
     else:
-        bot.sendMessage('No such subcommand >:(', thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage(
+            'No such subcommand >:(', thread_id=thread_id, thread_type=thread_type)
