@@ -2,6 +2,7 @@
 
 
 class BattleAction:
+
     def __init__(self, cost):
         self.cost = cost
 
@@ -17,6 +18,7 @@ class BattleAction:
 
 
 class SwapAction(BattleAction):
+
     def __init__(self):
         super().__init__(2)
 
@@ -27,7 +29,7 @@ class SwapAction(BattleAction):
 
     def execute(self, competitor_data):
         competitor_data = super().execute(competitor_data)
-        d = competitor_data['deck'] 
+        d = competitor_data['deck']
         d[0], d[1] = d[1], d[0]
         competitor_data['deck'] = d
         return competitor_data
@@ -35,6 +37,7 @@ class SwapAction(BattleAction):
 actions = {
     'swap': SwapAction(),
 }
+
 
 def get_actions():
     return actions
