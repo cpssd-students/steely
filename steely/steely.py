@@ -47,6 +47,8 @@ class SteelyBot(Client):
 
     @staticmethod
     def parse_command_message(message):
+        if not message:
+            return
         if message[0] != config.COMMAND_PREFIX:
             return
         command, _, message = message[1:].partition(' ')
