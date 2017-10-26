@@ -4,7 +4,7 @@ import json
 
 
 __author__ = 'oskarmcd'
-COMMAND = '.sentiment'
+COMMAND = 'sentiment'
 BASE_URL = 'http://text-processing.com/api/sentiment/'
 FULL_STRINGS = {
     'pos': 'positive',

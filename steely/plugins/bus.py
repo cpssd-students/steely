@@ -15,7 +15,7 @@ from formatting import *
 
 
 __author__ = 'alexkraak'
-COMMAND = '.dbus'
+COMMAND = 'dbus'
 BASE_URL = "http://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation"
 COLUMNS =  ('route', 'destination', 'duetime')
 

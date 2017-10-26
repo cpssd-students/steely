@@ -47,10 +47,10 @@ class SteelyBot(Client):
 
     @staticmethod
     def parse_command_message(message):
-        if " " in message:
-            command, message = message.split(' ', 1)
-        else:
-            command, message = message, ""
+        if " " in message and message[0] == ".":
+            command, message = message[1:].split(' ', 1)
+        elif message[0] == ".":
+            command, message = message[1:], ""
         clean_command = command.lower().strip()
         return clean_command, message
 

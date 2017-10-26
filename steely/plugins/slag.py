@@ -9,7 +9,7 @@ import random
 
 
 __author__ = 'devoxel'
-COMMAND='.slag'
+COMMAND='slag'
 REPLIES = (
     "{} smells like a baby prostitute",
     "{}, you whore",

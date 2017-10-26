@@ -5,7 +5,7 @@ import random
 
 
 __author__ = 'sentriz'
-COMMAND = '.drunk'
+COMMAND = 'drunk'
 
 
 def shuffle(string):

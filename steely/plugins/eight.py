@@ -5,7 +5,7 @@ import random
 
 
 __author__ = 'sentriz'
-COMMAND = '.8'
+COMMAND = '8'
 REPLIES = (
     "it is certain",
     "okay sam",

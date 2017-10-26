@@ -2,7 +2,7 @@
 
 
 __author__ = 'sentriz'
-COMMAND = '.leet'
+COMMAND = 'leet'
 NORMAL = "abcdefghijklmnopqrstuvwxyz"
 LEET =   "48(d3f9#|jklmn0pqr5+uvwxy2"
 

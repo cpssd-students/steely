@@ -2,7 +2,7 @@
 
 
 __author__ = 'iandioch'
-COMMAND = '.flip'
+COMMAND = 'flip'
 
 NORMAL =  'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 FLIPPED = 'ɐqɔpǝⅎƃɥᴉɾʞʅɯuodbɹsʇnʌʍxʎz∀ꓭϽᗡƎᖵ⅁HIᒋꓘ⅂ꟽNOԀꝹꓤSꓕՈɅϺX⅄Z'

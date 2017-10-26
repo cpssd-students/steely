@@ -10,7 +10,7 @@ from formatting import *
 
 
 __author__ = 'sentriz'
-COMMAND = '.box'
+COMMAND = 'box'
 
 
 DIAGONAL = '/'

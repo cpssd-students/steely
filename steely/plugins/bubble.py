@@ -1,7 +1,7 @@
 '''ⓐyy lmao'''
 
 __author__ = 'CianLR'
-COMMAND = '.bubble'
+COMMAND = 'bubble'
 NORMAL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 BUBBLED = 'ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ'
 TRANS = str.maketrans(NORMAL, BUBBLED)

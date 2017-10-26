@@ -9,7 +9,7 @@ import random
 
 
 __author__ = ('alexkraak', 'byxor')
-COMMAND = '.coinflip'
+COMMAND = 'coinflip'
 
 
 PREFIXES = ("good egg", "ok sam", "incredible", "aaaaaaaaaand", "ouch",

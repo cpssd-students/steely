@@ -6,7 +6,7 @@ import random
 
 
 __author__ = 'sentriz'
-COMMAND = '.nose'
+COMMAND = 'nose'
 MODIFIERS = "🏻🏼🏽🏾🏿🏿🏾🏽🏼🏻"
 NOSE = "👃"
 

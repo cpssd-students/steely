@@ -4,7 +4,7 @@
 import requests
 
 __author__ = 'devoxel'
-COMMAND = '.pang'
+COMMAND = 'pang'
 
 
 def get(host):

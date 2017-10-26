@@ -5,7 +5,7 @@ import re
 
 
 __author__ = ('sentriz', 'devoxel')
-COMMAND = '.clap'
+COMMAND = 'clap'
 
 
 def mock(string):

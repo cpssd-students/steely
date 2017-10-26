@@ -2,7 +2,7 @@
 
 
 __author__ = 'iandioch'
-COMMAND = '.prod'
+COMMAND = 'prod'
 
 
 NORMAL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'

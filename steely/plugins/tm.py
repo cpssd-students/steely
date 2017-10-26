@@ -5,7 +5,7 @@ import requests
 from steely import config
 
 __author__ = 'CianLR'
-COMMAND = '.tm'
+COMMAND = 'tm'
 URL = "https://www.markerapi.com/api/v1/trademark/search/*{}*/username/{}/password/{}"
 REQUIRED_KEYS = ["wordmark", "serialnumber", "registrationdate", "description"]
 RESPONSE_TEMPLATE = """Name: {wordmark}

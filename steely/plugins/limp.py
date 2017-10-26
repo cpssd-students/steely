@@ -22,7 +22,7 @@ import limp.environment
 
 
 __author__ = 'byxor'
-COMMAND = '.limp'
+COMMAND = 'limp'
 
 
 def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):

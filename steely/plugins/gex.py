@@ -14,7 +14,7 @@ from plugins import _gex_battle
 from formatting import *
 
 __author__ = 'iandioch'
-COMMAND = '.gex'
+COMMAND = 'gex'
 CARD_DB = TinyDB('databases/gex_cards.json')
 USER_DB = TinyDB('databases/gex_users.json')
 CARD = Query()
