@@ -35,7 +35,7 @@ class SteelyBot(Client):
         self.non_plugins = []
         self.plugins = {}
         self.plugin_helps = {
-            '.help': HELP_DOC
+            'help': HELP_DOC
         }
         for plugin in list_plugins():
             if plugin.__doc__ and plugin.COMMAND:
