@@ -47,15 +47,17 @@ class SteelyBot(Client):
 
     @staticmethod
     def parse_command_message(message):
-        if " " in message and message[0] == ".":
-            command, message = message[1:].split(' ', 1)
-        elif message[0] == ".":
-            command, message = message[1:], ""
+        if message[0] != config.COMMAND_PREFIX:
+            return
+        command, _, message = message[1:].partition(' ')
         clean_command = command.lower().strip()
         return clean_command, message
 
     def run_plugin(self, author_id, message, thread_id, thread_type, **kwargs):
-        command, message = self.parse_command_message(message)
+        parsed_message = self.parse_command_message(message)
+        if parsed_message is None:
+            return
+        command, message = parsed_message
         if not command in self.plugins:
             return
         plugin = self.plugins[command]
@@ -88,8 +90,6 @@ class SteelyBot(Client):
         if author_id == self.uid:
             return
         self.run_non_plugins(author_id, message, thread_id, thread_type, **kwargs)
-        if not message.startswith("."):
-            return
         self.run_plugin(author_id, message, thread_id, thread_type, **kwargs)
 
 
