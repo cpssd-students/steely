@@ -8,7 +8,7 @@ import random
 
 
 __author__ = 'sentriz'
-COMMAND = '.lenny'
+COMMAND = 'lenny'
 LENNYS = (
     """( ͡° ͜ʖ ͡°)""",
     """¯\_(ツ)_/¯""",

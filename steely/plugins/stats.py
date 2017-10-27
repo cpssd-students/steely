@@ -11,7 +11,7 @@ from formatting import *
 
 
 __author__ = 'sentriz'
-COMMAND = '.stats'
+COMMAND = 'stats'
 CMD_DB = TinyDB('databases/stats.json')
 CMD = Query()
 LIMIT = 10

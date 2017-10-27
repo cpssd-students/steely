@@ -1,7 +1,7 @@
 from formatting import *
 
 __author__ = 'byxor'
-COMMAND = '.b'
+COMMAND = 'b'
 
 
 REPLACEABLE = 'PpBbGg'

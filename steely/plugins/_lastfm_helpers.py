@@ -4,7 +4,7 @@ from tinydb import TinyDB, Query
 import requests
 
 
-COMMAND = '.np'
+COMMAND = 'np'
 USERDB = TinyDB('databases/lastfm.json')
 USER = Query()
 SESSION = FuturesSession(max_workers=100)

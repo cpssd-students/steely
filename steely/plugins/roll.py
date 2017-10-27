@@ -15,7 +15,7 @@ from formatting import *
 
 __author__ = 'devoxel'
 REPATTERN = re.compile('[\ \W]+')
-COMMAND = '.roll'
+COMMAND = 'roll'
 NLIMIT, RLIMIT = 30, 10000
 
 

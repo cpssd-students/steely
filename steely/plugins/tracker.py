@@ -12,7 +12,7 @@ from formatting import *
 
 
 __author__ = 'sentriz'
-COMMAND = '.tracker'
+COMMAND = 'tracker'
 BASE = 'https://{tracker}.trackerstatus.info/api/all/'
 TRACKERS = ('ar', 'nwcd', 'btn', 'ptp', 'mtv', 'red', 'ggn')
 

@@ -2,7 +2,7 @@
 
 
 __author__ = 'alexkraak'
-COMMAND = '.snack'
+COMMAND = 'snack'
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):

@@ -21,7 +21,7 @@ import rpn
 
 
 __author__ = 'sentriz'
-COMMAND = '.rpn'
+COMMAND = 'rpn'
 
 
 def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):

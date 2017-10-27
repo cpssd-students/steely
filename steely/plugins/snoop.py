@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 
 __author__ = 'CianLR'
-COMMAND = '.snoop'
+COMMAND = 'snoop'
 GIZOOGLE_URL = 'http://gizoogle.net/textilizer.php'
 
 
