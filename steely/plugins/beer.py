@@ -2,7 +2,7 @@ from steely import config
 import requests
 
 __author__ = 'devoxel'
-COMMAND = '.beer'
+COMMAND = 'beer'
 
 URL = 'http://api.brewerydb.com/v2/'
 SEARCH = URL + "search/"
