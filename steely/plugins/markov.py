@@ -13,10 +13,10 @@ LOGFOLDER = 'logs'
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    if not any(word in message.lower() for word in ('steely', 'reed', 'bot')):
+    if random.random() > 0.05:
         return
-    if random.random() > 0.3:
-        return
+    # if not any(word in message.lower() for word in ('steely', 'reed', 'bot')):
+    #     return
     log_path = os.path.join(LOGFOLDER, thread_type.name, thread_id)
     with open(log_path, 'r') as file:
         log_model = markovify.NewlineText(file.read())
