@@ -7,3 +7,4 @@ TRANSLATE_API_KEY = ''
 TM_API_USER = ''
 TM_API_PASS = ''
 ADMINS = ('', )
+BREWERYDB_API_KEY = ''
