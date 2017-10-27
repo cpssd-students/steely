@@ -1,46 +1,43 @@
 from steely import config
 import requests
 
-# steely stuff
 __author__ = 'devoxel'
 COMMAND = '.beer'
 
-# API stuff
 URL = 'http://api.brewerydb.com/v2/'
 SEARCH = URL + "search/"
 API_KEY = config.BREWERYDB_API_KEY
 
-# error stuff
 ERR_NO_RESULTS = "ah now we got no results"
 ERR_API_LIMIT = "we used up all our api juice, try again tomorrow"
 ERR_WHAT = "no idea whats going on"
 
-def search_request(q):
+
+def search_request(query):
     payload = {
-        'q': q,
+        'q':    query,
         'type': 'beer',
-        'key': API_KEY,
+        'key':  API_KEY,
     }
-    r = requests.get(SEARCH, params=payload)
-    if r.status_code != 200:
-        raise ValueError
-    return r.json()
+    response = requests.get(SEARCH, params=payload)
+    if response.status_code != 200:
+        raise ValueError(ERR_API_LIMIT)
+    return response.json()
 
-def format_output(r):
-    if 'data' not in r:
-        return ERR_NO_RESULTS
-    beer = r['data']
+
+def format_output(response):
+    if 'data' not in response:
+        raise ValueError(ERR_NO_RESULTS)
+    beer = response['data']
     if len(beer) == 0:
-        return ERR_NO_RESULTS
-
+        raise ValueError(ERR_NO_RESULTS)
     # just take the first result
     beer = beer[0]
     output_format = [
-            ('{}', ['nameDisplay']),
-            ('abv: {}%', ['abv']),
+            ('{}',        ['nameDisplay']),
+            ('abv: {}%',  ['abv']),
             ('style: {}', ['style', 'shortName']),
     ]
-
     out = []
     for template, keys in output_format:
         o = beer
@@ -51,27 +48,25 @@ def format_output(r):
             o = o[v]
         if o:
             out.append(template.format(o))
-
+    if not out:
+        raise ValueError(ERR_WHAT)
     img_url = None
     if 'labels' in beer:
         img_url = beer['labels']['medium']
-
     return '\n'.join(out), img_url
 
-def searcher(query):
-    try:
-        q = search_request(query)
-    except ValueError:
-        return ERR_API_LIMIT
-    return format_output(q)
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    desc, url = searcher(message)
-    if not desc:
-        bot.sendMessage(ERR_WHAT, thread_id=thread_id, thread_type=thread_type)
+    try:
+        response = search_request(message)
+        desc, url = format_output(response)
+    except ValueError as exc:
+        bot.sendMessage(str(exc), thread_id=thread_id, thread_type=thread_type)
+        return
     if url:
         bot.sendRemoteImage(url, thread_id=thread_id, thread_type=thread_type)
     bot.sendMessage(desc, thread_id=thread_id, thread_type=thread_type)
+
 
 if __name__ == "__main__":
     import sys
