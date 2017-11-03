@@ -195,7 +195,8 @@ def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
     if not reciever:
         reciever = create_user(reciever_model.uid, reciever_model.first_name)
     if not sender:
-        sender = create_user(author_id, sender_model.first_name)
+        bot.sendMessage('Sorry! Lindens are invite only!!!!', thread_id=thread_id, thread_type=thread_type)
+        return
     new_sender_balance = sender['lindens'] - amount
     if new_sender_balance < 0:
         bot.sendMessage('you\'d be broke boyo', thread_id=thread_id, thread_type=thread_type)
