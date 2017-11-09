@@ -38,9 +38,9 @@ def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
         result = limp.evaluate(source_code, environment)
         send(result)
     except limp.errors.LimpError as error:
-        send_error('You got a limp error.', error)
+        send_error('You got a limp error', error)
     except Exception as error:
-        send_error('Something unexpected happened.', error)
+        send_error('Something unexpected happened', error)
         send("It's possible that it's your fault.")
 
 
