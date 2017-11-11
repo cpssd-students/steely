@@ -42,7 +42,7 @@ steely/plugins/linden for an example.
 - [x] [izaakf](https://github.com/izaakf)'s secret idea
 
 ## thanks (related to the cpssd steely instance)
-  - to [CianLr](https://github.com/cianLR/) for bailing me out of DO bills to get the dbs/logs backs
+  - to [CianLR](https://github.com/cianLR/) for bailing me out of DO bills to get the dbs/logs backs
   - to [devoxel](https://github.com/devoxel) for hosting after the bailout
   - the contributors below
 
