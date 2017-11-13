@@ -22,11 +22,11 @@ def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
 
     def last_message():
         return bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1].text
-    
+
     def globally_define(name, variable):
         send("This is a hack; enjoy.")
         GLOBAL_DEFINITIONS[name] = variable
-        
+
     def retrieve_global(name):
         return GLOBAL_DEFINITIONS[name]
 
@@ -56,11 +56,11 @@ def _generate_help():
             message = f"User: {_FULL_COMMAND} {code}"
             response = f"ChatBot: {result}"
             return message + "\n" + response + "\n\n"
-        
+
         _CREATE_CODE_EXAMPLES = lambda input_examples: "".join(list(map(_CREATE_CODE_EXAMPLE, input_examples))).strip()
-    
+
         description = "Evaluate the limp programming language!"
-        usage = "Usage: {_FULL_COMMAND} <source_code>"
+        usage = f"Usage: {_FULL_COMMAND} <source_code>"
         examples = _CREATE_CODE_EXAMPLES([
             "(+ 1 2)",
             "(// 100 (- 5 2))",
@@ -88,7 +88,7 @@ def _generate_help():
         message += "\n\n"
         message += f"Reason: {e}"
 
-    sys.modules[__name__].__doc__ = message 
+    sys.modules[__name__].__doc__ = message
 
-        
+
 _generate_help()
