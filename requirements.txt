@@ -4,6 +4,6 @@ requests-futures
 tinydb
 tabulate
 nose
-limp==0.2
+limp
 markovify
 textstat
