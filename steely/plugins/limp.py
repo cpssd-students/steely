@@ -29,10 +29,13 @@ def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
 
     try:
         environment = limp.environment.create_standard()
-        environment.define('send', send)
-        environment.define('last-message', last_message)
-        environment.define('define-global', define_global)
-        environment.define_batch_of(GLOBAL_DEFINITIONS.items())
+
+        _define([
+            ('send', send),
+            ('last-message', last_message),
+            ('define-global', define_global),
+        ] + GLOBAL_DEFINITIONS.items(), environment)
+
         result = limp.evaluate(source_code, environment)
         send(result)
     except limp.errors.LimpError as error:
@@ -40,6 +43,14 @@ def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
     except Exception as error:
         send_error('Something unexpected happened', error)
         send("It's possible that it's your fault.")
+
+
+def _define(custom_symbols, environment):
+    for name, value in custom_definitions:
+        try:
+            environment.define(name, value)
+        except limp.errors.RedefinedSymbol:
+            pass
 
 
 def _generate_help():
