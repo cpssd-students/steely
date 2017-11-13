@@ -50,6 +50,7 @@ def _generate_help():
     def _help():
         _FULL_COMMAND = f".{COMMAND}"
         _REPOSITORY = f"https://www.github.com/byxor/limp"
+        _BORDER = '=' * 10
 
         def _CREATE_CODE_EXAMPLE(code):
             result = limp.evaluate(code)
@@ -75,7 +76,9 @@ def _generate_help():
         return "\n\n".join([
             description,
             usage,
+            _BORDER,
             examples,
+            _BORDER,
             source_code,
             contributing,
         ])
