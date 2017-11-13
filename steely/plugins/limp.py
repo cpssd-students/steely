@@ -46,7 +46,7 @@ def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
 
 
 def _define(custom_symbols, environment):
-    for name, value in custom_definitions:
+    for name, value in custom_symbols:
         try:
             environment.define(name, value)
         except limp.errors.RedefinedSymbol:
