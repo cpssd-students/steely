@@ -23,19 +23,16 @@ def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
     def last_message():
         return bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1].text
 
-    def globally_define(name, variable):
+    def define_global(name, variable):
         send("This is a hack; enjoy.")
         GLOBAL_DEFINITIONS[name] = variable
-
-    def retrieve_global(name):
-        return GLOBAL_DEFINITIONS[name]
 
     try:
         environment = limp.environment.create_standard()
         environment.define('send', send)
         environment.define('last-message', last_message)
-        environment.define('globally-define', globally_define)
-        environment.define('retrieve-global', retrieve_global)
+        environment.define('define-global', define_global)
+        environment.define_batch_of(GLOBAL_DEFINITIONS.items())
         result = limp.evaluate(source_code, environment)
         send(result)
     except limp.errors.LimpError as error:
