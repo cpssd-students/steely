@@ -10,17 +10,17 @@ import random
 
 __author__ = 'devoxel'
 COMMAND = None
-STRINGS = ["NUMBERWANG!", 
+STRINGS = ["NUMBERWANG!",
            "Another one",
            "Thaaaaaat's Numberwang!",
-           "Okay", "Uh huh", 
+           "Okay", "Uh huh",
            "WangerNumb ;)"]
 WEIGHTS = [3, 20, 2, 20, 20, 1]
 
 
 def numberwang():
-    return random.choice(STRINGS, weights=WEIGHTS)
-        
+    return random.choices(STRINGS, weights=WEIGHTS)
+
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     try:
