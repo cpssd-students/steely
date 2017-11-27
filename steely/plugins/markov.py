@@ -19,7 +19,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
 
 
 def should_reply():
-    return random.random() > PROBABILITY
+    return random.random() < PROBABILITY
 
 
 def generate_reply(thread_id, thread_type):
