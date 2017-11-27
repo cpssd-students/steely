@@ -34,7 +34,7 @@ def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
             ('send', send),
             ('last-message', last_message),
             ('define-global', define_global),
-        ] + GLOBAL_DEFINITIONS.items(), environment)
+        ] + list(GLOBAL_DEFINITIONS.items()), environment)
 
         result = limp.evaluate(source_code, environment)
         send(result)
