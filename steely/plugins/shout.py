@@ -5,7 +5,7 @@ import random
 
 
 __author__ = 'iandioch'
-COMMAND = '.shout'
+COMMAND = 'shout'
 
 
 def shout(message):

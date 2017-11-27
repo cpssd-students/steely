@@ -19,7 +19,7 @@ import requests
 from steely import config
 
 __author__ = 'CianLR'
-COMMAND = '.translate'
+COMMAND = 'translate'
 
 # Key can be obtained from https://translate.yandex.com/developers/keys
 URL = 'https://translate.yandex.net/api/v1.5/tr.json/translate'

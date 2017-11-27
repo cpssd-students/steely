@@ -11,7 +11,7 @@ import requests
 
 
 __author__ = 'EdwardDowling'
-COMMAND = '.ud'
+COMMAND = 'ud'
 
 
 def define(term):

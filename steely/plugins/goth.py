@@ -2,7 +2,7 @@
 
 
 __author__ = 'iandioch'
-COMMAND = '.goth'
+COMMAND = 'goth'
 
 
 NORMAL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'

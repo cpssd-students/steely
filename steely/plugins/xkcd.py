@@ -5,7 +5,7 @@ import requests
 
 
 __author__ = 'EdwardDowling'
-COMMAND = '.xkcd'
+COMMAND = 'xkcd'
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):

@@ -75,7 +75,7 @@ import traceback
 from collections import defaultdict
 
 
-COMMAND = '.basic'
+COMMAND = 'basic'
 
 
 class BasicInterpreter:

@@ -28,7 +28,6 @@ def parsed_response(response):
 def gen_reply_string(response):
     if not response:
         raise KeyError('no tracks found')
-    yield ''
     for time, artist, track in response:
         yield f'{time:>5} {artist:<15.15} {track:.25}'
 

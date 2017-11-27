@@ -16,7 +16,7 @@ from formatting import *
 
 
 __author__ = 'alexkraak'
-COMMAND = '.define'
+COMMAND = 'define'
 CMD_DB = TinyDB('databases/quote.json')
 CMD = Query()
 LIMIT = 20

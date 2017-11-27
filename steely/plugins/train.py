@@ -14,7 +14,7 @@ from formatting import *
 
 
 __author__ = 'izaakf'
-COMMAND = '.train'
+COMMAND = 'train'
 NAMESPACES = {'realtime': 'http://api.irishrail.ie/realtime/'}
 REALTIME_URL = f"{NAMESPACES['realtime']}realtime.asmx/getStationDataByNameXML"
 

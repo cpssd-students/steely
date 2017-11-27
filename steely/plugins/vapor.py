@@ -2,7 +2,7 @@
 
 
 __author__ = ('alexkraak', 'sentriz')
-COMMAND = '.vape'
+COMMAND = 'vape'
 
 
 import vapor

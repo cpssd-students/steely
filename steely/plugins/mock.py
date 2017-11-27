@@ -3,7 +3,7 @@ import random
 
 
 __author__ = 'EdwardDowling'
-COMMAND = '.mock'
+COMMAND = 'mock'
 
 
 def mock(string):

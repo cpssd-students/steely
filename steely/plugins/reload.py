@@ -5,7 +5,7 @@ import config
 
 
 __author__ = 'sentriz'
-COMMAND = '.reload'
+COMMAND = 'reload'
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):

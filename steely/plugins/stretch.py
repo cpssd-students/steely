@@ -5,7 +5,7 @@ import random
 
 
 __author__ = 'CianLR'
-COMMAND = '.stretch'
+COMMAND = 'stretch'
 STRETCH_FACTOR = 5
 
 
