@@ -16,7 +16,7 @@ def snoop(text):
     r = requests.post(GIZOOGLE_URL, data={'translatetext': text})
     html = r.text.replace('height:250px;"/>', 'height:250px;">')  # Don't ask
     soup = BeautifulSoup(html, 'html.parser')
-    return soup.textarea.string
+    return soup.textarea.string.encode('utf-8')
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
