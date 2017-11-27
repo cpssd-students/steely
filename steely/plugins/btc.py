@@ -9,14 +9,19 @@ RESP_TEMPLATE = """Bitcoin Price:
     €{}
     ${}"""
 
+def is_valid_response(resp):
+    return ('bpi' in resp and
+            'EUR' in resp['bpi'] and 'rate' in resp['bpi']['EUR'] and
+            'USD' in resp['bpi'] and 'rate' in resp['bpi']['USD'])
+
 def get_btc():
     response = requests.get(API_URL)
     if not response.ok:
         return "Error getting price. Response (code {}) {}".format(
             response.status_code, response.text)
     j = response.json()
-    if 'bpi' not in j:
-        return "Prices missing from JSON: {}".format(str(j))
+    if not is_valid_response(j):
+        return "Response is missing fields: {}".format(str(j))
     return RESP_TEMPLATE.format(j['bpi']['EUR']['rate'],
                                 j['bpi']['USD']['rate'])
 
