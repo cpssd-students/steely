@@ -8,7 +8,7 @@ gimme a number and see what happens
 import random
 
 
-__author__ = 'devoxel'
+__author__ = 'Hevehan'
 COMMAND = None
 STRINGS = ["NUMBERWANG!",
            "Another one",
