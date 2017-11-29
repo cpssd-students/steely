@@ -1,33 +1,64 @@
 '''Get the latest Bitcoin price (in USD and EUR)'''
 import requests
 
-__author__ = 'CianLR'
+__author__ = ('CianLR', 'byxor')
 COMMAND = 'btc'
 
 API_URL = 'https://api.coindesk.com/v1/bpi/currentprice.json'
 RESP_TEMPLATE = """Bitcoin Price:
-    €{}
-    ${}"""
+€{}
+${}
+Difference since last time: {}"""
 
-def is_valid_response(resp):
+last_euros = 100
+
+class BitcoinException(Exception): pass
+class BadHttpResponse(BitcoinException): pass
+class MissingFields(BitcoinException): pass
+
+
+def get_bitcoin_rates():
+    response = requests.get(API_URL)    
+
+    if not response.ok:
+        message = "Error getting price. Response (code {}) {}".format(
+            response.status_code, response.text)
+        raise BadHttpResponse(message)
+    
+    j = response.json()
+    
+    if not _is_valid_response(j):
+        message = "Response is missing fields: {}".format(str(j))
+        raise MissingFields(message)
+    
+    euros = float(j['bpi']['EUR']['rate'])
+    dollars = float(j['bpi']['USD']['rate'])
+    return (euros, dollars)
+
+    
+def _is_valid_response(resp):
     return ('bpi' in resp and
             'EUR' in resp['bpi'] and 'rate' in resp['bpi']['EUR'] and
             'USD' in resp['bpi'] and 'rate' in resp['bpi']['USD'])
 
-def get_btc():
-    response = requests.get(API_URL)
-    if not response.ok:
-        return "Error getting price. Response (code {}) {}".format(
-            response.status_code, response.text)
-    j = response.json()
-    if not is_valid_response(j):
-        return "Response is missing fields: {}".format(str(j))
-    return RESP_TEMPLATE.format(j['bpi']['EUR']['rate'],
-                                j['bpi']['USD']['rate'])
+
+def percentage_increase(before, after):
+    delta = after - before
+    return (delta * 100) / before
+
+
+def percentage_string(increase):
+    prefix = "+" if increase >= 0 else ""
+    return prefix + str(increase) + "%"
+
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    bot.sendMessage(get_btc(), thread_id=thread_id, thread_type=thread_type)
-
-if __name__ == '__main__':
-    print(get_btc())
-
+    try:
+        global last_euros
+        euros, dollars = get_bitcoin_rates()
+        increase = percentage_increase(last_euros, euros)
+        message = RESP_TEMPLATE.format(euros, dollars, percentage_string(increase))
+        last_euros = euros
+    except BitcoinException as e:
+        message = str(e)
+    bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
