@@ -47,9 +47,8 @@ def percentage_increase(before, after):
     return (delta * 100) / before
 
 
-def percentage_string(increase):
-    prefix = "+" if increase >= 0 else ""
-    return prefix + str(increase) + "%"
+def percentage_string(n):
+    return "{0:+d}%".format(n)
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
