@@ -10,7 +10,7 @@ RESP_TEMPLATE = """Bitcoin Price:
 ${}
 Difference since last time: {}"""
 
-last_euros = 100
+LAST_EUROS = 100
 
 class BitcoinException(Exception): pass
 class BadHttpResponse(BitcoinException): pass
@@ -53,11 +53,11 @@ def percentage_string(n):
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     try:
-        global last_euros
+        global LAST_EUROS
         euros, dollars = get_bitcoin_rates()
-        increase = percentage_increase(last_euros, euros)
+        increase = percentage_increase(LAST_EUROS, euros)
         message = RESP_TEMPLATE.format(euros, dollars, percentage_string(increase))
-        last_euros = euros
+        LAST_EUROS = euros
     except BitcoinException as e:
         message = str(e)
     bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
