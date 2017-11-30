@@ -12,16 +12,51 @@ __author__ = ('alexkraak', 'byxor')
 COMMAND = 'coinflip'
 
 
-PREFIXES = ("good egg", "ok sam", "incredible", "aaaaaaaaaand", "ouch",
-            "damn son", "go on my son", "what a flip",
+PREFIXES = ("good egg",
+            "ok sam",
+            "incredible",
+            "aaaaaaaaaand",
+            "ouch",
+            "damn son",
+            "go on my son",
+            "what a flip",
             "that was a fucking disgrace",
-            "well spread some peanut butter on my asshole and call me michelle")
-MIDDLES =  ("you got", "you landed on", "you managed to flip it onto",
-            "looks like you got", "you bagged yourself")
-SUFFIXES = ("better luck next time", "that was pretty good",
-            "i never want to play this game again", "kill me please",
+            "well spread some peanut butter on my asshole and call me michelle",
+            "not too bad man",
+            "YAO",
+            "bazinga",
+            "hot diggity dang",
+            "i can NOT believe it",
+            "weird",
+            "maaaaan")
+
+
+MIDDLES =  ("you got",
+            "you landed on",
+            "you managed to flip it onto",
+            "looks like you got",
+            "you bagged yourself",
+            "fate dictated",
+            "the coin landed on",
+            "we got",
+            "seems like")
+
+
+SUFFIXES = ("better luck next time",
+            "that was pretty good",
+            "i never want to play this game again",
+            "kill me please",
             "i wonder if linden has been fixed yet",
-            "can i have a snack now?")
+            "can i have a snack now?",
+            "i'm very impressed",
+            "you know i hadda do it to 'em",
+            "when's the next version of limp coming out?",
+            "i wonder how many ban warnings brandon has",
+            "the coin never lies",
+            "unfortunate")
+
+
+
 PROBABILITY_OF_SUFFIX = 0.1
 
 
