@@ -33,8 +33,13 @@ def gen_box(word):
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if not message:
         bot.sendMessage('word please', thread_id=thread_id, thread_type=thread_type)
-    elif 5 < len(message) < 20:
-        box = '\n'.join(gen_box(message))
-        bot.sendMessage(code_block(box), thread_id=thread_id, thread_type=thread_type)
+
+    length = len(message)
+    if length <= 5:
+        message = "Message is too short"
+    elif length >= 20:
+        message = "Message is too long"
     else:
-        bot.sendMessage("can't use \"{}\"".format(message), thread_id=thread_id, thread_type=thread_type)
+        message = code_block('\n'.join(gen_box(message)))
+
+    bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
