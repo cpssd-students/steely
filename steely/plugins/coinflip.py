@@ -53,7 +53,8 @@ SUFFIXES = ("better luck next time",
             "when's the next version of limp coming out?",
             "i wonder how many ban warnings brandon has",
             "the coin never lies",
-            "unfortunate")
+            "unfortunate",
+            "anyway, can you merge delet.py?")
 
 
 
