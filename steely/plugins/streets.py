@@ -7,7 +7,7 @@ __author__ = 'CianLR'
 COMMAND = None
 
 RESP_CHANCE = 0.5
-RESP_TRIGGERS = ("i think",)
+RESP_TRIGGERS = {"i think"}
 
 def get_response(message):
     if (not any(trigger in message.lower() for trigger in RESP_TRIGGERS) or
