@@ -59,7 +59,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     
     response = search_for_response(RESPONDERS, message)
     if response:
-        bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage(response, thread_id=thread_id, thread_type=thread_type)
 
 
 def new_responder(trigger_word, responses):
