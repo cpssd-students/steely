@@ -30,11 +30,11 @@ def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
     try:
         environment = limp.environment.create_standard()
 
-        _define([
-            ('send', send),
-            ('last-message', last_message),
-            ('define-global', define_global),
-        ] + GLOBAL_DEFINITIONS.items(), environment)
+        _define({
+            'send': send,
+            'last-message': last_message,
+            'define-global': define_global,
+            **GLOBAL_DEFINITIONS}, environment)
 
         result = limp.evaluate(source_code, environment)
         send(result)
@@ -46,7 +46,7 @@ def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
 
 
 def _define(custom_symbols, environment):
-    for name, value in custom_symbols:
+    for name, value in custom_symbols.items():
         try:
             environment.define(name, value)
         except limp.errors.RedefinedSymbol:
