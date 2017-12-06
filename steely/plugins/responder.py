@@ -44,14 +44,14 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         "send my love to 'em",
     }
 
-    RESPONDERS = {
-        
+    RESPONDERS = [
+
         new_responder("tired", {
             "if you're tired just go to bed",
             "then sleep",
             "why are you still awake?",
-        })
-        
+        }),
+
         new_responder("cpssd", {
             "the greatest course to ever live (and die)",
             "god rest its soul, #CPSSD",
@@ -70,7 +70,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
             "!!!",
             "wow! so exciting!",
         }),
-        
+
         new_responder("?", {
             "what kind of a question is that?",
             "only a 3 year old wouldn't know the answer to that",
@@ -89,13 +89,13 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         new_responder("sam", {
             "okay sam"
         }),
-        
+
         new_responder("who", {
             "who do you think?",
             "who is sam?",
             "whoever you want, sunshine",
         }.union(UNIVERSAL_RESPONSES)),
-        
+
         new_responder("what", {
             "what do you think?",
             "what do you mean by 'what'?",
@@ -131,8 +131,8 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         new_responder("alan", PRAISE_RESPONSES),
         new_responder("ben", PRAISE_RESPONSES),
         new_responder("oskar", PRAISE_RESPONSES),
-    }
-    
+    ]
+
     response = search_for_response(RESPONDERS, message)
     if response:
         bot.sendMessage(response, thread_id=thread_id, thread_type=thread_type)
@@ -160,4 +160,4 @@ def search_for_response(responders, message):
         if response:
             return response
     return None
-        
+
