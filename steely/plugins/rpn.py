@@ -1,19 +1,5 @@
 '''
-Evaluate limp, a lisp-flavoured language.
-
-Usage: .limp <source_code>
-
-# example 1
-UncleBob: ".limp (+ 2 3)"
-Chat Bot: "5"
-
-# example 2
-UncleBob: ".limp (// 100 (- 5 2))"
-Chat Bot: "33"
-
-For more information on how to write limp code, see https://www.github.com/byxor/limp
-Perhaps you feel like contributing to the language!
-I welcome anything (relevant) that has been fully covered by automatic tests and doesn't limit the architecture.
+Evaluate an expression in reverse polish notation.
 '''
 
 
