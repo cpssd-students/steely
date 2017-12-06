@@ -1,12 +1,13 @@
-'''Get the latest Bitcoin price (in USD and EUR)'''
+'''Get the latest Bitcoin price (in USD, EUR and GBP)'''
 import requests
 
-__author__ = ('CianLR', 'byxor')
+__author__ = ('CianLR', 'byxor', 'itsdoddsy')
 COMMAND = 'btc'
 
 API_URL = 'https://api.coindesk.com/v1/bpi/currentprice.json'
 RESP_TEMPLATE = """€{}
 ${}
+£{}
 difference since last time: {}"""
 LAST_EUROS = 100
 
@@ -30,13 +31,15 @@ def get_bitcoin_rates():
         raise MissingFields(message)
     euros = response_json['bpi']['EUR']['rate_float']
     dollars = response_json['bpi']['USD']['rate_float']
-    return euros, dollars
+    sterling = response_json['bpi']['GBP']['rate_float']
+    return euros, dollars, sterling
 
 
 def _is_valid_response(resp):
     return ('bpi' in resp and
             'EUR' in resp['bpi'] and 'rate' in resp['bpi']['EUR'] and
-            'USD' in resp['bpi'] and 'rate' in resp['bpi']['USD'])
+            'USD' in resp['bpi'] and 'rate' in resp['bpi']['USD'] and
+	    'GBP' in resp['bpi'] and 'rate' in resp['bpi']['GBP'])
 
 
 def percentage_increase(before, after):
@@ -51,9 +54,9 @@ def percentage_string(n):
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     try:
         global LAST_EUROS
-        euros, dollars = get_bitcoin_rates()
+        euros, dollars, sterling = get_bitcoin_rates()
         increase = percentage_increase(LAST_EUROS, euros)
-        message = RESP_TEMPLATE.format(euros, dollars, percentage_string(increase))
+        message = RESP_TEMPLATE.format(euros, dollars, sterling, percentage_string(increase))
         LAST_EUROS = euros
     except BitcoinException as e:
         message = str(e)
