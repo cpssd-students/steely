@@ -10,6 +10,8 @@ E.g.
 
  > Je déteste sam
 
+You can also translate multiple rounds by doing ".translate fr ga en"
+
 The list of supported languages (and codes) are here:
 https://tech.yandex.com/translate/doc/dg/concepts/api-overview-docpage/
 '''
@@ -25,32 +27,35 @@ COMMAND = 'translate'
 URL = 'https://translate.yandex.net/api/v1.5/tr.json/translate'
 
 
-def translate(lang, text):
-    if not lang:
+def translate(langs, text):
+    if not langs:
         return "No language provided"
-    data = {
-        'text': text,
-        'lang': lang,
-        'format': 'text',
-        'key': config.TRANSLATE_API_KEY,
-    }
-    response = requests.post(URL, data=data).json()
-    if response['code'] != 200:
-        return response['message']
-    return response['text'][0]
+    for lang in langs:
+        data = {
+            'text': text,
+            'lang': lang,
+            'format': 'text',
+            'key': config.TRANSLATE_API_KEY,
+        }
+        response = requests.post(URL, data=data).json()
+        if response['code'] != 200:
+            return response['message']
+        text = response['text'][0]
+    return text
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     last_message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1].text
-    bot.sendMessage(translate(message, last_message),
+    bot.sendMessage(translate(message.split(), last_message),
                     thread_id=thread_id,
                     thread_type=thread_type)
 
 if __name__ == '__main__':
     test_args = [
-        ('fr', 'I hate sam'),
-        ('ru', 'Greetings comrade'),
-        ('ga', 'Quiet road milk girl'),
+        (['fr'], 'I hate sam'),
+        (['ru'], 'Greetings comrade'),
+        (['ga'], 'Quiet road milk girl'),
+        (['ga', 'en'], 'Hello there friend'),
     ]
     for l, t in test_args:
         print(t)
