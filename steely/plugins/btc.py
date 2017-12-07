@@ -39,7 +39,7 @@ def _is_valid_response(resp):
     return ('bpi' in resp and
             'EUR' in resp['bpi'] and 'rate' in resp['bpi']['EUR'] and
             'USD' in resp['bpi'] and 'rate' in resp['bpi']['USD'] and
-	    'GBP' in resp['bpi'] and 'rate' in resp['bpi']['GBP'])
+            'GBP' in resp['bpi'] and 'rate' in resp['bpi']['GBP'])
 
 
 def percentage_increase(before, after):
