@@ -4,7 +4,7 @@ import random
 
 __author__ = 'byxor'
 COMMAND = None
-RESPONSE_CHANCE = 0.6
+RESPONSE_CHANCE = 0.2
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
@@ -118,6 +118,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         new_responder("steely", PERSONAL_RESPONSES),
         new_responder("saoirse", PERSONAL_RESPONSES),
         new_responder("tayne", PERSONAL_RESPONSES),
+        new_responder("weeura", PERSONAL_RESPONSES),
 
         new_responder("senan", PRAISE_RESPONSES),
         new_responder("noah", PRAISE_RESPONSES),
