@@ -22,7 +22,7 @@ def mayo(message):
     message = message.replace('s', 'sh')
     message = message.replace('sh ', 's ')
     message = message.replace('shh', 'sh')
-    sentences = re.split('[.,!]', message)
+    sentences = re.split('[.,!?]', message)
     out = ''
     for s in sentences:
         if random.random() < 0.4:
