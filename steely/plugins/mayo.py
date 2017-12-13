@@ -34,7 +34,7 @@ def mayo(message):
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]
-    mayonnaise = vapor.vapor(message.text)
+    mayonnaise = mayo(message.text)
     bot.sendMessage(mayonnaise, thread_id=thread_id, thread_type=thread_type)
 
 if __name__ == '__main__':
