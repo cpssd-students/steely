@@ -5,7 +5,7 @@ import re
 import string
 
 __author__ = ('iandioch')
-COMMAND = '.mayo'
+COMMAND = 'mayo'
 
 FORMATS = [
     'Ara, {}!',
