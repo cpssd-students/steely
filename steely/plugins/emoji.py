@@ -1,3 +1,5 @@
+'''🆒'''
+
 import random
 import requests
 from collections import defaultdict
