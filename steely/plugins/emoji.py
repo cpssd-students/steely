@@ -2,6 +2,9 @@ import random
 import requests
 from collections import defaultdict
 
+__author__ = ('iandioch')
+COMMAND = 'emoji'
+
 EMOJI_DATA = {}
 try:
     EMOJI_DATA = requests.get('https://raw.githubusercontent.com/muan/emojilib/master/emojis.json').json()
