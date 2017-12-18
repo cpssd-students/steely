@@ -36,7 +36,6 @@ def emojify_or_not_i_am_a_function_not_a_cop(word):
             return e
         return word + e
     else:
-        print(word, 'not found')
         return word
 
 def emojify(message):
