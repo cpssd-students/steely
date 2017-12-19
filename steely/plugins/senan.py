@@ -6,7 +6,7 @@ __author__ = 'itsdoddsy'
 COMMAND = 'senan'
 SENAN = (
     "https://i.imgur.com/nGboTxZ.png",
-	"https://i.imgur.com/3fQvF9r.png",
+    "https://i.imgur.com/3fQvF9r.png",
 )
 
 
