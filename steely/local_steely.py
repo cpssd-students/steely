@@ -91,7 +91,7 @@ def load_plugins(plist, pdir):
 
 def main():
     args = get_args()
-    plugins = load_plugins(args.p, args.plugin_dir)
+    plugins = list(load_plugins(args.p, args.plugin_dir))
     repl = SteelyREPL(plugins)
     repl.run()
 
