@@ -4,18 +4,13 @@ import random
 
 __author__ = 'byxor'
 COMMAND = None
-RESPONSE_CHANCE = 0.2
+RESPONSE_CHANCE = 0.05
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
 
     UNIVERSAL_RESPONSES = {
-        "why does it matter?",
-        "who cares?",
-        "do you need to know?",
-        "shut up",
         "ok sam",
-        "what in god's name do you want now?",
     }
 
     PERSONAL_RESPONSES = {
@@ -42,6 +37,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         "i know them! they contributed!",
         "#1 stunna",
         "send my love to 'em",
+        "good egg",
     }
 
     RESPONDERS = [
@@ -71,47 +67,9 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
             "wow! so exciting!",
         }),
 
-        new_responder("?", {
-            "what kind of a question is that?",
-            "only a 3 year old wouldn't know the answer to that",
-            "that's a dumb question tbh",
-            "the answer is always 4. always.",
-            "yeh",
-            "noe",
-            "yes",
-            "no",
-            "yup",
-            "nah",
-            "?",
-            "???",
-        }.union(UNIVERSAL_RESPONSES)),
-
         new_responder("sam", {
             "okay sam"
         }),
-
-        new_responder("who", {
-            "who do you think?",
-            "who is sam?",
-            "whoever you want, sunshine",
-        }.union(UNIVERSAL_RESPONSES)),
-
-        new_responder("what", {
-            "what do you think?",
-            "what do you mean by 'what'?",
-        }.union(UNIVERSAL_RESPONSES)),
-
-        new_responder("why", {
-            "why do you need to know?",
-            "why this? why that? stop asking questions",
-            "why are traps considered to be gay?",
-        }.union(UNIVERSAL_RESPONSES)),
-
-        new_responder("how", {
-            "how long is a piece of string?",
-            "How Can Our Eyes Be Real If Mirrors Aren't Real?",
-            "how did Liam Neeson land on the moon first if a videoman was filming him?",
-        }.union(UNIVERSAL_RESPONSES)),
 
         new_responder("bot", PERSONAL_RESPONSES),
         new_responder("reed", PERSONAL_RESPONSES),
