@@ -54,7 +54,7 @@ def emojify(message):
             curr = ''
         else:
             curr += c
-    return out
+    return out + curr
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]
