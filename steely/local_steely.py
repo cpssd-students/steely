@@ -69,7 +69,7 @@ def get_args():
                 "A plugin runner for steely designed for manual "
                 "testing. It supports basic FBChat operations and can load "
                 "multiple plugins at once. By default it will attempt to "
-                "load ALL plugins but I recommend against doing this"))
+                "load ALL plugins but this is not recommended."))
     parser.add_argument(
             "-p",
             nargs="+",
@@ -80,18 +80,20 @@ def get_args():
             help="The directory to look for plugins in")
     return parser.parse_args()
 
-def load_plugins(plist, pdir):
+def load_plugins(pdir, plist=None):
     """
     Given a list of plugin filenames return the loaded modules.
     If plist is None then return all plugins found.
     """
+    plugins = []
     for filename, path in scan_plugins_dir(pdir):
         if plist is None or filename in plist:
-            yield load_plugin(filename, path)
+            plugins.append(load_plugin(filename, path))
+    return plugins
 
 def main():
     args = get_args()
-    plugins = list(load_plugins(args.p, args.plugin_dir))
+    plugins = load_plugins(args.plugin_dir, args.p)
     repl = SteelyREPL(plugins)
     repl.run()
 
