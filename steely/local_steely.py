@@ -12,7 +12,7 @@ class FBChatMock:
         # This list will be updated with new messages so anything holding a 
         # reference to it will be up to date.
         self.prev_mes = prev_messages
-        # This is a seperate list for isolating the output of the plugin.
+        # This is a separate list for isolating the output of the plugin.
         self.output_mes = []
 
     def fetchThreadMessages(self, thread_id, limit):
