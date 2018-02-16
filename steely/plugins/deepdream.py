@@ -9,11 +9,12 @@ COMMAND = '..'
 API_URL = "https://api.deepai.org/api/deepdream"
 
 def get_dream(url):
-    return requests.post(
+    resp = requests.post(
         API_URL,
         data = {'content': url},
         headers = {'api-key': config.DEEP_API_KEY},
-    ).json()
+    )
+    return resp.status_code, None if resp.status_code != 200 else resp.json()
 
 def grab_image(message):
     for a in message.attachments:
@@ -27,7 +28,9 @@ def dream(bot, message, image_send, text_send):
     if image is None:
         return text_send("Last message doesn't contain an image")
     image_url = bot.fetchImageUrl(image.uid)
-    dream = get_dream(image_url)
+    code, dream = get_dream(image_url)
+    if code != 200:
+        return text_send("Non 200 HTTP code recieved: HTTP {}".format(code))
     if 'output_url' not in dream:
         return text_send("Some API error occured: {}".format(str(dream)))
     return image_send(dream['output_url'])
