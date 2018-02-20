@@ -27,6 +27,7 @@ def dream(bot, message, image_send, text_send):
     image = grab_image(message)
     if image is None:
         return text_send("Last message doesn't contain an image")
+    text_send("Dreaming, please wait... (may take a few mins)")
     image_url = bot.fetchImageUrl(image.uid)
     code, dream = get_dream(image_url)
     if code != 200:
