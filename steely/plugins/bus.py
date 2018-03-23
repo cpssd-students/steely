@@ -11,10 +11,11 @@ import json
 import operator
 import re
 import requests
+from formatting import *
 
 
 __author__ = 'alexkraak'
-COMMAND = '.dbus'
+COMMAND = 'dbus'
 BASE_URL = "http://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation"
 COLUMNS =  ('route', 'destination', 'duetime')
 
@@ -52,7 +53,7 @@ def gen_reply_string(arrivals):
     def max_string(column):
         return max(len(str(arrival[column])) for arrival in arrivals)
     max_route, max_dest, max_duetime = map(max_string, COLUMNS)
-    yield "```"
+    yield ""
     for arrival in sorted(arrivals, key=arrival_sort):
         due_suffix, extra_due_padding = 'min', 0
         if arrival['duetime'] == 'due':
@@ -61,7 +62,6 @@ def gen_reply_string(arrivals):
         yield f'{arrival["route"]:<{max_route}} ' + \
               f'{arrival["destination"]:<{max_dest}} ' + \
               f'{arrival["duetime"]:>{max_duetime + extra_due_padding}}{due_suffix}'
-    yield "```"
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
@@ -74,7 +74,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if not arrivals:
         send_message("no buses found >:(")
         return
-    send_message("\n".join(gen_reply_string(arrivals)))
+    send_message(code_block("\n".join(gen_reply_string(arrivals))))
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ from steely import config
 
 
 __author__ = 'EdwardDowling'
-COMMAND = '.joke'
+COMMAND = 'joke'
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):

@@ -2,7 +2,7 @@
 
 
 __author__ = ('alexkraak', 'sentriz')
-COMMAND = '.vape'
+COMMAND = 'vape'
 
 
 import vapor
@@ -10,4 +10,5 @@ import vapor
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]
-    bot.sendMessage(vapor.vapor(message.text), thread_id=thread_id, thread_type=thread_type)
+    vaped_message = vapor.vapor(message.text)
+    bot.sendMessage(f"「{vaped_message}」", thread_id=thread_id, thread_type=thread_type)

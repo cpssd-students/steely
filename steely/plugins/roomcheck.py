@@ -15,7 +15,7 @@ import bs4
 
 
 __author__ = 'gruunday'
-COMMAND = '.room'
+COMMAND = 'room'
 BASEURL = 'https://www101.dcu.ie/timetables/feed.php'
 
 

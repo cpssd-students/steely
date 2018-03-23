@@ -1,16 +1,17 @@
 from plugins._lastfm_helpers import *
+from formatting import *
 
 
 def parse_top(response):
-    ''' parse arist.getTopArtists and return the artist objects
-    '''
+    ''' parse arist.getTopArtists and return the artist objects '''
     for artist in response.json()['topartists']['artist']:
         yield artist["name"], int(artist["playcount"])
 
 
 def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     if not message_parts or message_parts[0] not in PERIODS:
-        bot.sendMessage('usage: .np top <period> [username]',
+        period_string = '|'.join(PERIODS)
+        bot.sendMessage(f'usage: .np top <{period_string}> [username]',
             thread_id=thread_id, thread_type=thread_type)
         return
     else:
@@ -19,7 +20,7 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
         username = message_parts[1]
     else:
         username = USERDB.get(USER.id == author_id)["username"]
-    artists, string = [], "```"
+    artists, string = [], ""
     topartsts_response = get_lastfm_request('user.getTopArtists',
             period=period, user=username, limit=8)
     artists = list(parse_top(topartsts_response))
@@ -27,4 +28,4 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     max_plays = max(len(str(plays)) for artists, plays in artists)
     for artist, playcount in artists:
         string += f"\n{artist:<{max_artist}} {playcount:>{max_plays}}"
-    bot.sendMessage(string + "```", thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(code_block(string), thread_id=thread_id, thread_type=thread_type)

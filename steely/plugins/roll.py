@@ -10,11 +10,12 @@ for example:
 
 import random
 import re
+from formatting import *
 
 
 __author__ = 'devoxel'
 REPATTERN = re.compile('[\ \W]+')
-COMMAND = '.roll'
+COMMAND = 'roll'
 NLIMIT, RLIMIT = 30, 10000
 
 
@@ -50,7 +51,7 @@ def dorolls(s):
             out.append(o)
     if len(out) == 0:
         return 'No valid rolls scrub'
-    return '```\n' + '\n'.join(out) + '\n```'
+    return code_block('\n'.join(out))
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     bot.sendMessage(dorolls(message), thread_id=thread_id, thread_type=thread_type)

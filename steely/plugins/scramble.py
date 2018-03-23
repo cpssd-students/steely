@@ -4,7 +4,7 @@ import random
 
 
 __author__ = 'iandioch'
-COMMAND = '.scramble'
+COMMAND = 'scramble'
 
 
 def scramble(message):

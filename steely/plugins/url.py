@@ -23,7 +23,7 @@ def expand(url):
     return expanded_url
 
 
-COMMAND = '.exp'
+COMMAND = 'exp'
 NO_URL_MESSAGE = "Input Error: You didn't provide a URL..."
 
 

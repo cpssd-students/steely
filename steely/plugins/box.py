@@ -6,32 +6,40 @@ the text must be between 6 and 19 characters.
 '''
 
 import random
+from formatting import *
 
 
 __author__ = 'sentriz'
-COMMAND = '.box'
+COMMAND = 'box'
+
+
+DIAGONAL = '/'
+GAP = ' '
 
 
 def gen_box(word):
-    yield '```'
-    yield ' '*6 + ' '.join(word)
-    yield ' '*4 + '/' + ' ' + word[1] + ' '*(2*len(word)-5) + '/' + ' ' + word[-2]
-    yield ' '*2 + '/' + ' '*3 + word[2] + ' '*(2*len(word)-7) + '/' + ' '*3 + word[-3]
-    yield ' '.join(word) + ' '*5 + word[-4]
+    yield GAP*6 + GAP.join(word)
+    yield GAP*4 + DIAGONAL + GAP + word[1] + GAP*(2*len(word)-5) + DIAGONAL + GAP + word[-2]
+    yield GAP*2 + DIAGONAL + GAP*3 + word[2] + GAP*(2*len(word)-7) + DIAGONAL + GAP*3 + word[-3]
+    yield GAP.join(word) + GAP*5 + word[-4]
     for n in range(len(word) - 5):
-        yield word[n + 1] + ' '*5 + word[n+4] + ' '*(2*len(word) - 9) + word[-n-2] + ' '*5 + word[-n+len(word)-5]
-    yield word[-4] + ' '*5 + ' '.join(word[::-1])
-    yield word[-3] + ' '*3 + '/' + ' '*(2*len(word)-7) + word[2] + ' '*3 + '/'
-    yield word[-2] + ' ' + '/' + ' '*(2*len(word)-5) + word[1] + ' /'
-    yield ' '.join(word[::-1])
-    yield '```'
+        yield word[n + 1] + GAP*5 + word[n+4] + GAP*(2*len(word) - 9) + word[-n-2] + GAP*5 + word[-n+len(word)-5]
+    yield word[-4] + GAP*5 + GAP.join(word[::-1])
+    yield word[-3] + GAP*3 + DIAGONAL + GAP*(2*len(word)-7) + word[2] + GAP*3 + DIAGONAL
+    yield word[-2] + GAP + DIAGONAL + GAP*(2*len(word)-5) + word[1] + GAP + DIAGONAL
+    yield GAP.join(word[::-1])
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if not message:
         bot.sendMessage('word please', thread_id=thread_id, thread_type=thread_type)
-    elif 5 < len(message) < 20:
-        box = '\n'.join(gen_box(message))
-        bot.sendMessage(box, thread_id=thread_id, thread_type=thread_type)
+
+    length = len(message)
+    if length <= 5:
+        message = "Message is too short"
+    elif length >= 20:
+        message = "Message is too long"
     else:
-        bot.sendMessage("can't use \"{}\"".format(message), thread_id=thread_id, thread_type=thread_type)
+        message = code_block('\n'.join(gen_box(message)))
+
+    bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)

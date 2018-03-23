@@ -3,7 +3,7 @@ from random import randint
 
 
 __author__ = 'alexkraak'
-COMMAND = '.skrrt'
+COMMAND = 'skrrt'
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):

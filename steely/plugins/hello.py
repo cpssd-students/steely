@@ -4,7 +4,7 @@ hello sam
 
 
 __author__ = 'izaakf'
-COMMAND = '.hello'
+COMMAND = 'hello'
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):

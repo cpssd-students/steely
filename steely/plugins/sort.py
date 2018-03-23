@@ -1,7 +1,7 @@
 '''message -> aeegmss'''
 
 __author__ = 'iandioch'
-COMMAND = '.sort'
+COMMAND = 'sort'
 
 
 def sort_message(message):

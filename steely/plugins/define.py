@@ -12,10 +12,11 @@ They can be accessed via ~<command_name>, and will output what you put in.
 
 
 from tinydb import TinyDB, Query
+from formatting import *
 
 
 __author__ = 'alexkraak'
-COMMAND = '.define'
+COMMAND = 'define'
 CMD_DB = TinyDB('databases/quote.json')
 CMD = Query()
 LIMIT = 20
@@ -25,7 +26,7 @@ ANGRY_STRING = 'please use in form .define <command_name> <command text>'
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if message == 'list':
         user_cmds = ', '.join((command['cmd'] for command in CMD_DB))
-        bot.sendMessage(f'```\n{user_cmds}\n```', thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage(code_block(user_cmds), thread_id=thread_id, thread_type=thread_type)
         return
     if not ' ' in message:
         bot.sendMessage(ANGRY_STRING, thread_id=thread_id, thread_type=thread_type)
@@ -34,7 +35,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if command == 'code':
         if ' ' in text:
             command, text = text.split(' ', 1)
-            text = f'```\n{text}\n```'
+            text = code_block(text)
         else:
             bot.sendMessage(ANGRY_STRING, thread_id=thread_id, thread_type=thread_type)
             return

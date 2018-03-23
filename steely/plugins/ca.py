@@ -6,7 +6,7 @@ from steely import config
 
 
 __author__ = 'sentriz'
-COMMAND = '.sendtocachat'
+COMMAND = 'sendtocachat'
 CA_CHAT_ID = '1182752481782139'
 
 

@@ -75,7 +75,7 @@ import traceback
 from collections import defaultdict
 
 
-COMMAND = '.basic'
+COMMAND = 'basic'
 
 
 class BasicInterpreter:
@@ -127,7 +127,7 @@ class BasicInterpreter:
         if '"' in args:
             self._stdout(args.strip('"'))
         else:
-            self._stdout(str(self._vars[args[0]]))
+            self._stdout(str(self._vars[args.strip()]))
         self._cur_instr = self._next_instr()
 
     def _instr_PRINTLN(self, args):

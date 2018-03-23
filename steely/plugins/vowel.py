@@ -3,7 +3,7 @@ import random
 
 
 __author__ = 'izaakf'
-COMMAND = '.muck'
+COMMAND = 'muck'
 
 
 def shuffle(string):

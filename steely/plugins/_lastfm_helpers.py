@@ -4,7 +4,7 @@ from tinydb import TinyDB, Query
 import requests
 
 
-COMMAND = '.np'
+COMMAND = 'np'
 USERDB = TinyDB('databases/lastfm.json')
 USER = Query()
 SESSION = FuturesSession(max_workers=100)
@@ -18,8 +18,7 @@ REQUEST_PARAMETERS = {'api_key': config.LASTFM_API_KEY,
 
 def get_lastfm_request(method, **kwargs):
     ''' make a normal python request to the last.fm api
-        return a Response()
-    '''
+        return a Response() '''
     return requests.get(API_BASE, params={"method": method,
                                           **REQUEST_PARAMETERS,
                                           **kwargs})
@@ -28,16 +27,14 @@ def get_lastfm_request(method, **kwargs):
 def get_lastfm_asyncrequest(method, **kwargs):
     ''' make an aysnc request using a requests_futures FuturesSession
         to the last.fm api
-        return a Future()
-    '''
+        return a Future() '''
     return SESSION.get(API_BASE, params={"method": method,
                                           **REQUEST_PARAMETERS,
                                           **kwargs})
 
 
 def get_lastfm_asyncrequest_list(method, **kwargs):
-    ''' call get_lastfm_asyncrequest for each user
-    '''
+    ''' call get_lastfm_asyncrequest for each user '''
     for user in USERDB.all():
         username = user["username"]
         yield get_lastfm_asyncrequest(method,

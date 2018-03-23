@@ -3,6 +3,7 @@
 
 from plugins._lastfm_helpers import *
 from operator import itemgetter
+from formatting import *
 
 
 def time_or_now(track):
@@ -27,10 +28,8 @@ def parsed_response(response):
 def gen_reply_string(response):
     if not response:
         raise KeyError('no tracks found')
-    yield '```'
     for time, artist, track in response:
         yield f'{time:>5} {artist:<15.15} {track:.25}'
-    yield '```'
 
 
 def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
@@ -45,6 +44,6 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
         clean_response = list(parsed_response(response))
         reply_lines = list(gen_reply_string(clean_response))
         reply_body = '\n'.join(reply_lines)
-        send_message(reply_body)
+        send_message(code_block(reply_body))
     except (NameError, KeyError) as exc:
         send_message(exc)
