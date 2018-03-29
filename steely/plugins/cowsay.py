@@ -82,5 +82,5 @@ def bubble_message(text):
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]
-    cow_message = bubble_message(message) + random.choice(animals)
+    cow_message = bubble_message(message.text) + random.choice(animals)
     bot.sendMessage(cow_message, thread_id=thread_id, thread_type=thread_type)
