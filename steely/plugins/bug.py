@@ -31,51 +31,51 @@ def get_bug(search):
         s = BUG_DB.get(Bug.title == search)
     return s
 
-def get_bug_info(m):
-    m = m.split(maxsplit=1)
-    if len(m) != 2:
+def get_bug_info(command):
+    command = command.split(maxsplit=1)
+    if len(command) != 2:
         return ERR_MSG
 
-    s = get_bug(m[1])
-    if s is None:
+    bug = get_bug(command[1])
+    if bug is None:
         return "no bug found"
 
     comments = "no comments"
-    if len(s["comments"]) > 0:
-        comments = '\n'.join(s["comments"])
+    if len(bug["comments"]) > 0:
+        comments = '\n'.join(bug["comments"])
 
-    return f'#{s.doc_id}: {s["title"]}\n{comments}'
+    return f'#{bug.doc_id}: {bug["title"]}\n{comments}'
 
 def list_bugs(_):
-    o = [ f'{item.doc_id}:  {item["title"]}' for item in BUG_DB]
-    return formatting.code_block('\n'.join(o))
+    bugs = [ f'{bug.doc_id}:  {bug["title"]}' for bug in BUG_DB]
+    return formatting.code_block('\n'.join(bugs))
 
-def unsanitary(t):
+def unsanitary(message):
     bad_chars = '`\n'
-    return any(e in bad_chars for e in t)
+    return any(char in bad_chars for char in message)
 
 def add_bug(title):
     if len(title) > 45 or unsanitary(title):
         return ERR_MSG
 
-    a = BUG_DB.insert({
+    id = BUG_DB.insert({
         'title': title,
         'comments': [],
     })
-    return 'added bug {}'.format(a)
+    return 'added bug {}'.format(id)
 
-def comment_on_bug(m):
-    m = m.split(maxsplit=2)
-    if len(m) < 3:
+def comment_on_bug(command):
+    command = command.split(maxsplit=2)
+    if len(command) < 3:
         return ERR_MSG
-    b = get_bug(m[1])
-    if b is None:
+    bug = get_bug(command[1])
+    if bug is None:
         return ERR_MSG
-    if unsanitary(m[2]):
+    if unsanitary(command[2]):
         return ERR_MSG
 
-    b['comments'].append(m[2])
-    BUG_DB.update({'comments': b['comments']}, doc_ids=[b.doc_id])
+    bug['comments'].append(command[2])
+    BUG_DB.update({'comments': bug['comments']}, doc_ids=[bug.doc_id])
     return "cool"
 
 COMMANDS = {
@@ -85,8 +85,8 @@ COMMANDS = {
 }
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    m = message.split(maxsplit=1)
-    cmd = m[0]
+    command = message.split(maxsplit=1)
+    cmd = command[0]
     if cmd in COMMANDS:
         r = COMMANDS[cmd](message)
     else:
