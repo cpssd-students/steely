@@ -1,4 +1,6 @@
+#!/usr/bin/python3.6
 import argparse
+import sys
 from utils import scan_plugins_dir, load_plugin
 
 class FBChatMessageMock:
@@ -78,6 +80,10 @@ def get_args():
             "--plugin-dir",
             default="plugins",
             help="The directory to look for plugins in")
+    parser.add_argument(
+            "--all-plugins",
+            action="store_true",
+            help="Load all the plugins in the plugins dir")
     return parser.parse_args()
 
 def load_plugins(pdir, plist=None):
@@ -86,16 +92,41 @@ def load_plugins(pdir, plist=None):
     If plist is None then return all plugins found.
     """
     plugins = []
+    loaded_names = set()
     for filename, path in scan_plugins_dir(pdir):
         if plist is None or filename in plist:
             plugins.append(load_plugin(filename, path))
+            loaded_names.add(filename)
+    # Check for any missed plugins
+    if plist:
+        for filename in plist:
+            if filename not in loaded_names:
+                print("Warning: Failed to find",
+                      "'" + filename + "'", "in dir",
+                      "'" + pdir + "'")
     return plugins
+
+def check_args(args):
+    if not (bool(args.p) ^ args.all_plugins):
+        print("One of -p or --all-plugins must be specified")
+        return False
+    if args.p:
+        for plugin_file in args.p:
+            if not plugin_file.endswith('.py'):
+                print("Warning: Plugin file",
+                      "'" + plugin_file + "'",
+                      "doesn't end with .py, is this a mistake?")
+    return True
 
 def main():
     args = get_args()
+    if not check_args(args):
+        return 1
     plugins = load_plugins(args.plugin_dir, args.p)
     repl = SteelyREPL(plugins)
     repl.run()
+    return 0
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
+
