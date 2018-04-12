@@ -28,4 +28,4 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     max_plays = max(len(str(plays)) for artists, plays in artists)
     for artist, playcount in artists:
         string += f"\n{artist:<{max_artist}} {playcount:>{max_plays}}"
-    bot.sendMessage(code_block(string), thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(code_block(string.strip()), thread_id=thread_id, thread_type=thread_type)
