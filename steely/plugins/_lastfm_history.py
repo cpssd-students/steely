@@ -21,8 +21,8 @@ def parsed_response(response):
         raise NameError('user not found')
     for track in response['recenttracks']['track']:
         yield time_or_now(track), \
-              track['artist']['#text'], \
-              track['name']
+            track['artist']['#text'], \
+            track['name']
 
 
 def gen_reply_string(response):
@@ -40,7 +40,8 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     else:
         username = USERDB.get(USER.id == author_id)['username']
     try:
-        response = get_lastfm_request('user.getRecentTracks', user=username, limit=8).json()
+        response = get_lastfm_request(
+            'user.getRecentTracks', user=username, limit=8).json()
         clean_response = list(parsed_response(response))
         reply_lines = list(gen_reply_string(clean_response))
         reply_body = '\n'.join(reply_lines)

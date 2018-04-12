@@ -26,6 +26,7 @@ literal commands can be mandatory or optional'''
 
 
 class SteelyBot(Client):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.last_suggestions = {}
@@ -39,7 +40,8 @@ class SteelyBot(Client):
         }
         for plugin in list_plugins():
             if plugin.__doc__ and plugin.COMMAND:
-                self.plugin_helps[plugin.COMMAND.lower()] = plugin.__doc__.strip('\n')
+                self.plugin_helps[
+                    plugin.COMMAND.lower()] = plugin.__doc__.strip('\n')
             if plugin.COMMAND:
                 self.plugins[plugin.COMMAND.lower()] = plugin
             else:
@@ -64,14 +66,14 @@ class SteelyBot(Client):
             return
         plugin = self.plugins[command]
         thread = threading.Thread(target=plugin.main,
-            args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
+                                  args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
         thread.deamon = True
         thread.start()
 
     def run_non_plugins(self, author_id, message, thread_id, thread_type, **kwargs):
         for plugin in self.non_plugins:
             thread = threading.Thread(target=plugin.main,
-                args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
+                                      args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
             thread.deamon = True
             thread.start()
 
@@ -81,7 +83,8 @@ class SteelyBot(Client):
             self.changeThreadEmoji(nose, thread_id=thread_id)
 
     def onNicknameChange(self, mid, author_id, changed_for, new_nickname, thread_id, thread_type, ts, metadata, msg):
-        self.changeNickname(vapor(new_nickname), user_id=changed_for, thread_id=thread_id, thread_type=thread_type)
+        self.changeNickname(vapor(new_nickname), user_id=changed_for,
+                            thread_id=thread_id, thread_type=thread_type)
 
     def onFriendRequest(self, from_id, msg):
         self.friendConnect(from_id)
@@ -91,7 +94,8 @@ class SteelyBot(Client):
         self.markAsRead(author_id)
         if author_id == self.uid:
             return
-        self.run_non_plugins(author_id, message, thread_id, thread_type, **kwargs)
+        self.run_non_plugins(author_id, message, thread_id,
+                             thread_type, **kwargs)
         self.run_plugin(author_id, message, thread_id, thread_type, **kwargs)
 
 

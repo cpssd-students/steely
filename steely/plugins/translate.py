@@ -45,7 +45,8 @@ def translate(langs, text):
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    last_message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1].text
+    last_message = bot.fetchThreadMessages(
+        thread_id=thread_id, limit=2)[1].text
     bot.sendMessage(translate(message.split(), last_message),
                     thread_id=thread_id,
                     thread_type=thread_type)

@@ -17,7 +17,7 @@ from formatting import *
 __author__ = 'alexkraak'
 COMMAND = 'dbus'
 BASE_URL = "http://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation"
-COLUMNS =  ('route', 'destination', 'duetime')
+COLUMNS = ('route', 'destination', 'duetime')
 
 
 def next_bus_realtime(stop_id):
@@ -51,6 +51,7 @@ def sanitized(arrival):
 
 def gen_reply_string(arrivals):
     arrivals = list(arrivals)
+
     def max_string(column):
         return max(len(str(arrival[column])) for arrival in arrivals)
     max_route, max_dest, max_duetime = map(max_string, COLUMNS)

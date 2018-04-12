@@ -37,4 +37,5 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         else:
             representation = count
         message += f'{command:<{max_command}} {representation:>3,}\n'
-    bot.sendMessage(code_block(message), thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(code_block(message), thread_id=thread_id,
+                    thread_type=thread_type)

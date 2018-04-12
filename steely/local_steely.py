@@ -1,15 +1,18 @@
 import argparse
 from utils import scan_plugins_dir, load_plugin
 
+
 class FBChatMessageMock:
+
     def __init__(self, message):
         self.text = message
 
 
 class FBChatMock:
+
     def __init__(self, prev_messages):
         # List of messages, oldest to newest.
-        # This list will be updated with new messages so anything holding a 
+        # This list will be updated with new messages so anything holding a
         # reference to it will be up to date.
         self.prev_mes = prev_messages
         # This is a separate list for isolating the output of the plugin.
@@ -24,9 +27,10 @@ class FBChatMock:
 
 
 class SteelyREPL:
+
     def __init__(self, plugins, prefix='.', author_id="test_author"):
         self._plugins = {
-                prefix + p.COMMAND: p for p in plugins if p.COMMAND is not None
+            prefix + p.COMMAND: p for p in plugins if p.COMMAND is not None
         }
         self._all_message_plugins = [p for p in plugins if p.COMMAND is None]
         self._message_list = []
@@ -54,7 +58,7 @@ class SteelyREPL:
             self._message_list.append(message)
             for out_m in self._exec_message(message):
                 print(out_m)
-    
+
     def run(self):
         try:
             return self._run_noguard()
@@ -65,20 +69,21 @@ class SteelyREPL:
 
 def get_args():
     parser = argparse.ArgumentParser(
-            description=(
-                "A plugin runner for steely designed for manual "
-                "testing. It supports basic FBChat operations and can load "
-                "multiple plugins at once. By default it will attempt to "
-                "load ALL plugins but this is not recommended."))
+        description=(
+            "A plugin runner for steely designed for manual "
+            "testing. It supports basic FBChat operations and can load "
+            "multiple plugins at once. By default it will attempt to "
+            "load ALL plugins but this is not recommended."))
     parser.add_argument(
-            "-p",
-            nargs="+",
-            help="A list of plugin filenames to load. E.g. -p b.py box.py")
+        "-p",
+        nargs="+",
+        help="A list of plugin filenames to load. E.g. -p b.py box.py")
     parser.add_argument(
-            "--plugin-dir",
-            default="plugins",
-            help="The directory to look for plugins in")
+        "--plugin-dir",
+        default="plugins",
+        help="The directory to look for plugins in")
     return parser.parse_args()
+
 
 def load_plugins(pdir, plist=None):
     """
@@ -90,6 +95,7 @@ def load_plugins(pdir, plist=None):
         if plist is None or filename in plist:
             plugins.append(load_plugin(filename, path))
     return plugins
+
 
 def main():
     args = get_args()

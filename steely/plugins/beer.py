@@ -34,9 +34,9 @@ def format_output(response):
     # just take the first result
     beer = beer[0]
     output_format = [
-            ('{}',        ['nameDisplay']),
-            ('abv: {}%',  ['abv']),
-            ('style: {}', ['style', 'shortName']),
+        ('{}',        ['nameDisplay']),
+        ('abv: {}%',  ['abv']),
+        ('style: {}', ['style', 'shortName']),
     ]
     out = []
     for template, keys in output_format:

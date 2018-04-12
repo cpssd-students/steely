@@ -19,8 +19,10 @@ def help():
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    last_message = lambda: bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1].text
-    send = lambda message: bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
+    last_message = lambda: bot.fetchThreadMessages(
+        thread_id=thread_id, limit=2)[1].text
+    send = lambda message: bot.sendMessage(
+        message, thread_id=thread_id, thread_type=thread_type)
     send(encode(last_message()))
 
 

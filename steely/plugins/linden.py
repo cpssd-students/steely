@@ -38,6 +38,7 @@ REED_ID = None
 
 
 class YahooTickerFetcher:
+
     def __init__(self):
         self.base_url = 'https://query.yahooapis.com/v1/public/yql'
         self.param_string = ('?q={}&format=json&env='
@@ -64,6 +65,7 @@ class YahooTickerFetcher:
 
 
 class AlphaVantageTickerFetcher:
+
     def __init__(self):
         self.base_url = "https://www.alphavantage.co/query"
         self.params = ("?function=TIME_SERIES_INTRADAY"
@@ -91,6 +93,7 @@ class AlphaVantageTickerFetcher:
 
 
 class IEXTickerFetcher:
+
     def __init__(self):
         self.base_url = 'https://api.iextrading.com/1.0/tops/last?symbols='
 
@@ -102,7 +105,8 @@ class IEXTickerFetcher:
             if quote is None:
                 res.append({'Symbol': tickers[i], 'Bid': None, 'Ask': None})
                 continue
-            res.append({'Symbol': tickers[i], 'Bid': quote['price'], 'Ask': quote['price']})
+            res.append({'Symbol': tickers[i], 'Bid': quote[
+                       'price'], 'Ask': quote['price']})
         return res
 
     def GetSingle(self, ticker):
@@ -113,6 +117,7 @@ TICKER_FETCHERS = [
     YahooTickerFetcher(),  # Fast, super flakey
     AlphaVantageTickerFetcher()  # Slow, little flakey
 ]
+
 
 def user_from_name(name, list):
     for user in list:
@@ -148,8 +153,10 @@ def handle_gex_sell_cards(user_id, ticker, profit):
     cards = ticker_cards[:]
     vals = [2000, 1500, 1000, 750, 500, 250, 100]
     for v in vals:
-        cards.append(('{}-gain'.format(v), 'I earned {} lindens in one sell xo'.format(v)))
-        cards.append(('{}-loss'.format(v), 'I dropped a bag of {} lindens :('.format(v)))
+        cards.append(
+            ('{}-gain'.format(v), 'I earned {} lindens in one sell xo'.format(v)))
+        cards.append(
+            ('{}-loss'.format(v), 'I dropped a bag of {} lindens :('.format(v)))
 
     # try to create badges if they don't already exist
     for card_id, desc in cards:
@@ -184,7 +191,8 @@ def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
         bot.sendMessage('please enter a valid amount',
                         thread_id=thread_id, thread_type=thread_type)
         return
-    reciever_name, amount = message_parts[0].lstrip("@").capitalize(), int(message_parts[-1])
+    reciever_name, amount = message_parts[0].lstrip(
+        "@").capitalize(), int(message_parts[-1])
     reciever_model = user_from_name(reciever_name, users)
     reciever = USERDB.get(USER.id == reciever_model.uid)
     sender_model = bot.fetchUserInfo(author_id)[author_id]
@@ -198,10 +206,12 @@ def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
         sender = create_user(author_id, sender_model.first_name)
     new_sender_balance = sender['lindens'] - amount
     if new_sender_balance < 0:
-        bot.sendMessage('you\'d be broke boyo', thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage('you\'d be broke boyo',
+                        thread_id=thread_id, thread_type=thread_type)
         return
     USERDB.update({'lindens': new_sender_balance}, USER.id == author_id)
-    USERDB.update({'lindens': reciever['lindens'] + amount}, USER.id == reciever_model.uid)
+    USERDB.update(
+        {'lindens': reciever['lindens'] + amount}, USER.id == reciever_model.uid)
     bot.sendMessage('you gave {} {} Linden Dollars™'.format(reciever_name, amount),
                     thread_id=thread_id, thread_type=thread_type)
 
@@ -212,17 +222,21 @@ def table_cmd(bot, message_parts, author_id, thread_id, thread_type):
     string = ''
     for user in sorted(USERDB.all(), key=lambda user: user['lindens'], reverse=True):
         string += '\n{name:<{max_name}} {lindens:>{max_lindens}.3f}L$'.format(name=user['first_name'],
-                                                                         lindens=user['lindens'],
-                                                                         max_name=max_name,
-                                                                         max_lindens=max_lindens + 4)
-    bot.sendMessage(code_block(string), thread_id=thread_id, thread_type=thread_type)
+                                                                              lindens=user[
+                                                                                  'lindens'],
+                                                                              max_name=max_name,
+                                                                              max_lindens=max_lindens + 4)
+    bot.sendMessage(code_block(string), thread_id=thread_id,
+                    thread_type=thread_type)
 
 
 QUOTE_CACHE = {}
 QUOTE_TTL = timedelta(minutes=10)
 
+
 def invest_check_valid_quote(quote):
     return "Bid" in quote and quote["Bid"] and "Ask" in quote and quote["Ask"]
+
 
 def invest_get_quotes_multi_source(tickers):
     # Iterate through each of the fetchers, removing tickers as a quote is
@@ -241,6 +255,7 @@ def invest_get_quotes_multi_source(tickers):
             break
         tickers = redo
     return done
+
 
 def invest_get_quotes_w_cache(tickers):
     cached_quotes = []
@@ -285,7 +300,8 @@ def invest_buy_cmd(user_id, args):
     elif user_balance < total_cost:
         return "you don't have enough Lindens\n" \
                "you have {user_balance:.2f}L$,\n" \
-               "but you need {total_cost:.2f}L$ ({qt} * {ask:.2f})".format_map(locals())
+               "but you need {total_cost:.2f}L$ ({qt} * {ask:.2f})".format_map(
+                   locals())
     # Edit that database
     total_holdings = USERDB.get(USER.id == user_id)['investments']
     new_holding = {'symbol': tic, 'quantity': qt, 'orig_value': total_cost}
@@ -320,7 +336,8 @@ def invest_sell_cmd(user_id, args):
     if tic not in total_holdings or total_holdings[tic]['quantity'] < qt:
         return "You don't own enough ${} to sell {}".format(tic, qt)
     # Edit that database
-    orig_bid = total_holdings[tic]['orig_value'] / total_holdings[tic]['quantity']
+    orig_bid = total_holdings[tic]['orig_value'] / \
+        total_holdings[tic]['quantity']
     total_holdings[tic]['orig_value'] -= orig_bid * qt
     total_holdings[tic]['quantity'] -= qt
     if total_holdings[tic]['quantity'] == 0:
@@ -331,7 +348,7 @@ def invest_sell_cmd(user_id, args):
     profit = qt * (bid - orig_bid)
     handle_gex_sell_cards(user_id, tic, profit)
     return "Successfully sold {} shares of ${} for {} Lindens ({:.2f}L profit)".format(
-            qt, tic, qt * bid, qt * (bid - orig_bid))
+        qt, tic, qt * bid, qt * (bid - orig_bid))
 
 
 def invest_list_cmd(user_id, args):
@@ -350,7 +367,8 @@ def invest_list_cmd(user_id, args):
         quant, orig_value = holding['quantity'], holding['orig_value']
 
         if quote['Bid'] is None:
-            print("Broken stock", holding['symbol'], 'for', user_id, '\nfull quote:\n', quote)
+            print("Broken stock", holding['symbol'],
+                  'for', user_id, '\nfull quote:\n', quote)
 
             return "The following stock broke: " + holding['symbol']
 
@@ -358,9 +376,10 @@ def invest_list_cmd(user_id, args):
         total_assets += quant * bid
 
         table.append([quote['Symbol'], quant, quant * bid,
-            100 * ((quant * bid) - orig_value) / orig_value])
+                      100 * ((quant * bid) - orig_value) / orig_value])
         total_profit += (quant * bid) - orig_value
-    out += tabulate.tabulate(table, headers=("ticker", "quant", "value", "% profit"), tablefmt="plain", floatfmt=".4f")
+    out += tabulate.tabulate(table, headers=("ticker", "quant",
+                                             "value", "% profit"), tablefmt="plain", floatfmt=".4f")
     out += "\nCurrent Profit: {:.2f}L$".format(total_profit)
     out += "\nTotal Assets: {:.2f}L$".format(total_assets)
     return code_block(out)
@@ -386,44 +405,46 @@ def invest_cmd(bot, message_parts, author_id, thread_id, thread_type):
     out_message = ''
     if message_parts[0] not in invest_cmds:
         out_message = 'Invalid investment decision, available commands: ' + ', '.join(
-                invest_cmds)
+            invest_cmds)
     else:
-        out_message = invest_cmds[message_parts[0]](author_id, message_parts[1:])
+        out_message = invest_cmds[message_parts[0]](
+            author_id, message_parts[1:])
     bot.sendMessage(out_message, thread_id=thread_id, thread_type=thread_type)
 
 
 def invalid_cmd(bot, message_parts, author_id, thread_id, thread_type):
-    bot.sendMessage("invalid subcommand", thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage("invalid subcommand", thread_id=thread_id,
+                    thread_type=thread_type)
 
 
 def gamble_cmd(bot, message_parts, author_id, thread_id, thread_type):
     if not message_parts or not message_parts[0].isdigit() or len(message_parts) != 1:
         bot.sendMessage("usage: .linden gamble <number 1-3>\nit's 2L$ to enter\n5$L if you win",
-            thread_id=thread_id, thread_type=thread_type)
+                        thread_id=thread_id, thread_type=thread_type)
         return
     guess, number = int(message_parts[0]), random.randint(1, 3)
     if 1 > guess or guess > 3:
         bot.sendMessage("number between 1 and 3 please",
-            thread_id=thread_id, thread_type=thread_type)
+                        thread_id=thread_id, thread_type=thread_type)
         return
     user = USERDB.get(USER.id == author_id)
     user_lindens = user["lindens"]
     if user_lindens < 3:
         bot.sendMessage(u"you'd be broke boyo",
-                thread_id=thread_id, thread_type=thread_type)
+                        thread_id=thread_id, thread_type=thread_type)
         return
 
     if guess == number:
         bot.sendMessage(u"you won, thats ✔ some good👌👌\n5L$ added to your balance",
-                thread_id=thread_id, thread_type=thread_type)
+                        thread_id=thread_id, thread_type=thread_type)
         USERDB.update({"lindens": user_lindens + 5}, USER.id == author_id)
 
     else:
         bot.sendMessage(u"you lost, the number was {}\n3L$ removed from your balance".format(number),
-            thread_id=thread_id, thread_type=thread_type)
+                        thread_id=thread_id, thread_type=thread_type)
         USERDB.update({"lindens": user["lindens"] - 3}, USER.id == author_id)
     bot.sendMessage(u"your new balance is {:.4f}L$".format(get_balance(author_id)),
-            thread_id=thread_id, thread_type=thread_type)
+                    thread_id=thread_id, thread_type=thread_type)
 
 
 SUBCOMMANDS = {
@@ -444,7 +465,8 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         return
 
     subcommand, *args = message.split()
-    SUBCOMMANDS.setdefault(subcommand, invalid_cmd)(bot, args, author_id, thread_id, thread_type)
+    SUBCOMMANDS.setdefault(subcommand, invalid_cmd)(
+        bot, args, author_id, thread_id, thread_type)
 
 
 if __name__ == "__main__":

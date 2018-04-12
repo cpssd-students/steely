@@ -31,7 +31,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     except ValueError:
         send_message('building is closed at this time')
     if booking:
-        send_message(f'{room_number} is not free, there is\n\n' + \
+        send_message(f'{room_number} is not free, there is\n\n' +
                      f'{booking}')
     else:
         send_message(f'{room_number} is currently free')
@@ -83,7 +83,7 @@ def academic_hour(date):
     minute = date.minute
     if minute > 30:
         hour += 1
-    return (hour - 8) + (hour - 7) 
+    return (hour - 8) + (hour - 7)
 
 
 if __name__ == '__main__':

@@ -13,6 +13,7 @@ SN: {serialnumber}
 Date: {registrationdate}
 Description: {description}"""
 
+
 def full_result(res):
     """Check the API returned a result with enough info"""
     return all(key in res for key in REQUIRED_KEYS)
@@ -29,7 +30,7 @@ def tm(term):
     resp = requests.get(filled_url)
     if resp.status_code != 200:
         return "Error code {}!".format(resp.code)
-    
+
     trademarks = resp.json()
     if trademarks['count'] == 0:
         return "No results!"
@@ -48,4 +49,3 @@ if __name__ == '__main__':
     tests = ['tayne', 'steely', 'lou', 'qwdfghtresxcghytrdcv']
     for t in tests:
         print(t + '\n' + tm(t) + '\n')
-

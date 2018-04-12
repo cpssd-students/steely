@@ -79,6 +79,7 @@ COMMAND = 'basic'
 
 
 class BasicInterpreter:
+
     def __init__(self, stdout=print, stderr=print):
         self._stdout = stdout
         self._stderr = stderr
@@ -142,9 +143,9 @@ class BasicInterpreter:
         else:
             assign, _, var1, op, var2 = args
             self._vars[assign] = self._32_bit_wrap(
-                    self._val_op_handlers[op](
-                        self._get_var(var1),
-                        self._get_var(var2)))
+                self._val_op_handlers[op](
+                    self._get_var(var1),
+                    self._get_var(var2)))
         self._cur_instr = self._next_instr()
 
     def _instr_IF(self, args):
@@ -187,16 +188,19 @@ MAX_OUTPUT = 1500
 
 def main(bot, author_id, source_code, thread_id, thread_type, **kwargs):
     def send(message):
-        bot.sendMessage(str(message), thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage(str(message), thread_id=thread_id,
+                        thread_type=thread_type)
 
     global stdout
     stdout = ''
+
     def add_stdout(s):
         global stdout
         stdout += s
 
     global stderr
     stderr = ''
+
     def add_stderr(s):
         global stderr
         stderr += s

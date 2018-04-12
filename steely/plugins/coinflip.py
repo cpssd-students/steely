@@ -31,15 +31,15 @@ PREFIXES = ("good egg",
             "maaaaan")
 
 
-MIDDLES =  ("you got",
-            "you landed on",
-            "you managed to flip it onto",
-            "looks like you got",
-            "you bagged yourself",
-            "fate dictated",
-            "the coin landed on",
-            "we got",
-            "seems like")
+MIDDLES = ("you got",
+           "you landed on",
+           "you managed to flip it onto",
+           "looks like you got",
+           "you bagged yourself",
+           "fate dictated",
+           "the coin landed on",
+           "we got",
+           "seems like")
 
 
 SUFFIXES = ("better luck next time",
@@ -55,7 +55,6 @@ SUFFIXES = ("better luck next time",
             "the coin never lies",
             "unfortunate",
             "anyway, can you merge delet.py?")
-
 
 
 PROBABILITY_OF_SUFFIX = 0.1
@@ -89,6 +88,6 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     speech = generate_speech_for(flip)
     image = IMAGES[flip]
     bot.sendRemoteImage(image,
-        thread_id=thread_id, thread_type=thread_type)
+                        thread_id=thread_id, thread_type=thread_type)
     bot.sendMessage(speech,
-        thread_id=thread_id, thread_type=thread_type)
+                    thread_id=thread_id, thread_type=thread_type)

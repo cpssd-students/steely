@@ -14,15 +14,15 @@ COMMAND = 'cowsay'
 
 
 animals = [
-"""
+    """
 \  ^__^
  \ (oo)\_______
    (__)\       )\/\\
        ||----w |
        ||     ||
 """
-,
-"""
+    ,
+    """
     \   .--.
      \ |o_o |
        |:_/ |
@@ -31,8 +31,8 @@ animals = [
     /'\\_   _/`\\
     \\___)=(___/
 """
-,
-"""
+    ,
+    """
  \    / <`     '> \\
   \  (  / @   @ \  )
       \(_ _\_/_ _)/
@@ -41,8 +41,8 @@ animals = [
       .==')___(`==.
        .='     `=.
 """
-,
-"""
+    ,
+    """
 \      .~~,
  \ ,_-( 9  )
      '-'==( ___\)
@@ -59,15 +59,15 @@ def normalize_text(str):
     return [line.ljust(len(max(lines, key=len))) for line in lines]
 
 
-def get_border(line_count,index):
+def get_border(line_count, index):
     if line_count == 1:
-        return [ "<", ">" ]
+        return ["<", ">"]
     elif index == 0:
-        return [ "/", "\\" ]
+        return ["/", "\\"]
     elif index == line_count - 1:
-        return [ "\\", "/" ]
+        return ["\\", "/"]
     else:
-        return [ "|", "|" ]
+        return ["|", "|"]
 
 
 def bubble_message(text):
@@ -87,5 +87,6 @@ def bubble_message(text):
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]
-    cow_message = code_block(bubble_message(message.text) + random.choice(animals))
+    cow_message = code_block(bubble_message(
+        message.text) + random.choice(animals))
     bot.sendMessage(cow_message, thread_id=thread_id, thread_type=thread_type)
