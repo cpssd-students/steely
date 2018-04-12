@@ -19,7 +19,7 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     if not message_parts or message_parts[0] not in PERIODS:
         period_string = '|'.join(PERIODS)
         bot.sendMessage(f'usage: .np collage <{period_string}> [username]',
-            thread_id=thread_id, thread_type=thread_type)
+                        thread_id=thread_id, thread_type=thread_type)
         return
     else:
         period = message_parts[0]

@@ -4,7 +4,7 @@
 __author__ = 'iandioch'
 COMMAND = 'flip'
 
-NORMAL =  'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+NORMAL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 FLIPPED = 'ɐqɔpǝⅎƃɥᴉɾʞʅɯuodbɹsʇnʌʍxʎz∀ꓭϽᗡƎᖵ⅁HIᒋꓘ⅂ꟽNOԀꝹꓤSꓕՈɅϺX⅄Z'
 
 FROM = NORMAL + FLIPPED
@@ -18,4 +18,5 @@ def flip(string):
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]
-    bot.sendMessage(flip(message.text), thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(flip(message.text), thread_id=thread_id,
+                    thread_type=thread_type)

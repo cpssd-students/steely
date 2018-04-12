@@ -26,10 +26,12 @@ ANGRY_STRING = 'please use in form .define <command_name> <command text>'
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if message == 'list':
         user_cmds = ', '.join((command['cmd'] for command in CMD_DB))
-        bot.sendMessage(code_block(user_cmds), thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage(code_block(user_cmds),
+                        thread_id=thread_id, thread_type=thread_type)
         return
     if not ' ' in message:
-        bot.sendMessage(ANGRY_STRING, thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage(ANGRY_STRING, thread_id=thread_id,
+                        thread_type=thread_type)
         return
     command, text = message.split(' ', 1)
     if command == 'code':
@@ -37,19 +39,21 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
             command, text = text.split(' ', 1)
             text = code_block(text)
         else:
-            bot.sendMessage(ANGRY_STRING, thread_id=thread_id, thread_type=thread_type)
+            bot.sendMessage(ANGRY_STRING, thread_id=thread_id,
+                            thread_type=thread_type)
             return
     if not command.startswith('~'):
         command = f'~{command}'
     if len(command) > LIMIT:
-        bot.sendMessage("that's too long dickhead", thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage("that's too long dickhead",
+                        thread_id=thread_id, thread_type=thread_type)
         return
     search = CMD_DB.get(CMD.cmd == command)
     if search == None:
         CMD_DB.insert({"cmd": command, "text": text})
         bot.sendMessage(f'Your command can be run with {command}',
-            thread_id=thread_id, thread_type=thread_type)
+                        thread_id=thread_id, thread_type=thread_type)
     else:
         CMD_DB.update({"text": text}, CMD.cmd == command)
         bot.sendMessage(f'Your command {command} has been updated',
-            thread_id=thread_id, thread_type=thread_type)
+                        thread_id=thread_id, thread_type=thread_type)

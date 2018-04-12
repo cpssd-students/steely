@@ -11,8 +11,8 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
     message_parts = message.split()
     if not message_parts:
-        commands = ', '.join((config.COMMAND_PREFIX + command \
-                              for command in bot.plugins.keys() \
+        commands = ', '.join((config.COMMAND_PREFIX + command
+                              for command in bot.plugins.keys()
                               if command))
         send_message(f'available commands: {commands}')
     else:

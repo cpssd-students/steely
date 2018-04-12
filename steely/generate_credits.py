@@ -40,7 +40,7 @@ def is_multi_author(authors):
 def get_credits():
     for plugin in list_plugins():
         yield get_plugin_name(plugin), \
-              get_plugin_author(plugin)
+            get_plugin_author(plugin)
 
 
 def format_credit_line(name, author):
@@ -49,7 +49,7 @@ def format_credit_line(name, author):
 
 def make_new_credits():
     credits = sorted_credits(get_credits())
-    return '\n'.join(format_credit_line(name, author) \
+    return '\n'.join(format_credit_line(name, author)
                      for name, author in credits)
 
 

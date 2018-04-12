@@ -17,7 +17,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         send_message('nice try idiot')
         return
     if not author_id in ('100002084833976', '1640731564', '100000433265428'):
-        send_message('sorry sam, only select people can use this command.\n' \
+        send_message('sorry sam, only select people can use this command.\n'
                      'we couldnt want poor reed getting removed from the ca chat would we?')
         return
     bot.sendMessage(message, thread_id=CA_CHAT_ID, thread_type=thread_type)

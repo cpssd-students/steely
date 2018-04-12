@@ -4,8 +4,8 @@ from nltk.corpus import wordnet
 
 __author__ = 'sentriz'
 COMMAND = None
-EXPRESSION = re.compile(r'^computer,\s+(\w+).*please(?:\.|\!)?$', \
-                        re.DOTALL + \
+EXPRESSION = re.compile(r'^computer,\s+(\w+).*please(?:\.|\!)?$',
+                        re.DOTALL +
                         re.IGNORECASE)
 Y_RESPONSE = "Yes, Paul."
 N_RESPONSE = "No, Paul."
@@ -24,6 +24,8 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         return
     first_word = match.group(1)
     if word_is_noun(first_word):
-        bot.sendMessage(Y_RESPONSE, thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage(Y_RESPONSE, thread_id=thread_id,
+                        thread_type=thread_type)
     else:
-        bot.sendMessage(N_RESPONSE, thread_id=thread_id, thread_type=thread_type)
+        bot.sendMessage(N_RESPONSE, thread_id=thread_id,
+                        thread_type=thread_type)

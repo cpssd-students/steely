@@ -26,18 +26,21 @@ PHRASES = [
     "{s} ;)",
 ]
 
+
 def flirt(message):
     if len(message) <= 1:
         return ''
     for sep in '.!?':
         s, sepfound, after = message.partition(sep)
         if random.random() < 0.75:
-          numspace = len(s) - len(s.lstrip())
-          s = ' '*numspace + random.choice(PHRASES).format(s=s.lstrip(), sep=sepfound)
+            numspace = len(s) - len(s.lstrip())
+            s = ' ' * numspace + \
+                random.choice(PHRASES).format(s=s.lstrip(), sep=sepfound)
         else:
-          s = s + sepfound
+            s = s + sepfound
         return s + flirt(after)
     return message
+
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]

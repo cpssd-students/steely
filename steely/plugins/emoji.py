@@ -9,7 +9,8 @@ COMMAND = 'emoji'
 
 EMOJI_DATA = {}
 try:
-    EMOJI_DATA = requests.get('https://raw.githubusercontent.com/muan/emojilib/master/emojis.json').json()
+    EMOJI_DATA = requests.get(
+        'https://raw.githubusercontent.com/muan/emojilib/master/emojis.json').json()
 except Exception as e:
     print('No emoji data for you sir! Good day!')
     print(e)
@@ -33,15 +34,18 @@ for k in EMOJI_DATA:
             continue
         WORD_TO_EMOJI[word].append(emoji)
 
+
 def emojify_or_not_i_am_a_function_not_a_cop(word):
     word = word.lower()
     if word in WORD_TO_EMOJI:
-        e = random.choice(WORD_TO_EMOJI[word])*random.choice([1, 1, 1, 2, 2, 3])
+        e = random.choice(WORD_TO_EMOJI[word]) * \
+            random.choice([1, 1, 1, 2, 2, 3])
         if random.random() < 0.3:
             return e
         return word + e
     else:
         return word
+
 
 def emojify(message):
     out = ''
@@ -55,6 +59,7 @@ def emojify(message):
         else:
             curr += c
     return out + curr
+
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     message = bot.fetchThreadMessages(thread_id=thread_id, limit=2)[1]

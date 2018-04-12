@@ -9,7 +9,7 @@ import random
 
 
 __author__ = 'devoxel'
-COMMAND='slag'
+COMMAND = 'slag'
 REPLIES = (
     "{} smells like a baby prostitute",
     "{}, you whore",
@@ -43,7 +43,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     name = message.strip()
     if not name:
         bot.sendMessage("cant even type a command correctly jfc",
-            thread_id=thread_id, thread_type=thread_type)
+                        thread_id=thread_id, thread_type=thread_type)
         return
     bot.sendMessage(random.choice(REPLIES).format(name),
-        thread_id=thread_id, thread_type=thread_type)
+                    thread_id=thread_id, thread_type=thread_type)

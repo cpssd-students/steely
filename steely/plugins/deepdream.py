@@ -8,13 +8,15 @@ __author__ = 'CianLR'
 COMMAND = '..'
 API_URL = "https://api.deepai.org/api/deepdream"
 
+
 def get_dream(url):
     resp = requests.post(
         API_URL,
-        data = {'content': url},
-        headers = {'api-key': config.DEEP_API_KEY},
+        data={'content': url},
+        headers={'api-key': config.DEEP_API_KEY},
     )
     return resp.status_code, None if resp.status_code != 200 else resp.json()
+
 
 def grab_image(message):
     for a in message.attachments:
@@ -22,6 +24,7 @@ def grab_image(message):
         if a.__class__.__name__ == 'ImageAttachment':
             return a
     return None
+
 
 def dream(bot, message, image_send, text_send):
     image = grab_image(message)
@@ -52,4 +55,3 @@ if __name__ == '__main__':
     harold = ('https://static.independent.co.uk/'
               's3fs-public/thumbnails/image/2017/07/11/11/harold-0.jpg')
     print(get_dream(harold))
-

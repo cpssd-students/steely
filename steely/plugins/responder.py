@@ -119,4 +119,3 @@ def search_for_response(responders, message):
         if response:
             return response
     return None
-

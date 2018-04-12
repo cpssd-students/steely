@@ -31,6 +31,7 @@ def roll(n, r):
     s = ' '.join([str(random.randint(1, r)) for i in range(0, n)])
     return '{:<7}| {}'.format(str(n) + 'd' + str(r), s)
 
+
 def parse_roll(r):
     '''Take a string that should look like: NdR and parse it'''
     r = r.split('d')
@@ -41,6 +42,7 @@ def parse_roll(r):
     if len(r[0]) == 0:
         return roll(1, r[1])
     return roll(r[0], r[1])
+
 
 def dorolls(s):
     rolls = REPATTERN.sub('', s).split(' ')[:NLIMIT]
@@ -53,5 +55,7 @@ def dorolls(s):
         return 'No valid rolls scrub'
     return code_block('\n'.join(out))
 
+
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    bot.sendMessage(dorolls(message), thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(dorolls(message), thread_id=thread_id,
+                    thread_type=thread_type)

@@ -1,6 +1,6 @@
-bold          = lambda text: _wrap(text, '*')
-italic        = lambda text: _wrap(text, '_')
-monospace     = lambda text: _wrap(text, '`')
+bold = lambda text: _wrap(text, '*')
+italic = lambda text: _wrap(text, '_')
+monospace = lambda text: _wrap(text, '`')
 strikethrough = lambda text: _wrap(text, '~')
 
 
@@ -14,4 +14,3 @@ def _wrap(text, prefix, suffix=None):
     if suffix == None:
         suffix = prefix
     return f'{prefix}{text}{suffix}'
-
