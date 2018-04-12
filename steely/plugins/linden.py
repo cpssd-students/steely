@@ -139,8 +139,7 @@ def create_user(id, first_name):
     USERDB.insert(data)
     return data
 
-
-def handle_gex_sell_cards(bot, user_id, ticker, profit):
+def handle_gex_sell_cards(user_id, ticker, profit):
     NOAH_ID = '100003244958231'
     MIN_TICKER_CARD_DELTA = 25
     ticker_cards = [
