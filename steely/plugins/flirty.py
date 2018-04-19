@@ -16,6 +16,7 @@ PHRASES = [
     "hey xxx {s}{sep}",
     "{s} xxx",
     "{s} xx",
+    "{s} xo",
     "{s} xoxo",
     "hot stuff, {s}{sep}",
     "{s} bbz{sep}",
@@ -31,6 +32,9 @@ PHRASES = [
     "{s} 💦💦💦",
     "{s} 👅",
     "{s} 😘😘",
+    "{s}, cutie{sep}",
+    "{s}, you absolute babe",
+    "{s} later???",
 ]
 
 
