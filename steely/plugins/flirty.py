@@ -24,6 +24,13 @@ PHRASES = [
     "do you want to come over tonight..? {s}{sep}",
     "my parents aren't home, {s}{sep}",
     "{s} ;)",
+    "{s} 🍆",
+    "{s} 🍆🍆",
+    "{s} 🍑",
+    "{s} 🍌",
+    "{s} 💦💦💦",
+    "{s} 👅",
+    "{s} 😘😘",
 ]
 
 
