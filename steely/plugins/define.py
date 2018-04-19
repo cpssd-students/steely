@@ -48,10 +48,12 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         if ' ' in text:
             command, image_url = text.split(' ', 1)
             try:
-                bot.sendRemoteImage(image_url, thread_id=thread_id, thread_type=thread_type)
+                bot.sendRemoteImage(
+                    image_url, thread_id=thread_id, thread_type=thread_type)
                 text = None
             except Exception:
-                bot.sendMessage(BAD_MEME_STRING, thread_id=thread_id, thread_type=thread_type)
+                bot.sendMessage(BAD_MEME_STRING,
+                                thread_id=thread_id, thread_type=thread_type)
         else:
             bot.sendMessage(ANGRY_STRING, thread_id=thread_id,
                             thread_type=thread_type)
