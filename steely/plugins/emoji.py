@@ -45,10 +45,12 @@ def emojify_or_not_i_am_a_function_not_a_cop(word):
     w = ''.join(c for c in w if c.isalnum())
     if not len(w):
         return word
+    if w not in WORD_TO_EMOJI and w[-2:] == 'es':
+        w = w[:-2] # peaches -> peach
     if w not in WORD_TO_EMOJI and w[-1] == 's':
-        w = w[:-1] # depluralise 
+        w = w[:-1] # aubergines -> aubergine
     if w not in WORD_TO_EMOJI and w[-3:] == 'ing':
-        w = w[:-3] # de-ing-ise
+        w = w[:-3] # hating -> hat
     if w in WORD_TO_EMOJI:
         e = random.choice(WORD_TO_EMOJI[w]) * \
             random.choice([1, 1, 1, 2, 2, 2, 3, 4, 5])
@@ -64,7 +66,7 @@ def emojify_or_not_i_am_a_function_not_a_cop(word):
 def emojify(message):
     out = ''
     curr = ''
-    splits = set(' .!?\n')
+    splits = set(' ,.!?\n')
     for c in message:
         if c in splits:
             out += emojify_or_not_i_am_a_function_not_a_cop(curr)
@@ -72,7 +74,7 @@ def emojify(message):
             curr = ''
         else:
             curr += c
-    return out + curr
+    return out + emojify_or_not_i_am_a_function_not_a_cop(curr)
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
@@ -84,3 +86,8 @@ if __name__ == '__main__':
     print(emojify('A face shown with a single finger and thumb resting on the chin, glancing upward. Used to indicate thinking, or deep thought.'))
     print(emojify('Thinking Face was approved as part of Unicode 8.0 in 2015 and added to Emoji 1.0 in 2015.'))
     print(emojify('is it a bird? is it a plane?'))
+    print(emojify('aubergines everywhere'))
+    print(emojify('train training train'))
+    print(emojify('flying'))
+    print(emojify('hating'))
+    print(emojify('teaches of peaches'))
