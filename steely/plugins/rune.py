@@ -25,4 +25,4 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
 
 if __name__ == '__main__':
     print(ruin('hey now you\'re an all star'))
-    print(ruin("🜘🞌🜞 🝀🜃🝁 🜞🜃🜫'🜛🞌 🜣🝀 🜣🜾🜾 🜖🜟🜣🜛")) # gibberish on purpose yo
+    print(ruin("🜘🞌🜞 🝀🜃🝁 🜞🜃🜫'🜛🞌 🜣🝀 🜣🜾🜾 🜖🜟🜣🜛"))  # gibberish on purpose yo
