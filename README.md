@@ -99,11 +99,3 @@ steely/plugins/linden for an example.
 |[stats](steely/plugins/stats.py)|[sentriz](https://github.com/sentriz/)| creditline
 |[tracker](steely/plugins/tracker.py)|[sentriz](https://github.com/sentriz/)| creditline
 |[clap](steely/plugins/clap.py)|[sentriz](https://github.com/sentriz/), [devoxel](https://github.com/devoxel/)| creditline
-
-## q&a
-
-- why the shit are some names camelCase? that's not pep8
-  - the fbchat module uses them for some reason
-- why the shit isn't the linden plugin working?
-  - ~~:(~~
-  - :)
