@@ -24,6 +24,23 @@ ANGRY_STRING = 'please use in form .define <command_name> <command text>'
 BAD_MEME_STRING = 'cannot use this image!'
 
 
+def try_define_image(text):
+    if ' ' in text:
+        command, image_url = text.split(' ', 1)
+        try:
+            bot.sendRemoteImage(
+                image_url, thread_id=thread_id, thread_type=thread_type)
+            text = None
+        except Exception:
+            bot.sendMessage(BAD_MEME_STRING,
+                            thread_id=thread_id, thread_type=thread_type)
+        return command, image_url, text
+    else:
+        bot.sendMessage(ANGRY_STRING, thread_id=thread_id,
+                        thread_type=thread_type)
+    return None, None, text
+
+
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if message == 'list':
         user_cmds = ', '.join((command['cmd'] for command in CMD_DB))
@@ -45,18 +62,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
                             thread_type=thread_type)
             return
     elif command == 'image':
-        if ' ' in text:
-            command, image_url = text.split(' ', 1)
-            try:
-                bot.sendRemoteImage(
-                    image_url, thread_id=thread_id, thread_type=thread_type)
-                text = None
-            except Exception:
-                bot.sendMessage(BAD_MEME_STRING,
-                                thread_id=thread_id, thread_type=thread_type)
-        else:
-            bot.sendMessage(ANGRY_STRING, thread_id=thread_id,
-                            thread_type=thread_type)
+        command, image_url, text = try_define_image(text)
     if not command.startswith('~'):
         command = f'~{command}'
     if len(command) > LIMIT:
