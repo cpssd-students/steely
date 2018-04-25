@@ -15,7 +15,8 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if should_reply():
         message = generate_reply(thread_id, thread_type)
         if message:
-            bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
+            bot.sendMessage(message, thread_id=thread_id,
+                            thread_type=thread_type)
 
 
 def should_reply():

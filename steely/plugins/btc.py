@@ -11,10 +11,15 @@ ${}
 difference since last time: {}"""
 LAST_EUROS = 100
 
+
 class BitcoinException(Exception):
     pass
+
+
 class BadHTTPResponse(BitcoinException):
     pass
+
+
 class MissingFields(BitcoinException):
     pass
 
@@ -56,7 +61,8 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         global LAST_EUROS
         euros, dollars, sterling = get_bitcoin_rates()
         increase = percentage_increase(LAST_EUROS, euros)
-        message = RESP_TEMPLATE.format(euros, dollars, sterling, percentage_string(increase))
+        message = RESP_TEMPLATE.format(
+            euros, dollars, sterling, percentage_string(increase))
         LAST_EUROS = euros
     except BitcoinException as e:
         message = str(e)

@@ -25,9 +25,9 @@ def get_train_times(station):
     response_tree = ElementTree.fromstring(response)
     for station in response_tree.findall('realtime:objStationData', NAMESPACES):
         yield parse_direction(station.find('./realtime:Direction', NAMESPACES).text), \
-                              station.find('./realtime:Origin', NAMESPACES).text, \
-                              station.find('./realtime:Destination', NAMESPACES).text, \
-                              station.find('./realtime:Duein', NAMESPACES).text
+            station.find('./realtime:Origin', NAMESPACES).text, \
+            station.find('./realtime:Destination', NAMESPACES).text, \
+            station.find('./realtime:Duein', NAMESPACES).text
 
 
 def parse_direction(direction):
@@ -57,7 +57,8 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     def send_message(message):
         bot.sendMessage(message, thread_id=thread_id, thread_type=thread_type)
     if not message:
-        send_message("invalid train station", thread_id=thread_id, thread_type=thread_type)
+        send_message("invalid train station",
+                     thread_id=thread_id, thread_type=thread_type)
         return
     try:
         times = list(get_train_times(message))

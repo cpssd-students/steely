@@ -33,4 +33,5 @@ REPLIES = (
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    bot.sendMessage(random.choice(REPLIES), thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(random.choice(REPLIES),
+                    thread_id=thread_id, thread_type=thread_type)

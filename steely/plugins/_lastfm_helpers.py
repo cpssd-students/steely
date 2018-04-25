@@ -13,7 +13,7 @@ COLLAGE_BASE = "http://www.tapmusic.net/collage.php/"
 SHORTENER_BASE = 'https://www.googleapis.com/urlshortener/v1/url'
 PERIODS = ("7day", "1month", "3month", "6month", "12month", "overall")
 REQUEST_PARAMETERS = {'api_key': config.LASTFM_API_KEY,
-		      'format': 'json'}
+                      'format': 'json'}
 
 
 def get_lastfm_request(method, **kwargs):
@@ -29,8 +29,8 @@ def get_lastfm_asyncrequest(method, **kwargs):
         to the last.fm api
         return a Future() '''
     return SESSION.get(API_BASE, params={"method": method,
-                                          **REQUEST_PARAMETERS,
-                                          **kwargs})
+                                         **REQUEST_PARAMETERS,
+                                         **kwargs})
 
 
 def get_lastfm_asyncrequest_list(method, **kwargs):
@@ -38,4 +38,4 @@ def get_lastfm_asyncrequest_list(method, **kwargs):
     for user in USERDB.all():
         username = user["username"]
         yield get_lastfm_asyncrequest(method,
-            user=username, limit=1, **kwargs)
+                                      user=username, limit=1, **kwargs)

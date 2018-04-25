@@ -43,4 +43,5 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
         SUBCOMMANDS[message_parts[0]](
             bot, author_id, message_parts[1:], thread_id, thread_type, **kwargs)
     else:
-        _lastfm_np.main(bot, author_id, message_parts, thread_id, thread_type, **kwargs)
+        _lastfm_np.main(bot, author_id, message_parts,
+                        thread_id, thread_type, **kwargs)

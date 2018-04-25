@@ -32,6 +32,7 @@ def build_output(info):
         ('zip_code', 'Zip: '),
         ('time_zone', 'Time zone: '),
     ]
+
     def valid_info(k): return k in info and info[k]
 
     out = []

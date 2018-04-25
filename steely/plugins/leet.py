@@ -4,7 +4,7 @@
 __author__ = 'sentriz'
 COMMAND = 'leet'
 NORMAL = "abcdefghijklmnopqrstuvwxyz"
-LEET =   "48(d3f9#|jklmn0pqr5+uvwxy2"
+LEET = "48(d3f9#|jklmn0pqr5+uvwxy2"
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):

@@ -49,6 +49,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
 
 if __name__ == '__main__':
     class FakeBot:
+
         def sendMessage(self, message, *args, **kwargs):
             print(message)
 

@@ -19,7 +19,13 @@ REGULAR_URL = f'{PROTOCOL}://{DOMAIN}/{REPOSITORY}'
 def handle_prs():
     pulls = requests.get(f'{API_URL}/pulls').json()
     message = f'Senan, you have {len(pulls)} fucken pr\'s to merge.' + \
-              f'\n{REGULAR_URL}/pulls'
+        f'\n{REGULAR_URL}/pulls'
+    
+    if 0 < len(pulls) < 10:
+        message += '\n\nFucken pr\'s:'
+        for pull in pulls:
+            pull_str = f'`{pull["title"]}` by {pull["user"]["login"]}'
+            message += f'\n{pull_str}'
     return message
 
 
@@ -27,7 +33,7 @@ def handle_last():
     url = f'{API_URL}/commits'
     commits = requests.get(url).json()
     return 'Last commit was "{}" by {}'.format(commits[0]['commit']['message'],
-                                             commits[0]['commit']['author']['name'])
+                                               commits[0]['commit']['author']['name'])
 
 SUBCOMMANDS = {
     'prs': handle_prs,
@@ -41,3 +47,6 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if message in SUBCOMMANDS:
         output = SUBCOMMANDS[message]()
     bot.sendMessage(output, thread_id=thread_id, thread_type=thread_type)
+
+if __name__ == '__main__':
+    print(handle_prs())

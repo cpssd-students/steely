@@ -17,7 +17,7 @@ from formatting import *
 __author__ = 'alexkraak'
 COMMAND = 'dbus'
 BASE_URL = "http://data.dublinked.ie/cgi-bin/rtpi/realtimebusinformation"
-COLUMNS =  ('route', 'destination', 'duetime')
+COLUMNS = ('route', 'destination', 'duetime')
 
 
 def next_bus_realtime(stop_id):
@@ -36,6 +36,7 @@ def arrival_sort(arrival):
     sort_column = COLUMNS[-1]
     return arrival[sort_column]
 
+
 def sanitized(arrival):
     dirty_duetime = arrival['duetime']
     dirty_dest = arrival['destination']
@@ -50,18 +51,21 @@ def sanitized(arrival):
 
 def gen_reply_string(arrivals):
     arrivals = list(arrivals)
+
     def max_string(column):
         return max(len(str(arrival[column])) for arrival in arrivals)
     max_route, max_dest, max_duetime = map(max_string, COLUMNS)
-    yield ""
-    for arrival in sorted(arrivals, key=arrival_sort):
-        due_suffix, extra_due_padding = 'min', 0
-        if arrival['duetime'] == 'due':
-            due_suffix = ''
-            extra_due_padding = 3
-        yield f'{arrival["route"]:<{max_route}} ' + \
-              f'{arrival["destination"]:<{max_dest}} ' + \
-              f'{arrival["duetime"]:>{max_duetime + extra_due_padding}}{due_suffix}'
+    if len(arrivals) <= 0:
+        yield ""
+    else:
+        for arrival in sorted(arrivals, key=arrival_sort):
+            due_suffix, extra_due_padding = 'min', 0
+            if arrival['duetime'] == 'due':
+                due_suffix = ''
+                extra_due_padding = 3
+            yield f'{arrival["route"]:<{max_route}} ' + \
+                f'{arrival["destination"]:<{max_dest}} ' + \
+                f'{arrival["duetime"]:>{max_duetime + extra_due_padding}}{due_suffix}'
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):

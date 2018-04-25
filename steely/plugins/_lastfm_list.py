@@ -16,7 +16,7 @@ def parse_onlines(async_responses):
             yield False
         else:
             yield "@attr" in latest_track_obj and \
-                    "nowplaying" in latest_track_obj["@attr"]
+                "nowplaying" in latest_track_obj["@attr"]
 
 
 def parse_playcounts(async_responses):
@@ -45,4 +45,5 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
             continue
         online_str = " ♬"[online]
         message += f"{online_str} {username:<{max_username}} {playcount:>6,}\n"
-    bot.sendMessage(code_block(message), thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(code_block(message), thread_id=thread_id,
+                    thread_type=thread_type)

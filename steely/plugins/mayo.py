@@ -15,10 +15,11 @@ FORMATS = [
     '{} #mayoforsam',
 ]
 
+
 def mayo(message):
     message += ' '
     message = message.lower()
-    message = message.replace('the', 'de') # !important
+    message = message.replace('the', 'de')  # !important
     message = message.replace('s', 'sh')
     message = message.replace('sh ', 's ')
     message = message.replace('shh', 'sh')
