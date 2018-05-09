@@ -7,8 +7,8 @@ COMMAND = 'owo'
 
 from random import choice
 
-substitutions = {'r':'w','R':'W','l':'w','L':'W','na':'nya','NA':'NYA'}
-faces = [" OwO", " owo", " UwU", " uwu", " :3", " :33", " :333", ""]
+substitutions = {'r':'w','R':'W','l':'w','L':'W','na':'nya','NA':'NYA','qu':'qw','QU':'QW'}
+faces = [' OwO', ' owo', ' UwU', ' uwu', ' :3', ' :33', ' :333', '']
 
 def owoify(message):
     for key in substitutions.keys():
