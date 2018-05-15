@@ -1,11 +1,11 @@
+def _new_wrapper(prefix, suffix=None):
+    return lambda text: _wrap(text, prefix, suffix)
+
+
 def _wrap(text, prefix, suffix):
     if suffix == None:
         suffix = prefix
     return f'{prefix}{text}{suffix}'
-
-
-def _new_wrapper(prefix, suffix=None):
-    return lambda text: _wrap(text, prefix, suffix)
 
 
 bold = _new_wrapper('*')
