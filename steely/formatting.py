@@ -1,16 +1,18 @@
-def _new_wrapper(prefix, suffix=None):
-    return lambda text: _wrap(text, prefix, suffix)
+import functools
 
 
-def _wrap(text, prefix, suffix):
+def _wrapper(prefix, suffix=None):
     if suffix == None:
         suffix = prefix
-    return f'{prefix}{text}{suffix}'
+    return functools.partial(_wrap, prefix, suffix)
 
 
-bold = _new_wrapper('*')
-italic = _new_wrapper('_')
-monospace = _new_wrapper('`')
-strikethrough = _new_wrapper('~')
-latex = _new_wrapper('\\(', '\\)')
-code_block = _new_wrapper('```\n', '\n```')
+_wrap = lambda prefix, suffix, text: f'{prefix}{text}{suffix}'
+
+
+bold = _wrapper('*')
+italic = _wrapper('_')
+monospace = _wrapper('`')
+strikethrough = _wrapper('~')
+latex = _wrapper('\\(', '\\)')
+code_block = _wrapper('```\n', '\n```')
