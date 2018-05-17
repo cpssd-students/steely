@@ -1,20 +1,31 @@
-set -e
 DIRECTORY="temporary"
 EXECUTABLE="$DIRECTORY/main"
 FILENAME="$DIRECTORY/code.hs"
 
-# Clean up
-rm -rf $DIRECTORY
-mkdir $DIRECTORY
+function _clean_up {
+    rm -rf $DIRECTORY
+    mkdir $DIRECTORY
+}
 
-# Read code from stdin
-code=$(cat)
+function _save {
+    code=$(cat)
+    echo "$code" > $FILENAME
+}
 
-# Save code to disk
-echo "$code" > $FILENAME
+function _compile {
+    ghc -o $EXECUTABLE $FILENAME
+}
 
-# Compile code
-ghc -o $EXECUTABLE $FILENAME
+function _run {
+    echo
+    echo "Output:"
+    ./$EXECUTABLE
+}
 
-# Run code
-./$EXECUTABLE
+set -e
+trap _clean_up EXIT
+
+_clean_up
+_save
+_compile
+_run
