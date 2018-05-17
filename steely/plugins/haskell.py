@@ -11,6 +11,9 @@ __author__ = "byxor"
 
 
 TIMEOUT_IN_SECONDS = 10
+TIMEOUT_MESSAGE = "Request timed out. Don't be naughty."
+
+
 SCRIPT = "plugins/_haskell.sh"
 SHELL_COMMAND = ["firejail", "timeout", f"{TIMEOUT_IN_SECONDS}", "bash", SCRIPT]
 
@@ -22,7 +25,7 @@ def main(bot, author_id, code, thread_id, thread_type, **kwargs):
 def attempt_to_run(code):
     result = run(code)
     if timed_out(result):
-        return "Request timed out. Don't be naughty."
+        return TIMEOUT_MESSAGE
     return result
 
 
