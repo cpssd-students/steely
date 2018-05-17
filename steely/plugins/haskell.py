@@ -28,10 +28,6 @@ def attempt_to_run(code):
 
 def run(code):
     process = Popen(SHELL_COMMAND, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
-    return communicate(process, code)
-
-
-def communicate(process, code):
     encoding = "utf-8"
     code_bytes = code.encode(encoding)
     write_code_to_process = lambda: process.communicate(input=code_bytes)
