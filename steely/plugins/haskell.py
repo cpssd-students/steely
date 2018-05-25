@@ -1,5 +1,6 @@
 # External Dependencies:
 # - firejail (for sandboxing)
+# - ghc (for compiling haskell)
 
 
 from subprocess import Popen, PIPE, STDOUT
