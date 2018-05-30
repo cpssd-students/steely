@@ -13,13 +13,17 @@ function _save {
 }
 
 function _compile {
+    echo
+    echo "*Compiler Output:*"
     ghc -o $EXECUTABLE $FILENAME
 }
 
 function _run {
     echo
-    echo "Output:"
-    ./$EXECUTABLE
+    echo "*Program Output:*"
+    local secondsToWait=10
+    local whitelist="$(pwd)/$DIRECTORY"
+    firejail --quiet --noprofile --whitelist=$whitelist timeout $secondsToWait ./$EXECUTABLE
 }
 
 set -e

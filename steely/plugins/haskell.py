@@ -11,12 +11,11 @@ __doc__ = "Compiles and executes Haskell."
 __author__ = "byxor"
 
 
-TIMEOUT_IN_SECONDS = 10
 TIMEOUT_MESSAGE = "Request timed out. Don't be naughty."
 
 
 SCRIPT = "plugins/_haskell.sh"
-SHELL_COMMAND = ["firejail", "timeout", f"{TIMEOUT_IN_SECONDS}", "bash", SCRIPT]
+SHELL_COMMAND = ["bash", SCRIPT]
 
 
 def main(bot, author_id, code, thread_id, thread_type, **kwargs):
