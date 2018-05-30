@@ -29,7 +29,7 @@ function _run {
 
 function _checkTimeout {
     local exitCode=$?
-    if [[ $exitCode -ne 0 ]]; then
+    if [[ $exitCode -eq 124 ]]; then
         echo "Program timed out. Don't be cheeky."
     fi
 }
