@@ -11,22 +11,12 @@ __doc__ = "Compiles and executes Haskell."
 __author__ = "byxor"
 
 
-TIMEOUT_MESSAGE = "Request timed out. Don't be naughty."
 
-
-SCRIPT = "plugins/_haskell.sh"
-SHELL_COMMAND = ["bash", SCRIPT]
+SHELL_COMMAND = ["bash", "plugins/_haskell.sh"]
 
 
 def main(bot, author_id, code, thread_id, thread_type, **kwargs):
-    bot.sendMessage(attempt_to_run(code), thread_id=thread_id, thread_type=thread_type)
-
-
-def attempt_to_run(code):
-    result = run(code)
-    if timed_out(result):
-        return TIMEOUT_MESSAGE
-    return result
+    bot.sendMessage(run(code), thread_id=thread_id, thread_type=thread_type)
 
 
 def run(code):
@@ -36,7 +26,3 @@ def run(code):
     write_code_to_process = lambda: process.communicate(input=code_bytes)
     output = write_code_to_process()[0].decode(encoding)
     return output
-
-
-def timed_out(result):
-    return (SCRIPT in result) and ("Terminated" in result)

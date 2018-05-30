@@ -21,9 +21,17 @@ function _compile {
 function _run {
     echo
     echo "*Program Output:*"
-    local secondsToWait=10
+    local secondsToWait=4
     local whitelist="$(pwd)/$DIRECTORY"
-    firejail --quiet --noprofile --whitelist=$whitelist timeout $secondsToWait ./$EXECUTABLE
+
+    timeout $secondsToWait firejail --quiet --noprofile --whitelist=$whitelist ./$EXECUTABLE || _checkTimeout
+}
+
+function _checkTimeout {
+    local exitCode=$?
+    if [[ $exitCode -ne 0 ]]; then
+        echo "Program timed out. Don't be cheeky."
+    fi
 }
 
 set -e
