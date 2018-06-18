@@ -1,23 +1,4 @@
 #!/usr/bin/env python3
-"""
-np does last fm stuff
-
-set your username:
-.np set <username>
-
-check whats your listening to:
-.np [username]
-.np top <overall|7day|1month|3month|6month|12month> [username]
-.np history [username]
-
-make a collage:
-.np collage <overall|7day|1month|3month|6month|12month> [username]
-
-scrobbles:
-.np list
-"""
-
-
 from plugins._lastfm_helpers import *
 from plugins import _lastfm_collage
 from plugins import _lastfm_history
@@ -35,6 +16,24 @@ SUBCOMMANDS = {
     'set':     _lastfm_set.main,
     'top':     _lastfm_top.main,
 }
+
+__doc__ = f"""
+np does last fm stuff
+
+set your username:
+{COMMAND} set <username>
+
+check what you're listening to:
+{COMMAND} [username]
+{COMMAND} top <overall|7day|1month|3month|6month|12month> [username]
+{COMMAND} history [username]
+
+make a collage:
+{COMMAND} collage <overall|7day|1month|3month|6month|12month> [username]
+
+scrobbles:
+{COMMAND} list
+"""
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
