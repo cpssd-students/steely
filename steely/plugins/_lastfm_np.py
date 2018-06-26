@@ -29,7 +29,7 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     elif user:
         username = user['username']
     else:
-        bot.sendMessage('include username please or use .np set',
+        bot.sendMessage(f'include username please or use {COMMAND} set',
                         thread_id=thread_id, thread_type=thread_type)
         return
     latest_track_obj = get_lastfm_request("user.getRecentTracks",
