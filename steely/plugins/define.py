@@ -24,7 +24,7 @@ ANGRY_STRING = 'please use in form .define <command_name> <command text>'
 BAD_MEME_STRING = 'cannot use this image!'
 
 
-def try_define_image(text):
+def try_define_image(bot, text):
     if ' ' in text:
         command, image_url = text.split(' ', 1)
         try:
@@ -62,7 +62,7 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
                             thread_type=thread_type)
             return
     elif command == 'image':
-        command, image_url, text = try_define_image(text)
+        command, image_url, text = try_define_image(bot, text)
     if not command.startswith('~'):
         command = f'~{command}'
     if len(command) > LIMIT:
