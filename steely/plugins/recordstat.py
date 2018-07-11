@@ -32,7 +32,7 @@ def is_command(command, plugins):
     if not looks_like_command(command):
         return False
     stripped_command = (command[1:] if command[0] == '.' else command)
-    elif stripped_command in plugins:
+    if stripped_command in plugins:
         return True
     elif is_tilda_command(command):
         return True
