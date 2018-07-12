@@ -50,3 +50,13 @@ def test_strikethrough_text():
     ]
     for text, expected_text in data:
         yield assert_equal, expected_text, strikethrough(text)
+
+
+def test_latex():
+    data = [
+        ('foo', '\\(foo\\)'),
+        ('bar', '\\(bar\\)'),
+        ('baz', '\\(baz\\)'),
+    ]
+    for text, expected_text in data:
+        yield assert_equal, expected_text, latex(text)
