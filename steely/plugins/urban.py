@@ -19,11 +19,10 @@ def define(term):
     term = quote(term)
     response = requests.get(
         'http://api.urbandictionary.com/v0/define?term=' + term)
-    if response.json()['result_type'] != 'exact':
-        return results
     for result in response.json()['list']:
         results.append(
             {'definition': result['definition'], 'example': result['example']})
+        break # we only use the 1st result anyway
     return results
 
 
