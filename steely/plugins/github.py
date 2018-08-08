@@ -20,6 +20,12 @@ def handle_prs():
     pulls = requests.get(f'{API_URL}/pulls').json()
     message = f'Senan, you have {len(pulls)} fucken pr\'s to merge.' + \
         f'\n{REGULAR_URL}/pulls'
+    
+    if 0 < len(pulls) < 10:
+        message += '\n\nFucken pr\'s:'
+        for pull in pulls:
+            pull_str = f'`{pull["title"]}` by {pull["user"]["login"]}'
+            message += f'\n{pull_str}'
     return message
 
 
@@ -41,3 +47,6 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if message in SUBCOMMANDS:
         output = SUBCOMMANDS[message]()
     bot.sendMessage(output, thread_id=thread_id, thread_type=thread_type)
+
+if __name__ == '__main__':
+    print(handle_prs())
