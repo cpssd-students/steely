@@ -1,10 +1,18 @@
+'''
+Get the latest image from archillect.
+'''
 from urllib import request
 from bs4 import BeautifulSoup
 
+
+__author__ = 'iandioch'
+COMMAND = 'arch'
 URL = 'http://archillect.com'
+
 
 def get_html(url):
     return request.urlopen(url).read()
+
 
 def get_latest_image_url():
     root_html = get_html(URL)
@@ -17,7 +25,11 @@ def get_latest_image_url():
     soup = BeautifulSoup(latest_post_html, 'html.parser')
     return soup.find('img')['src']
 
+
+def main(bot, author_id, message, thread_id, thread_type, **kwargs):
+    image = get_latest_image_url()
+    bot.sendRemoteImage(image, thread_id=thread_id, thread_type=thread_type)
+
+
 if __name__ == '__main__':
-    get_latest_image_url()
-
-
+    print(get_latest_image_url())
