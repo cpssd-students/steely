@@ -79,7 +79,7 @@ def academic_week_number(date):
 def academic_hour(date):
     hour = date.hour
     if hour < 8 or hour > 21:
-        raise ValueError('invalid accademic hour')
+        raise ValueError('invalid academic hour')
     minute = date.minute
     if minute > 30:
         hour += 1
