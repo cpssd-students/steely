@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
 from datetime import datetime
+
+from steely import config
 from plugins._lastfm_helpers import *
 from operator import itemgetter
 from formatting import *
 
 import pytz
 
-IRELAND_TZ = pytz.timezone('Europe/Dublin')
+LOCAL_TZ = pytz.timezone(config.TIMEZONE)
 
 
 def time_or_now(track):
@@ -20,9 +22,9 @@ def parsed_time(time_string):
     # Add UTC timezone info to given date:
     naive_obj = datetime.strptime(time_string, '%d %b %Y, %H:%M')
     utc_obj = pytz.utc.localize(naive_obj)
-    # Convert to Irish Standard Time
-    ist_obj = utc_obj.astimezone(IRELAND_TZ)
-    return datetime.strftime(ist_obj, '%H:%M')
+    # Convert to local timezone
+    local_obj = utc_obj.astimezone(LOCAL_TZ)
+    return datetime.strftime(local_obj, '%H:%M')
 
 
 def parsed_response(response):
