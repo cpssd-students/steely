@@ -7,4 +7,5 @@ nose
 limp
 markovify
 textstat
+pytz
 beautifulsoup4
