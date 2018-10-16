@@ -115,7 +115,7 @@ steely/plugins/linden for an example.
 |[sentiment](steely/plugins/sentiment.py)|[oskarmcd](https://github.com/oskarmcd/)| creditline
 |[angry](steely/plugins/angry.py)|[sentriz](https://github.com/sentriz/)| creditline
 |[box](steely/plugins/box.py)|[sentriz](https://github.com/sentriz/)| creditline
-|[ca](steely/plugins/ca.py)|[sentriz](https://github.com/sentriz/)| creditline
+|[send_to](steely/plugins/send_to.py)|[sentriz](https://github.com/sentriz/)| creditline
 |[cage](steely/plugins/cage.py)|[sentriz](https://github.com/sentriz/)| creditline
 |[eight](steely/plugins/eight.py)|[sentriz](https://github.com/sentriz/)| creditline
 |[leet](steely/plugins/leet.py)|[sentriz](https://github.com/sentriz/)| creditline
