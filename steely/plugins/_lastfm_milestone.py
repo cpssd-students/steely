@@ -2,7 +2,7 @@ from plugins._lastfm_helpers import *
 import json
 from contextlib import suppress
 from formatting import *
-from steely import config
+from paths import CONFIG
 
 
 def gen_milestones():

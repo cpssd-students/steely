@@ -1,5 +1,7 @@
 import os
 import imp
+from tinydb import TinyDB
+from paths import DB_DIR
 
 
 def scan_plugins_dir(plugins_dir='plugins'):
@@ -20,3 +22,8 @@ def load_plugin(filename, path):
 def list_plugins():
     for plugin_file, plugin_path in scan_plugins_dir():
         yield load_plugin(plugin_file, plugin_path)
+
+
+def new_database(name):
+    full_path = os.path.join(DB_DIR, f'{name}.json')
+    return TinyDB(full_path)

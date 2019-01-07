@@ -3,10 +3,9 @@
 
 from contextlib import suppress
 from fbchat import log, Client
-from tinydb import TinyDB
 from vapor import vapor
 from utils import list_plugins
-import config
+from paths import CONFIG
 import imp
 import os
 import random
@@ -51,7 +50,7 @@ class SteelyBot(Client):
     def parse_command_message(message):
         if not message:
             return
-        if message[0] != config.COMMAND_PREFIX:
+        if message[0] != CONFIG.COMMAND_PREFIX:
             return
         command, _, message = message[1:].partition(' ')
         clean_command = command.lower().strip()
@@ -100,7 +99,7 @@ class SteelyBot(Client):
 
 
 if __name__ == '__main__':
-    client = SteelyBot(config.EMAIL, config.PASSWORD)
+    client = SteelyBot(CONFIG.EMAIL, CONFIG.PASSWORD)
     while True:
         with suppress(requests.exceptions.ConnectionError):
             client.listen()

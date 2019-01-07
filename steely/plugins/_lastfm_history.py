@@ -2,14 +2,14 @@
 
 from datetime import datetime
 
-from steely import config
+from paths import CONFIG
 from plugins._lastfm_helpers import *
 from operator import itemgetter
 from formatting import *
 
 import pytz
 
-LOCAL_TZ = pytz.timezone(config.TIMEZONE)
+LOCAL_TZ = pytz.timezone(CONFIG.TIMEZONE)
 
 
 def time_or_now(track):

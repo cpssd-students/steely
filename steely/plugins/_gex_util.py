@@ -1,10 +1,11 @@
 import time
-from tinydb import TinyDB, Query
+from tinydb import Query
 from plugins import gex
+from utils import new_database
 
-USER_DB = TinyDB('databases/gex_users.json')
+USER_DB = new_database('gex_users')
 USER = Query()
-CARD_DB = TinyDB('databases/gex_cards.json')
+CARD_DB = new_database('gex_cards')
 CARD = Query()
 
 # Cache to map facebook IDs to real names.

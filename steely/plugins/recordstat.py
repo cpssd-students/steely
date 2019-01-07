@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 
 
-from tinydb import TinyDB, Query
+from tinydb import Query
 from tinydb.operations import increment
+from utils import new_database
 
 
 __author__ = 'sentriz'
 COMMAND = None
-CMD_DB = TinyDB('databases/stats.json')
+CMD_DB = new_database('stats')
 CMD = Query()
-TILDA_DB = TinyDB('databases/quote.json')
+TILDA_DB = new_database('quote')
 TILDA = Query()
 
 

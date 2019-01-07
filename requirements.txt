@@ -9,3 +9,5 @@ markovify
 textstat
 pytz
 beautifulsoup4
+pyxdg
+nltk
