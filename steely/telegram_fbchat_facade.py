@@ -15,6 +15,7 @@ class Client:
             password (str): Is used as the Telegram bot key.'''
         self.updater = Updater(token=password)
         self.dispatcher = self.updater.dispatcher
+        self.bot = self.updater.bot
         self.uid = self.updater.bot.username
 
         self.thread = deque(iterable=[], maxlen=16)
@@ -38,6 +39,15 @@ class Client:
         # TODO(iandioch): Support different threads.
         # TODO(iandioch): Do this more efficiently than list()
         return list(self.thread)[::-1][:limit]
+
+    def sendMessage(self, text, thread_id, thread_type):
+        '''Sends a message.
+
+        Args:
+            text (str): The message to send.
+            thread_id (str): The chat id to send the message to.
+            thread_type (str): Is thrown away.'''
+        self.bot.sendMessage(chat_id=thread_id, text=text)
 
     def markAsDelivered(self, *args, **kwargs):
         '''TODO: Remove this method, it's only here to suppress errors.'''
