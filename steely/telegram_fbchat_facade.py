@@ -51,8 +51,12 @@ class Client:
 
     def sendRemoteImage(self, image, thread_id, thread_type):
         # TODO(iandioch): this.
-        print('Tried to send image {}'.format(image))
-        pass
+        print('Trying to send image {}'.format(image))
+        try:
+            self.bot.sendPhoto(chat_id=thread_id,
+                               photo=image)
+        except Exception as e:
+            log(e)
 
     def markAsDelivered(self, *args, **kwargs):
         '''TODO: Remove this method, it's only here to suppress errors.'''
