@@ -100,7 +100,7 @@ class SteelyBot(Client):
 
 
 if __name__ == '__main__':
-    client = SteelyBot(config.EMAIL, config.PASSWORD)
+    client = SteelyBot(config.EMAIL, config.TELEGRAM_KEY)
     while True:
         with suppress(requests.exceptions.ConnectionError):
             client.listen()
