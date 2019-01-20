@@ -1,4 +1,4 @@
-from collections import deque
+from collections import defaultdict, deque
 from enum import Enum
 
 from telegram.ext import Updater, MessageHandler
@@ -27,18 +27,19 @@ class Client:
         self.bot = self.updater.bot
         self.uid = self.updater.bot.username
 
-        self.thread = deque(iterable=[], maxlen=16)
+        self.thread = defaultdict(lambda: deque(iterable=[], maxlen=16))
 
     def listen(self):
         def innerOnMessage(bot, update):
             try:
                 print(update.message)
-                self.thread.append(update.effective_message)
+                thread_id = update.effective_chat.id
                 thread_type = _telegram_chat_to_fbchat_thread_type(
                         update.effective_chat)
+                self.thread[thread_id].append(update.effective_message)
                 self.onMessage(author_id=update.effective_user.id,
                                message=update.effective_message.text,
-                               thread_id=update.effective_chat.id,
+                               thread_id=thread_id,
                                thread_type=thread_type)
             except Exception as e:
                 log(e)
@@ -50,7 +51,7 @@ class Client:
     def fetchThreadMessages(self, thread_id, limit):
         # TODO(iandioch): Support different threads.
         # TODO(iandioch): Do this more efficiently than list()
-        return list(self.thread)[::-1][:limit]
+        return list(self.thread[thread_id])[::-1][:limit]
 
     def sendMessage(self, text, thread_id, thread_type):
         '''Sends a message.
