@@ -49,6 +49,11 @@ class Client:
             thread_type (str): Is thrown away.'''
         self.bot.sendMessage(chat_id=thread_id, text=text)
 
+    def sendRemoteImage(self, image, thread_id, thread_type):
+        # TODO(iandioch): this.
+        print('Tried to send image {}'.format(image))
+        pass
+
     def markAsDelivered(self, *args, **kwargs):
         '''TODO: Remove this method, it's only here to suppress errors.'''
         pass
