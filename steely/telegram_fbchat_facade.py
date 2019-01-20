@@ -1,7 +1,16 @@
 from collections import deque
+from enum import Enum
 
 from telegram.ext import Updater, MessageHandler
 from telegram.ext.filters import Filters
+
+ThreadType = Enum('ThreadType', 'USER GROUP')
+
+def _telegram_chat_to_fbchat_thread_type(chat):
+    # TODO(iandioch): Figure out what a supergroup is.
+    if chat.type == 'private':
+        return ThreadType.USER
+    return ThreadType.GROUP
 
 class Client:
     '''Acts as a facade on fbchat bots to allow them to be backed by Telegram
@@ -25,13 +34,16 @@ class Client:
             try:
                 print(update.message)
                 self.thread.append(update.effective_message)
+                thread_type = _telegram_chat_to_fbchat_thread_type(
+                        update.effective_chat)
                 self.onMessage(author_id=update.effective_user.id,
                                message=update.effective_message.text,
                                thread_id=update.effective_chat.id,
-                               thread_type=update.effective_chat.type)
+                               thread_type=thread_type)
             except Exception as e:
                 log(e)
-        self.dispatcher.add_handler(MessageHandler(filters=Filters.all, callback=innerOnMessage))
+        self.dispatcher.add_handler(MessageHandler(filters=Filters.all,
+                                                   callback=innerOnMessage))
         self.updater.start_polling()
         self.updater.idle()
 
@@ -66,11 +78,13 @@ class Client:
         '''TODO: Remove this method, it's only here to suppress errors.'''
         pass
 
-    def onEmojiChange(self, author_id, new_emoji, thread_id, thread_type, **kwargs):
+    def onEmojiChange(self, author_id, new_emoji,
+                      thread_id, thread_type, **kwargs):
         '''Handler method; to be overriden.'''
         pass
 
-    def onNicknameChange(self, mid, author_id, changed_for, new_nickname, thread_id, thread_type, ts, metadata, msg):
+    def onNicknameChange(self, mid, author_id, changed_for, new_nickname,
+                         thread_id, thread_type, ts, metadata, msg):
         '''Handler method; to be overriden.'''
         pass
 
