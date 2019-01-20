@@ -1,3 +1,5 @@
+from collections import deque
+
 from telegram.ext import Updater, MessageHandler
 from telegram.ext.filters import Filters
 
@@ -15,10 +17,13 @@ class Client:
         self.dispatcher = self.updater.dispatcher
         self.uid = self.updater.bot.username
 
+        self.thread = deque(iterable=[], maxlen=16)
+
     def listen(self):
         def innerOnMessage(bot, update):
             try:
                 print(update.message)
+                self.thread.append(update.effective_message)
                 self.onMessage(author_id=update.effective_user.id,
                                message=update.effective_message.text,
                                thread_id=update.effective_chat.id,
@@ -28,6 +33,11 @@ class Client:
         self.dispatcher.add_handler(MessageHandler(filters=Filters.all, callback=innerOnMessage))
         self.updater.start_polling()
         self.updater.idle()
+
+    def fetchThreadMessages(self, thread_id, limit):
+        # TODO(iandioch): Support different threads.
+        # TODO(iandioch): Do this more efficiently than list()
+        return list(self.thread)[::-1][:limit]
 
     def markAsDelivered(self, *args, **kwargs):
         '''TODO: Remove this method, it's only here to suppress errors.'''
