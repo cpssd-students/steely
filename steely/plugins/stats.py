@@ -5,14 +5,15 @@ show plugin stats
 '''
 
 
-from tinydb import TinyDB, Query
-from operator import itemgetter
 from formatting import *
+from operator import itemgetter
+from tinydb import Query
+from utils import new_database
 
 
 __author__ = 'sentriz'
 COMMAND = 'stats'
-CMD_DB = TinyDB('databases/stats.json')
+CMD_DB = new_database('stats')
 CMD = Query()
 LIMIT = 10
 

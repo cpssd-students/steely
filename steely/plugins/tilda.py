@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 
-from tinydb import TinyDB, Query
-
+from tinydb import Query
+from utils import new_database
 
 __author__ = 'alexkraak'
 COMMAND = None
-CMD_DB = TinyDB('databases/quote.json')
+CMD_DB = new_database('quote')
 CMD = Query()
 
 

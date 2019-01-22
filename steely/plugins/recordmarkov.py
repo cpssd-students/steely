@@ -2,11 +2,11 @@
 
 
 import os
+from paths import LOG_DIR
 
 
 __author__ = 'sentriz'
 COMMAND = None
-LOGFOLDER = 'logs'
 
 
 def looks_like_command(message):
@@ -25,7 +25,7 @@ def make_empty_log(log_path):
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     if looks_like_command(message):
         return
-    log_path = os.path.join(LOGFOLDER, thread_type.name, thread_id)
+    log_path = os.path.join(LOG_DIR, thread_type.name, thread_id)
     make_empty_log(log_path)
     with open(log_path, 'a') as file:
         file.write(message + '\n')

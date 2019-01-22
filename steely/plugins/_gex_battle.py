@@ -1,12 +1,13 @@
-from random import shuffle
-import uuid
-from tinydb import TinyDB, Query
 from fbchat.models import ThreadType
-import plugins._gex_util as gex_util
-import plugins._gex_action as gex_action
 from plugins import gex
+from random import shuffle
+from tinydb import Query
+from utils import new_database
+import plugins._gex_action as gex_action
+import plugins._gex_util as gex_util
+import uuid
 
-BATTLE_DB = TinyDB('databases/gex_battles.json')
+BATTLE_DB = new_database('gex_battle')
 BATTLE = Query()
 
 # The number of cards coming up in the deck that users can see.

@@ -2,7 +2,7 @@
 http://i0.kym-cdn.com/photos/images/original/001/042/049/5ef.jpg
 '''
 import requests
-from steely import config
+from paths import CONFIG
 
 __author__ = 'CianLR'
 COMMAND = '..'
@@ -13,7 +13,7 @@ def get_dream(url):
     resp = requests.post(
         API_URL,
         data={'content': url},
-        headers={'api-key': config.DEEP_API_KEY},
+        headers={'api-key': CONFIG.DEEP_API_KEY},
     )
     return resp.status_code, None if resp.status_code != 200 else resp.json()
 
