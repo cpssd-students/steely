@@ -16,6 +16,8 @@ class Client:
     '''Acts as a facade on fbchat bots to allow them to be backed by Telegram
     instead. ie., Provides API compatibility.'''
 
+    NUM_STORED_MESSAGES_IN_THREAD = 16
+
     def __init__(self, email, password):
         '''Creates a client.
 
@@ -27,7 +29,9 @@ class Client:
         self.bot = self.updater.bot
         self.uid = self.updater.bot.username
 
-        self.thread = defaultdict(lambda: deque(iterable=[], maxlen=16))
+        # Each self.thread[thread_id] is a deque (FIFO linked list).
+        self.thread = defaultdict(lambda: deque(iterable=[],
+            maxlen=Client.NUM_STORED_MESSAGES_IN_THREAD))
 
     def listen(self):
         def innerOnMessage(bot, update):
@@ -49,7 +53,6 @@ class Client:
         self.updater.idle()
 
     def fetchThreadMessages(self, thread_id, limit):
-        # TODO(iandioch): Support different threads.
         # TODO(iandioch): Do this more efficiently than list()
         return list(self.thread[thread_id])[::-1][:limit]
 
@@ -63,7 +66,12 @@ class Client:
         self.bot.sendMessage(chat_id=thread_id, text=text)
 
     def sendRemoteImage(self, image, thread_id, thread_type):
-        # TODO(iandioch): this.
+        '''Sends an image.
+
+        Args:
+            image (str): The URL of the image to send.
+            thread_id (str): The chat id to send the message to.
+            thread_type (str): Is thrown away.'''
         print('Trying to send image {}'.format(image))
         try:
             self.bot.sendPhoto(chat_id=thread_id,
