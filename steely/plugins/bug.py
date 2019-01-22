@@ -11,16 +11,14 @@ bug titles can't be longer than 45 chars
 TODO: Add bug delete, bug modify, bug close and bug comment
 '''
 
-from tinydb import TinyDB, Query
+from tinydb import Query
 import formatting
+from utils import new_database
 
 __author__ = 'devoxel'
 COMMAND = 'bug'
-
-# TODO: add descriptive error messages
 ERR_MSG = "i'm sorry sam.. i'm afraid I can't do that."
-
-BUG_DB = TinyDB('databases/bug.json')
+BUG_DB = new_database('bug')
 Bug = Query()
 
 def get_bug(search):

@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 
+from datetime import datetime
 
+from paths import CONFIG
 from plugins._lastfm_helpers import *
 from operator import itemgetter
 from formatting import *
+
+import pytz
+
+LOCAL_TZ = pytz.timezone(CONFIG.TIMEZONE)
 
 
 def time_or_now(track):
@@ -13,7 +19,12 @@ def time_or_now(track):
 
 
 def parsed_time(time_string):
-    return time_string.split(', ')[1]
+    # Add UTC timezone info to given date:
+    naive_obj = datetime.strptime(time_string, '%d %b %Y, %H:%M')
+    utc_obj = pytz.utc.localize(naive_obj)
+    # Convert to local timezone
+    local_obj = utc_obj.astimezone(LOCAL_TZ)
+    return datetime.strftime(local_obj, '%H:%M')
 
 
 def parsed_response(response):

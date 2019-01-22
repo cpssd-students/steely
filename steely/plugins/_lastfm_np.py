@@ -2,7 +2,7 @@ from plugins._lastfm_helpers import *
 import json
 from contextlib import suppress
 from formatting import *
-from steely import config
+from paths import CONFIG
 
 
 def parse_tags(response):
@@ -15,15 +15,15 @@ def parse_tags(response):
 
 
 def absolute_short_url(relative):
-    return config.FLASKNASC_HOST + relative
+    return CONFIG.FLASKNASC_HOST + relative
 
 
 def get_short_url(url):
     params = {
-        'key': config.FLASKNASC_KEY,
+        'key': CONFIG.FLASKNASC_KEY,
         'address': url
     }
-    path = config.FLASKNASC_HOST + "/new/" + config.FLASKNASC_USER
+    path = CONFIG.FLASKNASC_HOST + "/new/" + CONFIG.FLASKNASC_USER
     response = requests.get(path, params=params)
     return absolute_short_url(response.text)
 

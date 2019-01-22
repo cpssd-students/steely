@@ -2,7 +2,7 @@
 import random
 import requests
 
-from steely import config
+from paths import CONFIG
 
 __author__ = 'CianLR'
 COMMAND = 'tm'
@@ -20,13 +20,13 @@ def full_result(res):
 
 
 def tm(term):
-    if not config.TM_API_USER or not config.TM_API_PASS:
-        return ".tm is unconfigured!"
+    if not CONFIG.TM_API_USER or not CONFIG.TM_API_PASS:
+        return ".tm is unCONFIG.red!"
 
     if len(term) < 3:
         return "Search term must be at least 3 chars (or the API gets _slow_)"
 
-    filled_url = URL.format(term, config.TM_API_USER, config.TM_API_PASS)
+    filled_url = URL.format(term, CONFIG.TM_API_USER, CONFIG.TM_API_PASS)
     resp = requests.get(filled_url)
     if resp.status_code != 200:
         return "Error code {}!".format(resp.code)

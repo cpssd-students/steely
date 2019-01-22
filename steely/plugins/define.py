@@ -11,13 +11,14 @@ They can be accessed via ~<command_name>, and will output what you put in.
 '''
 
 
-from tinydb import TinyDB, Query
+from tinydb import Query
 from formatting import *
+from utils import new_database
 
 
 __author__ = 'alexkraak'
 COMMAND = 'define'
-CMD_DB = TinyDB('databases/quote.json')
+CMD_DB = new_database('quote')
 CMD = Query()
 LIMIT = 20
 ANGRY_STRING = 'please use in form .define <command_name> <command text>'

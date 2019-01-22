@@ -18,7 +18,7 @@ https://tech.yandex.com/translate/doc/dg/concepts/api-overview-docpage/
 
 import requests
 
-from steely import config
+from paths import CONFIG
 
 __author__ = 'CianLR'
 COMMAND = 'translate'
@@ -35,7 +35,7 @@ def translate(langs, text):
             'text': text,
             'lang': lang,
             'format': 'text',
-            'key': config.TRANSLATE_API_KEY,
+            'key': CONFIG.TRANSLATE_API_KEY,
         }
         response = requests.post(URL, data=data).json()
         if response['code'] != 200:

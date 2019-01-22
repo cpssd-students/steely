@@ -2,7 +2,7 @@
 
 
 from nose.tools import *
-from steely import config
+from paths import CONFIG
 from steely.plugins  import lastfm
 from unittest.mock import patch
 
@@ -14,7 +14,7 @@ def test_lastfm_api_request(mock_requests_get):
     mock_requests_get.assert_called_once()
     mock_requests_get.assert_called_with(lastfm.API_BASE,
                                          params={'method': 'api method',
-                                                 'api_key': config.LASTFM_API_KEY,
+                                                 'api_key': CONFIG.LASTFM_API_KEY,
                                                  'format': 'json',
                                                  'key1': 'value 1',
                                                  'key2': 'value 2'})

@@ -1,4 +1,4 @@
-from steely import config
+from paths import CONFIG
 import requests
 
 __author__ = 'devoxel'
@@ -6,7 +6,7 @@ COMMAND = 'beer'
 
 URL = 'http://api.brewerydb.com/v2/'
 SEARCH = URL + "search/"
-API_KEY = config.BREWERYDB_API_KEY
+API_KEY = CONFIG.BREWERYDB_API_KEY
 
 ERR_NO_RESULTS = "ah now we got no results"
 ERR_API_LIMIT = "we used up all our api juice, try again tomorrow"

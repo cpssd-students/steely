@@ -8,17 +8,17 @@ See design doc at: https://docs.google.com/document/d/1HYDU3wrewmk9dwt6wX7MqMcbZ
 import time
 import heapq
 import difflib
-from tinydb import TinyDB, Query, where, operations
+from tinydb import Query, where, operations
 import plugins._gex_util as gex_util
 from plugins import _gex_battle
 from formatting import *
 
 __author__ = 'iandioch'
 COMMAND = 'gex'
-CARD_DB = TinyDB('databases/gex_cards.json')
-USER_DB = TinyDB('databases/gex_users.json')
-CARD = Query()
-USER = Query()  # not sure if this is needed instead of reusing CARD but w/e
+CARD_DB = gex_util.CARD_DB
+USER_DB = gex_util.USER_DB
+CARD = gex_util.CARD
+USER = gex_util.USER
 
 # IDs that don't need auth to create cards (ie. Reed)
 GOD_IDS = set(['100018746416184', '100022169435132', '100003244958231'])

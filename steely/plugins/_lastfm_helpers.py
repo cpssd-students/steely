@@ -1,18 +1,19 @@
 from requests_futures.sessions import FuturesSession
-from steely import config
-from tinydb import TinyDB, Query
+from paths import CONFIG
+from tinydb import Query
+from utils import new_database
 import requests
 
 
 COMMAND = 'np'
-USERDB = TinyDB('databases/lastfm.json')
+USERDB = new_database('lastfm')
 USER = Query()
 SESSION = FuturesSession(max_workers=100)
 API_BASE = "http://ws.audioscrobbler.com/2.0/"
 COLLAGE_BASE = "http://www.tapmusic.net/collage.php/"
 SHORTENER_BASE = 'https://www.googleapis.com/urlshortener/v1/url'
 PERIODS = ("7day", "1month", "3month", "6month", "12month", "overall")
-REQUEST_PARAMETERS = {'api_key': config.LASTFM_API_KEY,
+REQUEST_PARAMETERS = {'api_key': CONFIG.LASTFM_API_KEY,
                       'format': 'json'}
 
 

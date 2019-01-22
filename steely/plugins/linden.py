@@ -19,20 +19,21 @@ invest in the stock market:
 '''
 
 
-from tinydb import TinyDB, Query, where
-from tinydb.operations import increment
 from datetime import datetime, timedelta
-from plugins import gex
 from formatting import *
-import tabulate
+from plugins import gex
+from tinydb import Query, where
+from tinydb.operations import increment
+from utils import new_database
+import json
 import random
 import requests
-import json
+import tabulate
 
 
 __author__ = 'CianLR'
 COMMAND = "linden"
-USERDB = TinyDB("databases/linden.json")
+USERDB = new_database('linden')
 USER = Query()
 REED_ID = None
 

@@ -1,4 +1,4 @@
-'''.mock mocks the previous command'''
+'''.clap claps 👏 the 👏 previous 👏 message'''
 
 
 import re

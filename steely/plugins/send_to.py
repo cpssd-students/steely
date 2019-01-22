@@ -2,7 +2,7 @@
 
 
 import requests
-from steely import config
+from paths import CONFIG
 from fbchat import models
 
 
