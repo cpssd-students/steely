@@ -11,3 +11,4 @@ pytz
 beautifulsoup4
 pyxdg
 nltk
+python-telegram-bot
