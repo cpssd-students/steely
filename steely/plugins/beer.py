@@ -6,7 +6,7 @@ COMMAND = 'beer'
 
 URL = 'http://api.brewerydb.com/v2/'
 SEARCH = URL + "search/"
-API_KEY = CONFIG.BREWERYDB_API_KEY
+API_KEY = None 
 
 ERR_NO_RESULTS = "ah now we got no results"
 ERR_API_LIMIT = "we used up all our api juice, try again tomorrow"
@@ -57,6 +57,13 @@ def format_output(response):
 
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
+    global API_KEY
+    if 'BREWERYDB_API_KEY' in CONFIG:
+        API_KEY = CONFIG.BREWERYDB_API_KEY
+
+    if API_KEY is None:
+        print('No API_KEY found. Aborting beer plugin.')
+        return
     try:
         response = search_request(message)
         desc, url = format_output(response)
