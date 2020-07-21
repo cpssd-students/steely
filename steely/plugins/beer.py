@@ -58,7 +58,7 @@ def format_output(response):
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     global API_KEY
-    if 'BREWERYDB_API_KEY' in CONFIG:
+    if hasattr(CONFIG, 'BREWERYDB_API_KEY'):
         API_KEY = CONFIG.BREWERYDB_API_KEY
 
     if API_KEY is None:
