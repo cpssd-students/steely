@@ -18,14 +18,21 @@ def absolute_short_url(relative):
     return CONFIG.FLASKNASC_HOST + relative
 
 
-def get_short_url(url):
-    params = {
-        'key': CONFIG.FLASKNASC_KEY,
-        'address': url
-    }
-    path = CONFIG.FLASKNASC_HOST + "/new/" + CONFIG.FLASKNASC_USER
-    response = requests.get(path, params=params)
-    return absolute_short_url(response.text)
+# Try to get a short URL. If the URL shortener service isn't responding, just
+# return the original long URL.
+def maybe_get_short_url(long_url):
+    try:
+        params = {
+            'key': CONFIG.FLASKNASC_KEY,
+            'address': long_url
+        }
+        path = CONFIG.FLASKNASC_HOST + "/new/" + CONFIG.FLASKNASC_USER
+        response = requests.get(path, params=params)
+        return absolute_short_url(response.text)
+    except requests.exceptions.ConnectionError as e:
+        print('Error while trying to shorten URL for .np:')
+        print(e)
+        return long_url
 
 
 def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
@@ -45,7 +52,7 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
     track = latest_track_obj["name"]
     tag_response = get_lastfm_request("artist.getTopTags", artist=artist)
     tags = ', '.join(parse_tags(tag_response))
-    link = get_short_url(latest_track_obj["url"])
+    link = maybe_get_short_url(latest_track_obj["url"])
     with suppress(ValueError):
         image = latest_track_obj["image"][2]["#text"]
         bot.sendRemoteImage(image, thread_id=thread_id,
