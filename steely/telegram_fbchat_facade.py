@@ -13,9 +13,32 @@ def _telegram_chat_to_fbchat_thread_type(chat):
         return ThreadType.USER
     return ThreadType.GROUP
 
+class SteelyUserManager:
+    '''Telegram doesn't allow any querying of users in a group, so we have to
+    track user IDs ourselves if we want to be able to query them later.'''
+
+    def UserManager():
+        pass
+
+    def maybe_add_user(self, thread_id, user_id):
+        '''Inform about an interaction with a user user_id in the given thread.
+        It is required to add the thread because Telegram doesn't allow shot-in-
+        the-dark queries about a given user ID.'''
+        print('Maybe adding user', user_id, 'in thread', thread_id)
+        pass
+
+    def get_user_info(self, user_id):
+        print('requested user info', user_id)
+        return
+
+    def search_for_users(self, name): 
+        print('searching for user', name)
+        return []
+
+
 class Client:
-    '''Acts as a facade on fbchat bots to allow them to be backed by Telegram
-    instead. ie., Provides API compatibility.'''
+    '''Acts as a facade on fbchat-alike bots to allow them to be backed by
+    Telegram instead. ie., Provides API compatibility.'''
 
     NUM_STORED_MESSAGES_IN_THREAD = 16
 
@@ -25,6 +48,8 @@ class Client:
         Args:
             email (str): Is thrown away.
             password (str): Is used as the Telegram bot key.'''
+
+        self.user_manager = SteelyUserManager()
         self.updater = Updater(token=password)
         self.dispatcher = self.updater.dispatcher
         self.bot = self.updater.bot
@@ -42,7 +67,9 @@ class Client:
                 thread_type = _telegram_chat_to_fbchat_thread_type(
                         update.effective_chat)
                 self.thread[thread_id].append(update.effective_message)
-                self.onMessage(author_id=update.effective_user.id,
+                author_id = update.effective_user.id
+                self.user_manager.maybe_add_user(thread_id, author_id)
+                self.onMessage(author_id=author_id,
                                message=update.effective_message.text,
                                thread_id=thread_id,
                                thread_type=thread_type)
@@ -84,17 +111,19 @@ class Client:
         '''Handler method; to be overriden.'''
         pass
 
-    def fetchUserInfo(self, *user_ids):
+    def fetchUserInfo(self, user_id):
         '''Gets info about the given user(s).'''
-        raise NotImplementedError('fetchUserInfo not implemented')
+        print('fetchUserInfo({})'.format(user_id))
+        return self.user_manager.get_user_info(user_id)
 
-    def fetchGroupInfo(self, *thread_ids):
+    def fetchGroupInfo(self, thread_id):
         '''Gets info about the given group(s).'''
-        raise NotImplementedError('fetchGroupInfo not implemented')
+        print('fetchGroupInfo({})'.format(thread_id))
+        return self.bot.get_chat(thread_id)
 
     def searchForUsers(self, name, limit=10):
         '''Finds users by their display name.'''
-        raise NotImplementedError('searchForUsers not implemented')
+        return self.user_manager.search_for_users(name)
 
 def log(*args, **kwargs):
     print("log:", *args, *kwargs)

@@ -26,6 +26,8 @@ literal commands can be mandatory or optional'''
 
 
 class SteelyBot(Client):
+    '''Wraps around the Telegram Fbchat facade and handles Steely-specific stuff,
+    ie. plugins.'''
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
