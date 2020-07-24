@@ -189,7 +189,7 @@ def get_balance(user_id):
     matching_users = USERDB.search(USER.id == user_id)
     if len(matching_users) == 0:
         return
-    return matching_users['lindens']
+    return matching_users[0]['lindens']
 
 
 def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
