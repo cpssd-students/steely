@@ -201,14 +201,14 @@ def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
     reciever_name, amount = message_parts[0].lstrip(
         "@").capitalize(), int(message_parts[-1])
     reciever_model = user_from_name(reciever_name, users)
-    reciever = USERDB.get(USER.id == reciever_model.uid)
-    sender_model = bot.fetchUserInfo(author_id)[author_id]
+    reciever = USERDB.get(USER.id == reciever_model['id'])
+    sender_model = bot.fetchUserInfo(author_id)[0]
     sender = USERDB.get(USER.id == author_id)
-    if sender_model.uid == reciever_model.uid:
+    if sender_model['id'] == reciever_model['id']:
         bot.sendMessage('no', thread_id=thread_id, thread_type=thread_type)
         return
     if not reciever:
-        reciever = create_user(reciever_model.uid, reciever_model.first_name)
+        reciever = create_user(reciever_model['id'], reciever_model.first_name)
     if not sender:
         sender = create_user(author_id, sender_model.first_name)
     new_sender_balance = sender['lindens'] - amount
@@ -218,7 +218,7 @@ def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
         return
     USERDB.update({'lindens': new_sender_balance}, USER.id == author_id)
     USERDB.update(
-        {'lindens': reciever['lindens'] + amount}, USER.id == reciever_model.uid)
+        {'lindens': reciever['lindens'] + amount}, USER.id == reciever_model['id'])
     bot.sendMessage('you gave {} {} Linden Dollars™'.format(reciever_name, amount),
                     thread_id=thread_id, thread_type=thread_type)
 
