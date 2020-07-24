@@ -105,5 +105,17 @@ class Client:
         '''Handler method; to be overriden.'''
         pass
 
+    def fetchUserInfo(self, *user_ids):
+        '''Gets info about the given user(s).'''
+        raise NotImplementedError('fetchUserInfo not implemented')
+
+    def fetchGroupInfo(self, *thread_ids):
+        '''Gets info about the given group(s).'''
+        raise NotImplementedError('fetchGroupInfo not implemented')
+
+    def searchForUsers(self, name, limit=10):
+        '''Finds users by their display name.'''
+        raise NotImplementedError('searchForUsers not implemented')
+
 def log(*args, **kwargs):
     print("log:", *args, *kwargs)
