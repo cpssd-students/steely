@@ -122,14 +122,20 @@ TICKER_FETCHERS = [
 
 def user_from_name(name, list):
     for user in list:
-        if user.first_name == name:
+        if user['first_name'] == name:
             return user
 
 
 def list_users(bot, thread_id):
-    group = bot.fetchGroupInfo(thread_id)[thread_id]
-    user_ids = group.participants
-    yield from bot.fetchUserInfo(*user_ids).values()
+    groups = bot.fetchGroupInfo(thread_id)
+    if len(groups) == 0:
+        return
+    user_ids = groups[0]['users']
+    for user_id in user_ids:
+        matching_users = bot.fetchUserInfo(user_id)
+        if len(matching_users) == 0:
+            continue
+        yield matching_users[0]
 
 
 def create_user(id, first_name):
