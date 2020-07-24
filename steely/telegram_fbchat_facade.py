@@ -1,3 +1,4 @@
+import json
 from collections import defaultdict, deque
 from enum import Enum
 
@@ -78,15 +79,6 @@ class Client:
                                photo=image)
         except Exception as e:
             log(e)
-
-    def onNicknameChange(self, mid, author_id, changed_for, new_nickname,
-                         thread_id, thread_type, ts, metadata, msg):
-        '''Handler method; to be overriden.'''
-        pass
-
-    def onFriendRequest(self, from_id, msg):
-        '''Handler method; to be overriden.'''
-        pass
 
     def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
         '''Handler method; to be overriden.'''

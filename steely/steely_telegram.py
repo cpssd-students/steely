@@ -77,13 +77,6 @@ class SteelyBot(Client):
             thread.deamon = True
             thread.start()
 
-    def onNicknameChange(self, mid, author_id, changed_for, new_nickname, thread_id, thread_type, ts, metadata, msg):
-        self.changeNickname(vapor(new_nickname), user_id=changed_for,
-                            thread_id=thread_id, thread_type=thread_type)
-
-    def onFriendRequest(self, from_id, msg):
-        self.friendConnect(from_id)
-
     def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
         if author_id == self.uid:
             return
