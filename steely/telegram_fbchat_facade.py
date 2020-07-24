@@ -2,6 +2,9 @@ import json
 from collections import defaultdict, deque
 from enum import Enum
 
+from utils import new_database
+
+from tinydb import Query
 from telegram.ext import Updater, MessageHandler
 from telegram.ext.filters import Filters
 
@@ -17,22 +20,37 @@ class SteelyUserManager:
     '''Telegram doesn't allow any querying of users in a group, so we have to
     track user IDs ourselves if we want to be able to query them later.'''
 
-    def UserManager():
-        pass
+    def __init__(self, db_path):
+        self.db = new_database(db_path)
 
-    def maybe_add_user(self, thread_id, user_id):
+    def maybe_add_user(self, bot, thread_id, user_id):
         '''Inform about an interaction with a user user_id in the given thread.
         It is required to add the thread because Telegram doesn't allow shot-in-
         the-dark queries about a given user ID.'''
         print('Maybe adding user', user_id, 'in thread', thread_id)
-        pass
+        try:
+            user_data = bot.get_chat_member(chat_id=thread_id, user_id=user_id)
+        except Exception as e:
+            print(e)
+            return
+        info = user_data.user
+        data = {
+            'id': user_id,
+            'first_name': info.first_name, # eg. 'Noah'
+            'last_name': info.last_name, # eg. 'Ó D'. Optional.
+            'full_name': info.full_name, # eg 'Noah Ó D'
+            'username': info.username, # eg. 'iandioch'
+        }
+        self.db.insert(data)
 
     def get_user_info(self, user_id):
         print('requested user info', user_id)
-        return
+        user_query = Query()
+        return self.db.search(user_query.id == user_id)
 
     def search_for_users(self, name): 
-        print('searching for user', name)
+        print('searching for user:', name)
+        # TODO(iandioch): Find a closest user from the DB for full_name ~= name.
         return []
 
 
@@ -49,7 +67,7 @@ class Client:
             email (str): Is thrown away.
             password (str): Is used as the Telegram bot key.'''
 
-        self.user_manager = SteelyUserManager()
+        self.user_manager = SteelyUserManager(db_path='users')
         self.updater = Updater(token=password)
         self.dispatcher = self.updater.dispatcher
         self.bot = self.updater.bot
@@ -68,7 +86,7 @@ class Client:
                         update.effective_chat)
                 self.thread[thread_id].append(update.effective_message)
                 author_id = update.effective_user.id
-                self.user_manager.maybe_add_user(thread_id, author_id)
+                self.user_manager.maybe_add_user(self.bot, thread_id, author_id)
                 self.onMessage(author_id=author_id,
                                message=update.effective_message.text,
                                thread_id=thread_id,
