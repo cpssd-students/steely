@@ -180,7 +180,7 @@ def handle_gex_sell_cards(user_id, ticker, profit):
 
 
 def get_balance(user_id):
-    matching_users = USERDB.get(USER.id == user_id)
+    matching_users = USERDB.search(USER.id == user_id)
     if len(matching_users) == 0:
         return
     return matching_users['lindens']
@@ -461,7 +461,12 @@ SUBCOMMANDS = {
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     REED_ID = bot.uid
     if not message:
-        bot.sendMessage('you have {:.4f} Linden Dollars™'.format(get_balance(author_id)),
+        balance = get_balance(author_id)
+        if balance is None:
+            bot.sendMessage('you have no account, loser',
+                            thread_id=thread_id, thread_type=thread_type)
+            return
+        bot.sendMessage('you have {:.4f} Linden Dollars™'.format(balance),
                         thread_id=thread_id, thread_type=thread_type)
         return
 
