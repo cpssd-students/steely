@@ -79,11 +79,6 @@ class Client:
         except Exception as e:
             log(e)
 
-    def onEmojiChange(self, author_id, new_emoji,
-                      thread_id, thread_type, **kwargs):
-        '''Handler method; to be overriden.'''
-        pass
-
     def onNicknameChange(self, mid, author_id, changed_for, new_nickname,
                          thread_id, thread_type, ts, metadata, msg):
         '''Handler method; to be overriden.'''

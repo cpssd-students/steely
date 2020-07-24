@@ -77,11 +77,6 @@ class SteelyBot(Client):
             thread.deamon = True
             thread.start()
 
-    def onEmojiChange(self, author_id, new_emoji, thread_id, thread_type, **kwargs):
-        nose = '👃'
-        if new_emoji != nose:
-            self.changeThreadEmoji(nose, thread_id=thread_id)
-
     def onNicknameChange(self, mid, author_id, changed_for, new_nickname, thread_id, thread_type, ts, metadata, msg):
         self.changeNickname(vapor(new_nickname), user_id=changed_for,
                             thread_id=thread_id, thread_type=thread_type)
