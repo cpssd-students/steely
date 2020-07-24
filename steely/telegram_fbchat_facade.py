@@ -20,14 +20,36 @@ class SteelyUserManager:
     '''Telegram doesn't allow any querying of users in a group, so we have to
     track user IDs ourselves if we want to be able to query them later.'''
 
-    def __init__(self, db_path):
-        self.db = new_database(db_path)
+    def __init__(self, user_db_path, thread_db_path):
+        self.user_db = new_database(user_db_path)
+        self.thread_db = new_database(thread_db_path)
+
+    def _add_user_to_thread(self, thread_id, user_id):
+        # TODO(iandioch): This data will be stale as soon as someone leaves a
+        # group. We need a _delete_user_from_thread...
+        THREAD = Query()
+        threads = self.thread_db.search(THREAD.id == thread_id) 
+        thread_data = {
+                'id': thread_id,
+        }
+        if len(threads) == 0:
+            thread_data['users'] = [user_id]
+        else:
+            # TODO(iandioch): This is inefficient af. Do it better (eg. query
+            # "user_id not in users" at TinyDB level, instead of in python.
+            thread_data['users'] = threads[0]['users']
+            if user_id not in thread_data['users']:
+                thread_data['users'].append(user_id)
+        self.thread_db.upsert(thread_data, THREAD.id == thread_id)
 
     def maybe_add_user(self, bot, thread_id, user_id):
         '''Inform about an interaction with a user user_id in the given thread.
         It is required to add the thread because Telegram doesn't allow shot-in-
         the-dark queries about a given user ID.'''
-        print('Maybe adding user', user_id, 'in thread', thread_id)
+        print('SteelyUserManager: Maybe adding user',
+              user_id, 'in thread', thread_id)
+        self._add_user_to_thread(thread_id, user_id)
+
         try:
             user_data = bot.get_chat_member(chat_id=thread_id, user_id=user_id)
         except Exception as e:
@@ -41,15 +63,20 @@ class SteelyUserManager:
             'full_name': info.full_name, # eg 'Noah Ó D'
             'username': info.username, # eg. 'iandioch'
         }
-        self.db.insert(data)
+        self.user_db.insert(data)
 
     def get_user_info(self, user_id):
-        print('requested user info', user_id)
-        user_query = Query()
-        return self.db.search(user_query.id == user_id)
+        print('SteelyUserManager: requested user info', user_id)
+        USER = Query()
+        return self.user_db.search(USER.id == user_id)
+
+    def get_thread_info(self, thread_id):
+        print('SteelyUserManager: requested thread info', thread_id)
+        THREAD = Query()
+        return self.thread_db.search(THREAD.id == thread_id)
 
     def search_for_users(self, name): 
-        print('searching for user:', name)
+        print('SteelyUserManager: searching for user:', name)
         # TODO(iandioch): Find a closest user from the DB for full_name ~= name.
         return []
 
@@ -67,7 +94,8 @@ class Client:
             email (str): Is thrown away.
             password (str): Is used as the Telegram bot key.'''
 
-        self.user_manager = SteelyUserManager(db_path='users')
+        self.user_manager = SteelyUserManager(user_db_path='users',
+                                              thread_db_path='threads')
         self.updater = Updater(token=password)
         self.dispatcher = self.updater.dispatcher
         self.bot = self.updater.bot
@@ -137,7 +165,7 @@ class Client:
     def fetchGroupInfo(self, thread_id):
         '''Gets info about the given group(s).'''
         print('fetchGroupInfo({})'.format(thread_id))
-        return self.bot.get_chat(thread_id)
+        return self.user_manager.get_thread_info(thread_id)
 
     def searchForUsers(self, name, limit=10):
         '''Finds users by their display name.'''
