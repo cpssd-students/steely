@@ -90,8 +90,6 @@ class SteelyBot(Client):
         self.friendConnect(from_id)
 
     def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
-        self.markAsDelivered(author_id, thread_id)
-        self.markAsRead(author_id)
         if author_id == self.uid:
             return
         self.run_non_plugins(author_id, message, thread_id,

@@ -79,14 +79,6 @@ class Client:
         except Exception as e:
             log(e)
 
-    def markAsDelivered(self, *args, **kwargs):
-        '''TODO: Remove this method, it's only here to suppress errors.'''
-        pass
-
-    def markAsRead(self, *args, **kwargs):
-        '''TODO: Remove this method, it's only here to suppress errors.'''
-        pass
-
     def onEmojiChange(self, author_id, new_emoji,
                       thread_id, thread_type, **kwargs):
         '''Handler method; to be overriden.'''
