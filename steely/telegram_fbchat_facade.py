@@ -5,6 +5,7 @@ from enum import Enum
 from utils import new_database
 
 from tinydb import Query
+from telegram import ParseMode
 from telegram.ext import Updater, MessageHandler
 from telegram.ext.filters import Filters
 
@@ -137,7 +138,8 @@ class Client:
             text (str): The message to send.
             thread_id (str): The chat id to send the message to.
             thread_type (str): Is thrown away.'''
-        sent_message = self.bot.sendMessage(chat_id=thread_id, text=text)
+        sent_message = self.bot.send_message(chat_id=thread_id, text=text,
+                                             parse_mode=ParseMode.MARKDOWN)
         # Add steely's response to the log so you can mock him, etc.
         self.thread[thread_id].append(sent_message)
 
