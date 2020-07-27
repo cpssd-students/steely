@@ -137,7 +137,9 @@ class Client:
             text (str): The message to send.
             thread_id (str): The chat id to send the message to.
             thread_type (str): Is thrown away.'''
-        self.bot.sendMessage(chat_id=thread_id, text=text)
+        sent_message = self.bot.sendMessage(chat_id=thread_id, text=text)
+        # Add steely's response to the log so you can mock him, etc.
+        self.thread[thread_id].append(sent_message)
 
     def sendRemoteImage(self, image, thread_id, thread_type):
         '''Sends an image.
