@@ -122,14 +122,20 @@ TICKER_FETCHERS = [
 
 def user_from_name(name, list):
     for user in list:
-        if user.first_name == name:
+        if user['first_name'] == name:
             return user
 
 
 def list_users(bot, thread_id):
-    group = bot.fetchGroupInfo(thread_id)[thread_id]
-    user_ids = group.participants
-    yield from bot.fetchUserInfo(*user_ids).values()
+    groups = bot.fetchGroupInfo(thread_id)
+    if len(groups) == 0:
+        return
+    user_ids = groups[0]['users']
+    for user_id in user_ids:
+        matching_users = bot.fetchUserInfo(user_id)
+        if len(matching_users) == 0:
+            continue
+        yield matching_users[0]
 
 
 def create_user(id, first_name):
@@ -180,10 +186,10 @@ def handle_gex_sell_cards(user_id, ticker, profit):
 
 
 def get_balance(user_id):
-    matching_users = USERDB.get(USER.id == user_id)
+    matching_users = USERDB.search(USER.id == user_id)
     if len(matching_users) == 0:
         return
-    return matching_users['lindens']
+    return matching_users[0]['lindens']
 
 
 def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
@@ -195,16 +201,16 @@ def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
     reciever_name, amount = message_parts[0].lstrip(
         "@").capitalize(), int(message_parts[-1])
     reciever_model = user_from_name(reciever_name, users)
-    reciever = USERDB.get(USER.id == reciever_model.uid)
-    sender_model = bot.fetchUserInfo(author_id)[author_id]
+    reciever = USERDB.get(USER.id == reciever_model['id'])
+    sender_model = bot.fetchUserInfo(author_id)[0]
     sender = USERDB.get(USER.id == author_id)
-    if sender_model.uid == reciever_model.uid:
+    if sender_model['id'] == reciever_model['id']:
         bot.sendMessage('no', thread_id=thread_id, thread_type=thread_type)
         return
     if not reciever:
-        reciever = create_user(reciever_model.uid, reciever_model.first_name)
+        reciever = create_user(reciever_model['id'], reciever_model['first_name'])
     if not sender:
-        sender = create_user(author_id, sender_model.first_name)
+        sender = create_user(author_id, sender_model['first_name'])
     new_sender_balance = sender['lindens'] - amount
     if new_sender_balance < 0:
         bot.sendMessage('you\'d be broke boyo',
@@ -212,7 +218,7 @@ def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
         return
     USERDB.update({'lindens': new_sender_balance}, USER.id == author_id)
     USERDB.update(
-        {'lindens': reciever['lindens'] + amount}, USER.id == reciever_model.uid)
+        {'lindens': reciever['lindens'] + amount}, USER.id == reciever_model['id'])
     bot.sendMessage('you gave {} {} Linden Dollars™'.format(reciever_name, amount),
                     thread_id=thread_id, thread_type=thread_type)
 
@@ -461,7 +467,12 @@ SUBCOMMANDS = {
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     REED_ID = bot.uid
     if not message:
-        bot.sendMessage('you have {:.4f} Linden Dollars™'.format(get_balance(author_id)),
+        balance = get_balance(author_id)
+        if balance is None:
+            bot.sendMessage('you have no account, loser',
+                            thread_id=thread_id, thread_type=thread_type)
+            return
+        bot.sendMessage('you have {:.4f} Linden Dollars™'.format(balance),
                         thread_id=thread_id, thread_type=thread_type)
         return
 
