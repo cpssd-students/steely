@@ -1,3 +1,4 @@
+import difflib
 import json
 from collections import defaultdict, deque
 from enum import Enum
@@ -64,7 +65,8 @@ class SteelyUserManager:
             'full_name': info.full_name, # eg 'Noah Ó D'
             'username': info.username, # eg. 'iandioch'
         }
-        self.user_db.insert(data)
+        USER = Query()
+        self.user_db.upsert(data, USER.id == user_id)
 
     def get_user_info(self, user_id):
         print('SteelyUserManager: requested user info', user_id)
@@ -78,8 +80,10 @@ class SteelyUserManager:
 
     def search_for_users(self, name): 
         print('SteelyUserManager: searching for user:', name)
-        # TODO(iandioch): Find a closest user from the DB for full_name ~= name.
-        return []
+        print(self.user_db.all())
+        ans = max(self.user_db.all(),
+                  key=lambda x: difflib.SequenceMatcher(None, x['full_name'], name).ratio())
+        return ans
 
 
 class Client:
