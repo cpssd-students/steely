@@ -29,7 +29,7 @@ $ nosetest
 
 If the tests are failing to import, you probably aren't in the virtualenv.
 
-## how to write help for you commands
+## how to write help for your commands
 
 Throw a doc string in the top of the plugin.
 
