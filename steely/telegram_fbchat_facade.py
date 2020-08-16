@@ -6,7 +6,7 @@ from enum import Enum
 from utils import new_database
 
 from tinydb import Query
-from telegram import ParseMode
+from telegram import ParseMode, error as telegram_error
 from telegram.ext import Updater, MessageHandler
 from telegram.ext.filters import Filters
 
@@ -142,8 +142,14 @@ class Client:
             text (str): The message to send.
             thread_id (str): The chat id to send the message to.
             thread_type (str): Is thrown away.'''
-        sent_message = self.bot.send_message(chat_id=thread_id, text=text,
-                                             parse_mode=ParseMode.MARKDOWN)
+        try:
+            sent_message = self.bot.send_message(chat_id=thread_id, text=text,
+                                                 parse_mode=ParseMode.MARKDOWN)
+        except telegram_error.BadRequest as e:
+            # If it fails to send as markdown, try to send as plaintext.
+            sent_message = self.bot.send_message(chat_id=thread_id, text=text)
+            print('Failed to send as markdown, sent as plaintext.')
+
         # Add steely's response to the log so you can mock him, etc.
         self.thread[thread_id].append(sent_message)
 
@@ -154,12 +160,29 @@ class Client:
             image (str): The URL of the image to send.
             thread_id (str): The chat id to send the message to.
             thread_type (str): Is thrown away.'''
-        print('Trying to send image {}'.format(image))
+        print('Trying to send remote image {}'.format(image))
         try:
             self.bot.sendPhoto(chat_id=thread_id,
                                photo=image)
         except Exception as e:
             log(e)
+
+    def sendLocalImage(self, image, thread_id, thread_type, message=None):
+        '''Sends an image.
+
+        Args:
+            image (str): The URL of the image to send.
+            thread_id (str): The chat id to send the message to.
+            thread_type (str): Is thrown away.'''
+        print('Trying to send local image {}'.format(image))
+        try:
+            self.bot.sendPhoto(chat_id=thread_id,
+                               photo=open(image, 'rb'))
+            if message is not None:
+                self.sendMessage(message.text, thread_id, thread_type)
+        except Exception as e:
+            log(e)
+
 
     def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
         '''Handler method; to be overriden.'''
