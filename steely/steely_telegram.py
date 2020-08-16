@@ -56,7 +56,7 @@ class SteelyBot(Client):
         if message[0] != config.COMMAND_PREFIX:
             return
         command, _, message = message[1:].partition(' ')
-        clean_command = command.lower().strip()
+        clean_command = command.split('@')[0].lower().strip()
         return clean_command, message
 
     def run_plugin(self, author_id, message, thread_id, thread_type, **kwargs):
@@ -71,6 +71,7 @@ class SteelyBot(Client):
                                   args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
         thread.deamon = True
         thread.start()
+        # TODO(iandioch): Record stat for plugin.
 
     def run_non_plugins(self, author_id, message, thread_id, thread_type, **kwargs):
         for plugin in self.non_plugins:

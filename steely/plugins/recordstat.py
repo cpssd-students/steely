@@ -25,7 +25,7 @@ def is_tilda_command(command):
 
 
 def looks_like_command(command):
-    identifiers = '.', '~'
+    identifiers = '.', '~', '/'
     return any(command.startswith(char) for char in identifiers)
 
 
