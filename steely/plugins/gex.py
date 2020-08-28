@@ -248,8 +248,11 @@ def _gex_give(bot, args, author_id, thread_id, thread_type):
     if not args or len(args) != 2:
         raise RuntimeError(
             'Need to provide command in the form give USER CARD_ID .')
+    print('args = ', args)
     user_id = gex_util.user_name_to_id(bot, args[0])
+    print('got user_id', user_id)
     card_id = args[1]
+    print('gex_give({}, {}, {})'.format(author_id, card_id, user_id))
     gex_give(author_id, card_id, user_id)
     # TODO(iandioch): Notify user they got a new card.
 

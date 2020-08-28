@@ -32,10 +32,10 @@ def main(bot, author_id, message_parts, thread_id, thread_type, **kwargs):
         bot.sendMessage(f'include username please or use {COMMAND} set',
                         thread_id=thread_id, thread_type=thread_type)
         return
-    scrobbles = get_lastfm_request("user.getInfo",
+    scrobbles = int(get_lastfm_request("user.getInfo",
                                    user=username) \
                     .json() \
-                    ['user']['playcount']
+                    ['user']['playcount'])
     distance, milestone = get_distance_and_milestone(scrobbles)
     bot.sendMessage(f"{username} is {distance:,} scrobbles away from their next milestone of *{milestone:,}*",
                     thread_id=thread_id, thread_type=thread_type)
