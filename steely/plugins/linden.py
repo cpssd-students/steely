@@ -125,6 +125,8 @@ TICKER_FETCHERS = [
 
 
 def user_from_name(name, user_list):
+    # TODO(CianLR): Assuming a first name is unique is not good, use something
+    # else maybe. (user_id?)
     for user in user_list:
         if user['first_name'].lower() == name.lower():
             return user
