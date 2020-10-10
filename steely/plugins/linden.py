@@ -2,6 +2,9 @@
 '''
 linden gives the plebians currency.
 
+initalise your account
+.linden init
+
 give lindens to people:
 .linden give <user> <amount>
 .linden send <user> <amount>
@@ -113,6 +116,7 @@ class IEXTickerFetcher:
     def GetSingle(self, ticker):
         return self.GetMultiple([ticker])[0]
 
+
 TICKER_FETCHERS = [
     IEXTickerFetcher(),  # Fast, hopefully robust
     YahooTickerFetcher(),  # Fast, super flakey
@@ -120,9 +124,11 @@ TICKER_FETCHERS = [
 ]
 
 
-def user_from_name(name, list):
-    for user in list:
-        if user['first_name'] == name:
+def user_from_name(name, user_list):
+    # TODO(CianLR): Assuming a first name is unique is not good, use something
+    # else maybe. (user_id?)
+    for user in user_list:
+        if user['first_name'].lower() == name.lower():
             return user
 
 
@@ -138,13 +144,14 @@ def list_users(bot, thread_id):
         yield matching_users[0]
 
 
-def create_user(id, first_name):
-    data = {"id": id,
+def create_user(uid, first_name):
+    data = {"id": uid,
             "first_name": first_name,
             "investments": {},
             "lindens": 2000}
     USERDB.insert(data)
     return data
+
 
 def handle_gex_sell_cards(user_id, ticker, profit):
     NOAH_ID = '100003244958231'
@@ -201,6 +208,10 @@ def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
     reciever_name, amount = message_parts[0].lstrip(
         "@").capitalize(), int(message_parts[-1])
     reciever_model = user_from_name(reciever_name, users)
+    if reciever_model is None:
+        bot.sendMessage("Unrecognised reciever",
+                        thread_id=thread_id, thread_type=thread_type)
+        return
     reciever = USERDB.get(USER.id == reciever_model['id'])
     sender_model = bot.fetchUserInfo(author_id)[0]
     sender = USERDB.get(USER.id == author_id)
@@ -208,7 +219,9 @@ def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
         bot.sendMessage('no', thread_id=thread_id, thread_type=thread_type)
         return
     if not reciever:
-        reciever = create_user(reciever_model['id'], reciever_model['first_name'])
+        reciever = create_user(
+            reciever_model['id'],
+            reciever_model['first_name'])
     if not sender:
         sender = create_user(author_id, sender_model['first_name'])
     new_sender_balance = sender['lindens'] - amount
@@ -224,15 +237,21 @@ def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
 
 
 def table_cmd(bot, message_parts, author_id, thread_id, thread_type):
+    users = list(USERDB.all())
+    if not users:
+        bot.sendMessage(
+            "Database returned no users",
+            thread_id=thread_id,
+            thread_type=thread_type)
+        return
     max_lindens = len(str(max(user['lindens'] for user in USERDB.all())))
     max_name = len(max((user['first_name'] for user in USERDB.all()), key=len))
     string = ''
-    for user in sorted(USERDB.all(), key=lambda user: user['lindens'], reverse=True):
-        string += '\n{name:<{max_name}} {lindens:>{max_lindens}.3f}L$'.format(name=user['first_name'],
-                                                                              lindens=user[
-                                                                                  'lindens'],
-                                                                              max_name=max_name,
-                                                                              max_lindens=max_lindens + 4)
+    for user in sorted(
+            USERDB.all(), key=lambda user: user['lindens'], reverse=True):
+        string += '\n{name:<{max_name}} {lindens:>{max_lindens}.3f}L$'.format(
+            name=user['first_name'], lindens=user['lindens'],
+            max_name=max_name, max_lindens=max_lindens + 4)
     bot.sendMessage(code_block(string), thread_id=thread_id,
                     thread_type=thread_type)
 
@@ -318,7 +337,8 @@ def invest_buy_cmd(user_id, args):
     total_holdings[tic] = new_holding
     USERDB.update({'investments': total_holdings}, USER.id == user_id)
     USERDB.update({'lindens': user_balance - (total_cost)}, USER.id == user_id)
-    return "Successfully bought {} shares of ${} for {:.4f}L$".format(qt, tic, total_cost)
+    return "Successfully bought {} shares of ${} for {:.4f}L$".format(
+        qt, tic, total_cost)
 
 
 def invest_sell_cmd(user_id, args):
@@ -425,7 +445,8 @@ def invalid_cmd(bot, message_parts, author_id, thread_id, thread_type):
 
 
 def gamble_cmd(bot, message_parts, author_id, thread_id, thread_type):
-    if not message_parts or not message_parts[0].isdigit() or len(message_parts) != 1:
+    if not message_parts or not message_parts[0].isdigit() or len(
+            message_parts) != 1:
         bot.sendMessage("usage: .linden gamble <number 1-3>\nit's 2L$ to enter\n5$L if you win",
                         thread_id=thread_id, thread_type=thread_type)
         return
@@ -454,7 +475,21 @@ def gamble_cmd(bot, message_parts, author_id, thread_id, thread_type):
                     thread_id=thread_id, thread_type=thread_type)
 
 
+def init_cmd(bot, message_parts, author_id, thread_id, thread_type):
+    user = USERDB.get(USER.id == author_id)
+    if user:
+        bot.sendMessage("You already have an account sir/maam.",
+                        thread_id=thread_id, thread_type=thread_type)
+        return
+    users = list_users(bot, thread_id)
+    user_model = bot.fetchUserInfo(author_id)[0]
+    user = create_user(author_id, user_model['first_name'])
+    bot.sendMessage('Welcome {}, enjoy your Linden Dollars™'.format(user['first_name']),
+                    thread_id=thread_id, thread_type=thread_type)
+
+
 SUBCOMMANDS = {
+    'init': init_cmd,
     'give': give_cmd,
     'gamble': gamble_cmd,
     'send': give_cmd,
@@ -484,18 +519,32 @@ def main(bot, author_id, message, thread_id, thread_type, **kwargs):
 if __name__ == "__main__":
     # tests
     class Bot:
+        def __init__(self):
+            self.uid = "4444"
+            self._users = [
+                {"id": "2343", "first_name": "steely"},
+                {"id": "5435", "first_name": "dan"},
+                {"id": "54344445", "first_name": "egg"},
+                {"id": "1234", "first_name": "Cian"}
+            ]
 
-        @staticmethod
-        def sendMessage(message, *args, **kwargs):
+        def sendMessage(self, message, *args, **kwargs):
             print(message)
 
-        @staticmethod
-        def fetchAllUsers(*args, **kwargs):
-            return [{"id": "2343", "name": "steely"},
-                    {"id": "5435", "name": "dan"},
-                    {"id": "54344445", "name": "egg gggggggbobu"}]
+        def fetchUserInfo(self, user_id):
+            for u in self._users:
+                if u['id'] == user_id:
+                    return [u]
+            return None
+
+        def fetchGroupInfo(self, thread_id):
+            return [{'users': [u['id'] for u in self._users]}]
+
+        def fetchAllUsers(self, *args, **kwargs):
+            return self._users
 
     b = Bot()
-    main(Bot, '2343', 'send dan 6', 1, 1)
-    main(Bot, '2343', 'send egg gggggggbobu 6', 1, 1)
-    main(Bot, '2343', 'table', 1, 1)
+    main(b, '1234', 'init', 1, 1)
+    main(b, '2343', 'send dan 6', 1, 1)
+    main(b, '2343', 'send egg 6', 1, 1)
+    main(b, '2343', 'table', 1, 1)
