@@ -2,6 +2,9 @@
 '''
 linden gives the plebians currency.
 
+initalise your account
+.linden init
+
 give lindens to people:
 .linden give <user> <amount>
 .linden send <user> <amount>
@@ -235,7 +238,7 @@ def table_cmd(bot, message_parts, author_id, thread_id, thread_type):
     users = list(USERDB.all())
     if not users:
         bot.sendMessage(
-            "No users",
+            "Database returned no users",
             thread_id=thread_id,
             thread_type=thread_type)
         return
