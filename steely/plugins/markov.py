@@ -24,7 +24,7 @@ def should_reply():
 
 
 def generate_reply(thread_id, thread_type):
-    log_path = os.path.join(LOGFOLDER, thread_type.name, thread_id)
+    log_path = os.path.join(LOGFOLDER, thread_type.name, str(thread_id))
     with open(log_path, 'r') as file_:
         log_model = markovify.NewlineText(file_.read())
         new_sentence = log_model.make_sentence(tries=100)

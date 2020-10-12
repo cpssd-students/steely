@@ -13,18 +13,25 @@ ID_TO_NAME = {}
 
 
 def user_name_to_id(bot, name):
+    print('user_name_to_id(bot, {})'.format(name))
     users = bot.searchForUsers(name)
-    return users[0].uid
+    print("Searched for", name, "got", users)
+    return users['id']
 
 
 def user_id_to_name(bot, user_id):
     if user_id in ID_TO_NAME:
+        print('Cache hit for {} in user_id_to_name'.format(user_id))
         return ID_TO_NAME[user_id]
     try:
-        user = bot.fetchUserInfo(user_id)[user_id]
-        ID_TO_NAME[user_id] = user.name
-        return user.name
-    except Exception:
+        users = bot.fetchUserInfo(user_id)
+        if len(users) == 0:
+            raise ValueError('No user found for ID {}'.format(user_id))
+        ID_TO_NAME[user_id] = users[0]['full_name']
+        return users[0]['full_name']
+    except Exception as e:
+        print('Error in user_id_to_name:')
+        print(e)
         return 'Zucc'
 
 

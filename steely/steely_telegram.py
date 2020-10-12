@@ -26,6 +26,8 @@ literal commands can be mandatory or optional'''
 
 
 class SteelyBot(Client):
+    '''Wraps around the Telegram Fbchat facade and handles Steely-specific stuff,
+    ie. plugins.'''
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -54,7 +56,7 @@ class SteelyBot(Client):
         if message[0] != config.COMMAND_PREFIX:
             return
         command, _, message = message[1:].partition(' ')
-        clean_command = command.lower().strip()
+        clean_command = command.split('@')[0].lower().strip()
         return clean_command, message
 
     def run_plugin(self, author_id, message, thread_id, thread_type, **kwargs):
@@ -69,6 +71,7 @@ class SteelyBot(Client):
                                   args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
         thread.deamon = True
         thread.start()
+        # TODO(iandioch): Record stat for plugin.
 
     def run_non_plugins(self, author_id, message, thread_id, thread_type, **kwargs):
         for plugin in self.non_plugins:
@@ -77,21 +80,7 @@ class SteelyBot(Client):
             thread.deamon = True
             thread.start()
 
-    def onEmojiChange(self, author_id, new_emoji, thread_id, thread_type, **kwargs):
-        nose = '👃'
-        if new_emoji != nose:
-            self.changeThreadEmoji(nose, thread_id=thread_id)
-
-    def onNicknameChange(self, mid, author_id, changed_for, new_nickname, thread_id, thread_type, ts, metadata, msg):
-        self.changeNickname(vapor(new_nickname), user_id=changed_for,
-                            thread_id=thread_id, thread_type=thread_type)
-
-    def onFriendRequest(self, from_id, msg):
-        self.friendConnect(from_id)
-
     def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
-        self.markAsDelivered(author_id, thread_id)
-        self.markAsRead(author_id)
         if author_id == self.uid:
             return
         self.run_non_plugins(author_id, message, thread_id,
