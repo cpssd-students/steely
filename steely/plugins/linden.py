@@ -2,7 +2,7 @@
 '''
 linden gives the plebians currency.
 
-initalise your account
+initialise your account:
 .linden init
 
 give lindens to people:
