@@ -71,7 +71,6 @@ class SteelyBot(Client):
                                   args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
         thread.deamon = True
         thread.start()
-        # TODO(iandioch): Record stat for plugin.
 
     def run_non_plugins(self, author_id, message, thread_id, thread_type, **kwargs):
         for plugin in self.non_plugins:
