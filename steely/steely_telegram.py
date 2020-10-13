@@ -83,6 +83,9 @@ class SteelyBot(Client):
     def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
         if author_id == self.uid:
             return
+        if message is None or message == '':
+            # May occur when an image or sticker is sent.
+            return
         self.run_non_plugins(author_id, message, thread_id,
                              thread_type, **kwargs)
         self.run_plugin(author_id, message, thread_id, thread_type, **kwargs)
