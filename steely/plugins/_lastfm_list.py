@@ -11,7 +11,7 @@ def parse_onlines(async_responses):
         response = async_response.result()
         try:
             latest_track_obj = response.json()["recenttracks"]["track"][0]
-        except IndexError:
+        except (IndexError, KeyError):
             yield False
         else:
             yield "@attr" in latest_track_obj and \
