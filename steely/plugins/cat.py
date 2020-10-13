@@ -11,11 +11,10 @@ FORMAT = ("png", "jpg")
 
 def main(bot, author_id, message, thread_id, thread_type, **kwargs):
     params = {
-        "type": FORMAT.choice(FORMAT)
+        "type": random.choice(FORMAT)
     }
     response = requests.get('http://thecatapi.com/api/images/get',
                             params=params)
-    bot.sendRemoteImage(respose.url,
-                        message=None,
+    bot.sendRemoteImage(response.url,
                         thread_id=thread_id,
                         thread_type=thread_type)
