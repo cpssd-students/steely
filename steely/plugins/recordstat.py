@@ -12,6 +12,7 @@ CMD_DB = new_database('stats')
 CMD = Query()
 TILDA_DB = new_database('quote')
 TILDA = Query()
+COMMAND_IDENTIFIERS = set(['.', '~', '/'])
 
 
 def first_word_of(message):
@@ -25,14 +26,14 @@ def is_tilda_command(command):
 
 
 def looks_like_command(command):
-    identifiers = '.', '~', '/'
-    return any(command.startswith(char) for char in identifiers)
+    return any(command.startswith(char) for char in COMMAND_IDENTIFIERS)
 
 
 def is_command(command, plugins):
     if not looks_like_command(command):
         return False
-    stripped_command = (command[1:] if command[0] == '.' else command)
+    stripped_command = (command[1:] if command[0]
+                        in COMMAND_IDENTIFIERS else command)
     if stripped_command in plugins:
         return True
     elif is_tilda_command(command):
