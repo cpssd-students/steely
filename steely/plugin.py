@@ -32,6 +32,10 @@ class PluginManager:
             raise KeyError('Tried to add listener for command "{}", but one already exists.'.format(command))
         cls._command_listeners[command] = func
 
+    @staticmethod
+    def load_plugins():
+        import plugins.letterboxd.main
+
 
 class Plugin:
     def __init__(self, name, author, help):
@@ -89,3 +93,6 @@ class Plugin:
 
 def create_plugin(name=None, author=None, help=None):
     return Plugin(name, author, help)
+
+if __name__ == '__main__':
+    PluginManager.load_plugins()
