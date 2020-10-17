@@ -6,6 +6,7 @@ from telegram_fbchat_facade import log, Client
 from tinydb import TinyDB
 from vapor import vapor
 from utils import list_plugins
+from plugin import PluginManager
 import config
 import imp
 import os
@@ -35,6 +36,7 @@ class SteelyBot(Client):
         self.load_plugins()
 
     def load_plugins(self):
+        PluginManager.load_plugins()
         self.non_plugins = []
         self.plugins = {}
         self.plugin_helps = {
@@ -64,6 +66,16 @@ class SteelyBot(Client):
         if parsed_message is None:
             return
         command, message = parsed_message
+
+        # Run plugins following SEP1 interface.
+        plugin = PluginManager.get_listener_for_command('{} {}'.format(command, message))
+        if plugin is not None:
+            thread = threading.Thread(target=plugin,
+                                      args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
+            thread.deamon = True
+            thread.start()
+
+        # Run normal traditional steely plugins.
         if not command in self.plugins:
             return
         plugin = self.plugins[command]
@@ -80,12 +92,20 @@ class SteelyBot(Client):
             thread.deamon = True
             thread.start()
 
+        for plugin in PluginManager.get_passive_listeners():
+            thread = threading.Thread(target=plugin,
+                                      args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
+            thread.deamon = True
+            thread.start()
+
+
     def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
         if author_id == self.uid:
             return
         self.run_non_plugins(author_id, message, thread_id,
                              thread_type, **kwargs)
         self.run_plugin(author_id, message, thread_id, thread_type, **kwargs)
+
 
 
 if __name__ == '__main__':
