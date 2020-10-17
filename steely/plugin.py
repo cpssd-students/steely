@@ -9,7 +9,7 @@ class PluginManager:
     @classmethod
     def get_listener_for_command(cls, command):
         # assumes "command" does not start with "/". Eg., for "/np top 7day", "command" would be "np top 7day"
-        # returns a func to be called against "command"
+        # returns longest matching command and a func to be called against "command"
 
         print('Finding longest match for "/{}".'.format(command))
         print('Active listeners:', ', '.join(cls._command_listeners.keys()))
@@ -19,8 +19,10 @@ class PluginManager:
             if command.startswith(command_listener):
                 if len(command_listener) > longest_match:
                     longest_match = len(command_listener)
-                    longest_matching_listener = cls._command_listeners[command_listener]
-        return longest_matching_listener
+                    longest_matching_listener = command_listener
+        if longest_matching_listener is None:
+            return None, None
+        return longest_matching_listener, cls._command_listeners[longest_matching_listener]
 
     @classmethod
     def add_passive_listener(cls, func):
