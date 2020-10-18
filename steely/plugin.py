@@ -239,6 +239,71 @@ class PluginManager:
 
 
 class Plugin:
+    """A class containing one Steely plugin.
+
+    A plugin can be created by simply calling this class' constructor, eg:
+
+    plugin = Plugin(name='my plugin', author='steely', help='instructions here')
+
+    This plugin can then be configured to listen for specific commands and
+    respond to them. Eg. the following decorated function will listen for any
+    command of the form "/bazinga". Any time a command matching that pattern is
+    sent to a chat the bot is active in, the bazinga() function will be
+    triggered.
+
+    @plugin.listen(command='bazinga')
+    def bazinga(bot, message, ..., **kwargs):
+        bot.sendMessage(message="Bazinga!", ...)
+
+    It is also possible to add more specific patterns to listen for. Arguments
+    that the command needs can be declared here, and they will be automatically
+    parsed from the command call and added as a keyword argument the function
+    receives. The remaining part of the command call, which is not consumed as
+    one of the subcommands or arguments, will be in the 'message' argument to
+    the decorated function.
+
+    @plugin.listen(command='shout insult [nickname] <target_id>')
+    def shout_insult(bot, message, ..., **kwargs):
+        nickname = kwargs['nickname']
+        insult = 'Hey, {}! _{}_'.format(nickname, message)
+        target = kwargs['target_id']
+        bot.sendMessage(insult, thread_id=target, ...)
+
+    The plugin manager will try to match the command call to the most specific
+    declared matcher. Eg. "/np help" will match
+    @plugin.listen(command='np help')
+    and not
+    @plugin.listen(command='np [username]')
+    when both are defined.
+
+    Subcommands required to be included literally (eg. "set" in "/np set") can
+    be included inline in the command matcher string: A matcher for
+    "/linden invest" would simply be @plugin.listen(command='linden invest')
+
+    Optional arguments can be included in the string surrounded by
+    [square brackets]. Eg. @plugin.listen(command='/np [username]')
+
+    Required arguments can be included surrounded by <angle brackets>. Eg.
+    @plugin.listen(command='/roll <dice_string>')
+
+    If no 'command' argument is given to @plugin.listen(), the function will be
+    considered a passive listener, and will be triggered for every message sent
+    to a channel the bot is active in. Eg.:
+
+    @plugin.listen()
+    def respond_to_swearwords(bot, message, ..., **kwargs):
+        if 'heck' in message:
+            bot.sendMessage('this is a christian server!', ...)
+
+    If a plugin has some operations it needs to do on program startup, then
+    those can be performed in a single function annotated by @plugin.setup().
+    If this function returns any value, or raises any exception, then it is
+    acknowledged that there was some error in setting up this plugin, and the
+    command matchers associated with it are ignored. This allows a plugin to be
+    disabled at startup and a warning presented to the admin if some required
+    dependency is not present, instead of the plugin failing on every message
+    at runtime.
+    """
 
     def __init__(self, name, author, help):
         self.name = name
@@ -274,7 +339,6 @@ class Plugin:
             return func
 
         # TODO(iandioch): Add the helpstring so that '/help name' might work.
-        # TODO(iandioch): Consider the fact that "name" and the specific listed commands might be different.
         # TODO(iandioch): Consider that someone shouldn't have to repeat the
         # same root command for all different @plugin.listen() methods in that
         # plugin.
