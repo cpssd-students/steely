@@ -1,5 +1,6 @@
 import logging
 
+from collections import namedtuple
 from enum import Enum
 
 
@@ -17,6 +18,22 @@ class CommandPartType(Enum):
     # "username".
     OPTIONAL_ARGUMENT = 3
 
+# A single possible match of a PluginCommand for some command string from a
+# user.
+CommandMatch = namedtuple('CommandMatch', [
+    # An int with the number of tokens consumed.
+    'num_parts',
+    # An int with some value of the match. Stricter matches (eg.
+    # SUBCOMMAND > REQUIRED_ARGUMENT, REQUIRED_ARGUMENT > OPTIONAL_ARGUMENT) add
+    # a higher value to this match.
+    'value',
+    # An int containing the number of characters of prefix of the given command
+    # were matched by this PluginCommand.
+    'str_len',
+    # A dict {arg_name: arg_value} of args parsed from this command call.
+    'args'
+])
+
 
 class PluginCommand:
 
@@ -30,7 +47,6 @@ class PluginCommand:
         def __init__(self, _str):
             if not len(_str):
                 raise ValueError('Cannot define arg for empty string: ' + _str)
-
             self._str = _str
             if _str[0] == '<' and _str[-1] == '>':
                 # Required arg.
@@ -47,7 +63,6 @@ class PluginCommand:
     def __init__(self, command, func):
         self.command = command
         self.func = func
-
         self.command_parts = self._parse_defined_command_parts(command)
 
     def _parse_defined_command_parts(self, command_str):
@@ -55,8 +70,8 @@ class PluginCommand:
         return [PluginCommand.CommandPart(part) for part in parts]
 
     def _parse_command_call(self, expected_command_parts, called_command_parts):
-        # Returns the number of matched parts, the value of the match, the
-        # string length matched, and a dict of the parsed args.
+        # Returns a CommandMatch tuple for the given expected command parts and
+        # actual given command parts.
         parsed_args = {}
         i = 0
         str_match_len = 0
@@ -78,7 +93,7 @@ class PluginCommand:
                     continue
                 else:
                     # Expected some specific str, got something else, abort.
-                    return 0, 0, 0, {}
+                    return CommandMatch(0, 0, 0, {})
 
             elif expected_part.type is CommandPartType.REQUIRED_ARGUMENT:
                 parsed_args[expected_part.name] = called_command_parts[i]
@@ -94,62 +109,71 @@ class PluginCommand:
                 # or as a topic for a better overall match.
                 # We do this by trying both options, and seeing which has a
                 # better score, erring on the side of over-matching.
-                logging.debug('Trying to match part "{}" against optional command "{}".'.format(
-                    called_command_parts[i], expected_command_parts[i].name))
+                logging.debug(
+                    'Trying to match part "%s" against optional command "%s".',
+                    called_command_parts[i], expected_command_parts[i].name)
 
-                i_matched, value_matched, len_matched, args_matched = self._parse_command_call(
-                    expected_command_parts[i + 1:], called_command_parts[i + 1:])
-                len_matched += len(called_command_parts[i])
-                args_matched[expected_command_parts[
+                match_with_arg = self._parse_command_call(
+                    expected_command_parts[i + 1:],
+                    called_command_parts[i + 1:])
+                match_with_arg.args[expected_command_parts[
                     i].name] = called_command_parts[i]
 
-                i_not_matched, value_not_matched, len_not_matched, args_not_matched = self._parse_command_call(
+                match_with_arg = CommandMatch(match_with_arg.num_parts,
+                                              match_with_arg.value + 1,
+                                              match_with_arg.str_len +
+                                              len(called_command_parts[i]),
+                                              match_with_arg.args)
+
+                match_without_arg = self._parse_command_call(
                     expected_command_parts[i + 1:], called_command_parts[i:])
 
                 # Choose whether matching or not matching this optional argument
                 # creates a better overall match for the string...
-                best_match_i = i_not_matched
-                best_match_value = value_not_matched
-                best_match_len = len_not_matched
-                best_matched_args = args_not_matched
-                if i_matched >= i_not_matched:
-                    logging.debug('Matching "{}" against "{}" is better than not.'.format(
-                        called_command_parts[i], expected_command_parts[i].name))
-                    best_match_i = i_matched
-                    best_match_value = value_matched
-                    best_match_len = len_matched
-                    best_matched_args = args_matched
+                best_match = match_without_arg
+                if match_with_arg.num_parts >= match_without_arg.num_parts:
+                    logging.debug(
+                        'Matching "%s" against "%s" is better than not.',
+                        called_command_parts[i], expected_command_parts[i].name)
+                    best_match = match_with_arg
 
-                # We must add + here because the optional arg was matched either
-                # way, as it is optional...
-                i += best_match_i + 1
-                match_value += 1 + best_match_value
-                parsed_args.update(best_matched_args)
-                str_match_len += best_match_len
+                # We must add 1 here because the optional arg was matched either
+                # way, as it is optional... So 'i' can progress to the next
+                # expected part.
+                i += best_match.num_parts + 1
+                match_value += best_match.value
+                parsed_args.update(best_match.args)
+                str_match_len += best_match.str_len
 
         # If we reached the end of the input string and there is still something
         # expected that _must_ be matched, then this avenue is useless, return
         # no match.
         if i < len(expected_command_parts):
             for other_expected_part in expected_command_parts[i:]:
-                if other_expected_part.type in [CommandPartType.REQUIRED_ARGUMENT,
-                                                CommandPartType.SUBCOMMAND]:
+                if other_expected_part.type in [
+                        CommandPartType.REQUIRED_ARGUMENT,
+                        CommandPartType.SUBCOMMAND]:
                     logging.debug(
-                        'Reached end of command call str, but no match found for "{}".'.format(
+                        'Reached end of command call str, ' +
+                        'but no match found for "{}".'.format(
                             other_expected_part.name))
-                    return 0, 0, 0, {}
+                    return CommandMatch(0, 0, 0, {})
 
         # We don't want i to ever be greater than len(expected_command_parts)...
-        # Not that this should happen.
+        # Not that this should ever happen.
         i = min(i, len(expected_command_parts))
 
         logging.debug('Matched {} parts for call "{}" in plugin "{}"'.format(
             i, called_command_parts, self.command))
-        return i, match_value, str_match_len, parsed_args
+        return CommandMatch(i, match_value, str_match_len, parsed_args)
 
     def get_best_match(self, called_command_parts):
-        # Returns (parts matched, match value, str length of match, matched args dict)
-        return self._parse_command_call(self.command_parts, called_command_parts)
+        # Returns the best possible CommandMatch for this argument.
+        # There may be more than one possible match, depending on whether or not
+        # optional arguments are consumed, so this will find the best possible
+        # one.
+        return self._parse_command_call(self.command_parts,
+                                        called_command_parts)
 
 
 class PluginManager:
@@ -168,45 +192,38 @@ class PluginManager:
 
         command = command.lower().strip()
         logging.debug('Finding longest match for "/{}".'.format(command))
-        logging.debug('Active listeners:', ', '.join(
+        logging.debug('Active listeners: %s', ','.join(
             c.command for c in cls._command_listeners))
 
         command_parts = command.split(' ')
 
-        longest_matching_listener = None
-        longest_match = 0
-
-        best_match_num_parts = 0
-        best_match_value = 0
-        best_match_str_len = 0
-        best_match_args = {}
+        best_match = CommandMatch(0, 0, 0, {})
         best_match_plugin = None
 
         for plugin_command in cls._command_listeners:
-            num_parts, match_value, str_len, args = plugin_command.get_best_match(
-                command_parts)
-            if (num_parts > best_match_num_parts) or (num_parts == best_match_num_parts and match_value > best_match_value):
-                best_match_num_parts = num_parts
-                best_match_value = match_value
-                best_match_str_len = str_len
-                best_match_args = args
+            command_match = plugin_command.get_best_match(command_parts)
+            if ((command_match.num_parts > best_match.num_parts) or
+                (command_match.num_parts == best_match.num_parts and
+                    command_match.value > best_match.value)):
+                best_match = command_match
                 best_match_plugin = plugin_command
 
         if best_match_plugin is None:
-            logging.info('No best matching plugin found for call "{}"'.format(command))
+            logging.info(
+                'No best matching plugin found for call "{}"'.format(command))
             return None, None, None
 
         # The "+ best_match_num_parts - 1" part of this is required to account
         # for the spaces between command parts that are matched but never added
         # anywhere before.
-        total_str_match_len = best_match_str_len + best_match_num_parts - 1
+        total_str_match_len = best_match.str_len + best_match.num_parts - 1
 
         logging.debug(
             'Best matching plugin for call "{}" is "{}", with args: {}'.format(
-                command, best_match_plugin.command, best_match_args))
+                command, best_match_plugin.command, best_match.args))
         logging.debug('This matches {} parts, with prefix substr "{}".'.format(
-            best_match_num_parts, command[:total_str_match_len]))
-        return command[:total_str_match_len], best_match_plugin.func, best_match_args
+            best_match.num_parts, command[:total_str_match_len]))
+        return command[:total_str_match_len], best_match_plugin.func, best_match.args
 
     @classmethod
     def add_passive_listener(cls, func):
@@ -245,12 +262,14 @@ class Plugin:
             try:
                 result = func()
                 if result is not None:
-                    logging.warning('Received error while running setup for plugin "{}":\n{}.'.format(
-                        self.name, result))
+                    logging.warning(
+                        'Received error while running setup for plugin "{}":\n{}.'.format(
+                            self.name, result))
                     self.active = False
             except Exception as e:
-                logging.error('Error thrown while running setup for plugin "{}":\n{}.'.format(
-                    self.name, e))
+                logging.error(
+                    'Error thrown while running setup for plugin "{}":\n{}.'.format(
+                        self.name, e))
                 self.active = False
             return func
 
@@ -267,7 +286,7 @@ class Plugin:
         if not self.active:
             logging.warning(
                 'Tried to set up listener "{}" for plugin "{}", but plugin is not active.'.format(
-                command, self.name))
+                    command, self.name))
             # Return a do-nothing decorator, as we don't want to register this
             # command.
             return lambda _: None

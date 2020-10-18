@@ -14,6 +14,7 @@ import random
 import requests
 import sys
 import threading
+import logging
 
 
 HELP_DOC = '''help <command>
@@ -112,6 +113,7 @@ class SteelyBot(Client):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
     client = SteelyBot(config.EMAIL, config.TELEGRAM_KEY)
     while True:
         with suppress(requests.exceptions.ConnectionError):
