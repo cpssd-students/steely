@@ -11,8 +11,11 @@ class PluginManager:
         # assumes "command" does not start with "/". Eg., for "/np top 7day", "command" would be "np top 7day"
         # returns longest matching command and a func to be called against "command"
 
+        command = command.lower().strip()
         print('Finding longest match for "/{}".'.format(command))
         print('Active listeners:', ', '.join(cls._command_listeners.keys()))
+
+        # TODO(iandioch): Should fix the bug where "/np helperson" would yield "/np help" instead of giving "/np" for user "helperson"
         longest_matching_listener = None
         longest_match = 0
         for command_listener in cls._command_listeners:
@@ -32,7 +35,7 @@ class PluginManager:
     def add_listener_for_command(cls, command, func):
         if command in cls._command_listeners:
             raise KeyError('Tried to add listener for command "{}", but one already exists.'.format(command))
-        cls._command_listeners[command] = func
+        cls._command_listeners[command.lower().strip()] = func
 
     @staticmethod
     def load_plugins():
