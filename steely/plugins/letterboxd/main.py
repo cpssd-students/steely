@@ -5,7 +5,10 @@ from paths import CONFIG
 from formatting import *
 import requests
 
-plugin = create_plugin(name='nw', author='iandioch', help='todo')
+HELP_STR = """'Now Watching' command, to give info on what films someone has
+recently watched, based on letterboxd.com activity."""
+
+plugin = create_plugin(name='nw', author='iandioch', help=HELP_STR)
 
 USERDB = None
 USER = Query()
@@ -63,7 +66,7 @@ def plugin_setup():
 def root_command(bot, author_id, message, thread_id, thread_type, **kwargs):
     user = USERDB.get(USER.id == author_id)
     if 'username' in kwargs:
-        username = kwargs['username'] 
+        username = kwargs['username']
     elif user:
         username = user['username']
     else:
@@ -77,7 +80,8 @@ def root_command(bot, author_id, message, thread_id, thread_type, **kwargs):
                         thread_id=thread_id, thread_type=thread_type)
         return
 
-    bot.sendMessage(f"{username} added {italic(title)} on {date_str}\n{url}", thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage(f"{username} added {italic(title)} on {date_str}\n{url}",
+                    thread_id=thread_id, thread_type=thread_type)
 
 
 @plugin.listen(command='nw set <username>')
@@ -89,15 +93,18 @@ def set_command(bot, author_id, message, thread_id, thread_type, **kwargs):
     username = kwargs['username']
     if not USERDB.search(USER.id == author_id):
         USERDB.insert({'id': author_id, 'username': username})
-        bot.sendMessage('good egg, you\'re now {}'.format(username), thread_id=thread_id,
+        bot.sendMessage('good egg, you\'re now {}'.format(username),
+                        thread_id=thread_id,
                         thread_type=thread_type)
     else:
         USERDB.update({'username': username}, USER.id == author_id)
-        bot.sendMessage('updated egg, you\'re now {}'.format(username), thread_id=thread_id,
+        bot.sendMessage('updated egg, you\'re now {}'.format(username),
+                        thread_id=thread_id,
                         thread_type=thread_type)
 
 
 @plugin.listen(command='nw help')
 def help_command(bot, author_id, message, thread_id, thread_type, **kwargs):
     bot.sendMessage(plugin.help, thread_id=thread_id, thread_type=thread_type)
-    bot.sendMessage('\n'.join(("/" + command) for command in plugin.commands), thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage('\n'.join(("/" + command) for command in plugin.commands),
+                    thread_id=thread_id, thread_type=thread_type)
