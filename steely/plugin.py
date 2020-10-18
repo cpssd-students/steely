@@ -286,6 +286,9 @@ class Plugin:
     Required arguments can be included surrounded by <angle brackets>. Eg.
     @plugin.listen(command='/roll <dice_string>')
 
+    All patterns (subcommands or arguments) are assumed to be single tokens (ie.
+    single words) in a single-space-delimited string.
+
     If no 'command' argument is given to @plugin.listen(), the function will be
     considered a passive listener, and will be triggered for every message sent
     to a channel the bot is active in. Eg.:
