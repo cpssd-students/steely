@@ -59,12 +59,11 @@ def plugin_setup():
     USERDB = new_database('letterboxd')
 
 
-@plugin.listen(command='nw')
+@plugin.listen(command='nw [username]')
 def root_command(bot, author_id, message, thread_id, thread_type, **kwargs):
-    message_parts = message.split(' ')
     user = USERDB.get(USER.id == author_id)
-    if message_parts and len(message_parts[0]):
-        username = message_parts[0]
+    if 'username' in kwargs:
+        username = kwargs['username'] 
     elif user:
         username = user['username']
     else:
@@ -81,23 +80,24 @@ def root_command(bot, author_id, message, thread_id, thread_type, **kwargs):
     bot.sendMessage(f"{username} added {italic(title)} on {date_str}\n{url}", thread_id=thread_id, thread_type=thread_type)
 
 
-@plugin.listen(command='nw set')
+@plugin.listen(command='nw set <username>')
 def set_command(bot, author_id, message, thread_id, thread_type, **kwargs):
-    if not message or not len(message):
+    if 'username' not in kwargs or not len(kwargs['username']):
         bot.sendMessage('no username provided', thread_id=thread_id,
                         thread_type=thread_type)
         return
-    username = message.split(' ')[0]
+    username = kwargs['username']
     if not USERDB.search(USER.id == author_id):
         USERDB.insert({'id': author_id, 'username': username})
-        bot.sendMessage('good egg', thread_id=thread_id,
+        bot.sendMessage('good egg, you\'re now {}'.format(username), thread_id=thread_id,
                         thread_type=thread_type)
     else:
         USERDB.update({'username': username}, USER.id == author_id)
-        bot.sendMessage('updated egg', thread_id=thread_id,
+        bot.sendMessage('updated egg, you\'re now {}'.format(username), thread_id=thread_id,
                         thread_type=thread_type)
 
 
 @plugin.listen(command='nw help')
 def help_command(bot, author_id, message, thread_id, thread_type, **kwargs):
     bot.sendMessage(plugin.help, thread_id=thread_id, thread_type=thread_type)
+    bot.sendMessage('\n'.join(("/" + command) for command in plugin.commands), thread_id=thread_id, thread_type=thread_type)

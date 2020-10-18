@@ -69,10 +69,12 @@ class SteelyBot(Client):
 
         # Run plugins following SEP1 interface.
         full_message = '{} {}'.format(command, message)
-        matched_command, plugin = PluginManager.get_listener_for_command(full_message)
+        matched_command, plugin, args = PluginManager.get_listener_for_command(full_message)
         if matched_command is not None:
+            passed_kwargs = kwargs.copy()
+            passed_kwargs.update(args)
             thread = threading.Thread(target=plugin,
-                    args=(self, author_id, full_message[len(matched_command)+1:], thread_id, thread_type), kwargs=kwargs)
+                    args=(self, author_id, full_message[len(matched_command)+1:], thread_id, thread_type), kwargs=passed_kwargs)
             thread.deamon = True
             thread.start()
 
