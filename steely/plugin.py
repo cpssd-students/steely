@@ -1,3 +1,5 @@
+import logging
+
 from enum import Enum
 
 
@@ -19,11 +21,19 @@ class CommandPartType(Enum):
 class PluginCommand:
 
     class CommandPart:
+        # One specific token in a command string declaration. This has two
+        # fields:
+        # .name contains the name of the argument, or the subcommand string, if
+        # it is a subcommand part and not an argument.
+        # .type is a CommandPartType specifying the type of this command part.
 
         def __init__(self, _str):
+            if not len(_str):
+                raise ValueError('Cannot define arg for empty string: ' + _str)
+
             self._str = _str
-            # TODO(iandioch): Handle zero-len strings edge case
             if _str[0] == '<' and _str[-1] == '>':
+                # Required arg.
                 self.type = CommandPartType.REQUIRED_ARGUMENT
                 self.name = _str[1:-1]
             elif _str[0] == '[' and _str[-1] == ']':
@@ -45,11 +55,18 @@ class PluginCommand:
         return [PluginCommand.CommandPart(part) for part in parts]
 
     def _parse_command_call(self, expected_command_parts, called_command_parts):
-        # Returns the number of matched parts, the string length matched, and a
-        # dict of the parsed args.
+        # Returns the number of matched parts, the value of the match, the
+        # string length matched, and a dict of the parsed args.
         parsed_args = {}
         i = 0
         str_match_len = 0
+
+        # match_value is an arbitrary numeric scoring for how nice this match is.
+        # It allows us to differentiate between "/np help" being a call to
+        # "/np help", or a call to "/np [username]" where username = "help".
+        # The first case, with an exact string match, would have a higher
+        # match_value.
+        match_value = 0
         while i < len(expected_command_parts) and i < len(called_command_parts):
             expected_part = expected_command_parts[i]
             if expected_part.type is CommandPartType.SUBCOMMAND:
@@ -57,15 +74,17 @@ class PluginCommand:
                 if called_command_parts[i] == expected_part.name:
                     str_match_len += len(called_command_parts[i])
                     i += 1
+                    match_value += 5
                     continue
                 else:
                     # Expected some specific str, got something else, abort.
-                    return 0, 0, {}
+                    return 0, 0, 0, {}
 
             elif expected_part.type is CommandPartType.REQUIRED_ARGUMENT:
                 parsed_args[expected_part.name] = called_command_parts[i]
                 str_match_len += len(called_command_parts[i])
                 i += 1
+                match_value += 3
 
             elif expected_part.type is CommandPartType.OPTIONAL_ARGUMENT:
                 # If the expected command is "/help [search_str] <topic>" to
@@ -73,39 +92,38 @@ class PluginCommand:
                 # "search_str", and the called command is "/help jamiroquai",
                 # then decide if we should count "jamiroquai" as a search_str
                 # or as a topic for a better overall match.
-                print('Trying to match part "{}" against optional command "{}".'.format(
+                # We do this by trying both options, and seeing which has a
+                # better score, erring on the side of over-matching.
+                logging.debug('Trying to match part "{}" against optional command "{}".'.format(
                     called_command_parts[i], expected_command_parts[i].name))
 
-                i_matched, len_matched, args_matched = self._parse_command_call(
+                i_matched, value_matched, len_matched, args_matched = self._parse_command_call(
                     expected_command_parts[i + 1:], called_command_parts[i + 1:])
                 len_matched += len(called_command_parts[i])
                 args_matched[expected_command_parts[
                     i].name] = called_command_parts[i]
-                print('If matched: ({}, {}, {})'.format(
-                    i_matched, len_matched, args_matched))
 
-                i_not_matched, len_not_matched, args_not_matched = self._parse_command_call(
+                i_not_matched, value_not_matched, len_not_matched, args_not_matched = self._parse_command_call(
                     expected_command_parts[i + 1:], called_command_parts[i:])
-                print('If not matched: ({}, {}, {})'.format(
-                    i_not_matched, len_not_matched, args_not_matched))
 
                 # Choose whether matching or not matching this optional argument
                 # creates a better overall match for the string...
                 best_match_i = i_not_matched
+                best_match_value = value_not_matched
                 best_match_len = len_not_matched
                 best_matched_args = args_not_matched
                 if i_matched >= i_not_matched:
-                    print('Matching "{}" against "{}" is better than not.'.format(
+                    logging.debug('Matching "{}" against "{}" is better than not.'.format(
                         called_command_parts[i], expected_command_parts[i].name))
                     best_match_i = i_matched
+                    best_match_value = value_matched
                     best_match_len = len_matched
                     best_matched_args = args_matched
-
-                print(best_match_i, best_matched_args)
 
                 # We must add + here because the optional arg was matched either
                 # way, as it is optional...
                 i += best_match_i + 1
+                match_value += 1 + best_match_value
                 parsed_args.update(best_matched_args)
                 str_match_len += best_match_len
 
@@ -116,21 +134,21 @@ class PluginCommand:
             for other_expected_part in expected_command_parts[i:]:
                 if other_expected_part.type in [CommandPartType.REQUIRED_ARGUMENT,
                                                 CommandPartType.SUBCOMMAND]:
-                    print('Reached end of command call str, but no match found for "{}".'.format(
-                        other_expected_part.name))
-                    return 0, 0, {}
+                    logging.debug(
+                        'Reached end of command call str, but no match found for "{}".'.format(
+                            other_expected_part.name))
+                    return 0, 0, 0, {}
 
         # We don't want i to ever be greater than len(expected_command_parts)...
         # Not that this should happen.
         i = min(i, len(expected_command_parts))
 
-        print('Matched {} parts for call "{}" in plugin "{}"'.format(
+        logging.debug('Matched {} parts for call "{}" in plugin "{}"'.format(
             i, called_command_parts, self.command))
-        print('This has matched args: ', parsed_args)
-        return i, str_match_len, parsed_args
+        return i, match_value, str_match_len, parsed_args
 
     def get_best_match(self, called_command_parts):
-        # Returns (parts matched, str length of match, matched args dict)
+        # Returns (parts matched, match value, str length of match, matched args dict)
         return self._parse_command_call(self.command_parts, called_command_parts)
 
 
@@ -144,48 +162,49 @@ class PluginManager:
 
     @classmethod
     def get_listener_for_command(cls, command):
-        # assumes "command" does not start with "/". Eg., for "/np top 7day", "command" would be "np top 7day"
-        # returns longest matching command and a func to be called against
-        # "command"
+        # Assumes "command" does not start with "/". Eg. for "/np top 7day",
+        # "command" would be "np top 7day" returns longest matching command and
+        # a func to be called against "command".
 
         command = command.lower().strip()
-        print('Finding longest match for "/{}".'.format(command))
-        print('Active listeners:', ', '.join(
+        logging.debug('Finding longest match for "/{}".'.format(command))
+        logging.debug('Active listeners:', ', '.join(
             c.command for c in cls._command_listeners))
 
         command_parts = command.split(' ')
 
-        # TODO(iandioch): Should fix the bug where "/np helperson" would yield
-        # "/np help" instead of giving "/np" for user "helperson"
         longest_matching_listener = None
         longest_match = 0
 
         best_match_num_parts = 0
+        best_match_value = 0
         best_match_str_len = 0
         best_match_args = {}
         best_match_plugin = None
 
         for plugin_command in cls._command_listeners:
-            num_parts, str_len, args = plugin_command.get_best_match(
+            num_parts, match_value, str_len, args = plugin_command.get_best_match(
                 command_parts)
-            if (num_parts > best_match_num_parts) or (num_parts == best_match_num_parts and str_len > best_match_str_len):
+            if (num_parts > best_match_num_parts) or (num_parts == best_match_num_parts and match_value > best_match_value):
                 best_match_num_parts = num_parts
+                best_match_value = match_value
                 best_match_str_len = str_len
                 best_match_args = args
                 best_match_plugin = plugin_command
 
         if best_match_plugin is None:
-            print('No best matching plugin found for call "{}"'.format(command))
+            logging.info('No best matching plugin found for call "{}"'.format(command))
             return None, None, None
 
-        # The + best_match_num_parts - 1 part of this is required to account for
-        # the spaces between command parts that are matched but never added
+        # The "+ best_match_num_parts - 1" part of this is required to account
+        # for the spaces between command parts that are matched but never added
         # anywhere before.
         total_str_match_len = best_match_str_len + best_match_num_parts - 1
 
-        print('Best matching plugin for call "{}" is "{}", with args: {}'.format(
-            command, best_match_plugin.command, best_match_args))
-        print('This matches {} parts, with prefix substr "{}".'.format(
+        logging.debug(
+            'Best matching plugin for call "{}" is "{}", with args: {}'.format(
+                command, best_match_plugin.command, best_match_args))
+        logging.debug('This matches {} parts, with prefix substr "{}".'.format(
             best_match_num_parts, command[:total_str_match_len]))
         return command[:total_str_match_len], best_match_plugin.func, best_match_args
 
@@ -208,33 +227,33 @@ class Plugin:
         self.name = name
         self.author = author
         self.help = help
-        # .active decides whether the plugin is available to be used.
+        # .active decides whether the plugin is available to be used. This may
+        # be false if plugin.setup() fails for some reason.
         self.active = True
         self.commands = []
 
     def setup(self):
-        # TODO(iandioch): Right now, this decorator must be run like the following:
+        # TODO(iandioch): Right now, this decorator must be run like the
+        # following:
         # @setup()
         # def setup_func():
         #   ...
         #
-        # However, it should also be possible to run it without the brackets after @setup,
-        # as a naked decorator.
+        # However, it should also be possible to run it without the brackets
+        # after @setup, as a naked decorator.
         def wrapper(func):
             try:
                 result = func()
                 if result is not None:
-                    print('Received error while running setup for plugin "{}":\n{}.'.format(
+                    logging.warning('Received error while running setup for plugin "{}":\n{}.'.format(
                         self.name, result))
-                    print(self.name)
                     self.active = False
             except Exception as e:
-                print('Error thrown while running setup for plugin "{}":\n{}.'.format(
+                logging.error('Error thrown while running setup for plugin "{}":\n{}.'.format(
                     self.name, e))
                 self.active = False
             return func
 
-        print('active?', self.active)
         # TODO(iandioch): Add the helpstring so that '/help name' might work.
         # TODO(iandioch): Consider the fact that "name" and the specific listed commands might be different.
         # TODO(iandioch): Consider that someone shouldn't have to repeat the
@@ -246,13 +265,14 @@ class Plugin:
         # TODO(iandioch): Make it possible to run this as a naked decorator for
         # plugins that are passively listening.
         if not self.active:
-            print('Tried to set up listener "{}" for plugin "{}", but plugin is not active.'.format(
+            logging.warning(
+                'Tried to set up listener "{}" for plugin "{}", but plugin is not active.'.format(
                 command, self.name))
             # Return a do-nothing decorator, as we don't want to register this
             # command.
             return lambda _: None
 
-        print('Adding command "{}" to plugin "{}" by "{}".'.format(
+        logging.debug('Adding command "{}" to plugin "{}" by "{}".'.format(
             command, self.name, self.author))
         # TODO(iandioch): Add functools.wraps() to update __name__, etc.
 
@@ -265,7 +285,7 @@ class Plugin:
             return func
 
         if command is not None:
-            print('Adding command {} to list for plugin {}'.format(
+            logging.debug('Adding command {} to list for plugin {}'.format(
                 command, self.name))
             self.commands.append(command)
 
