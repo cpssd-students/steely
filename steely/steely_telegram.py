@@ -6,6 +6,7 @@ from telegram_fbchat_facade import log, Client
 from tinydb import TinyDB
 from vapor import vapor
 from utils import list_plugins
+from plugin import PluginManager
 import config
 import imp
 import os
@@ -13,6 +14,7 @@ import random
 import requests
 import sys
 import threading
+import logging
 
 
 HELP_DOC = '''help <command>
@@ -35,6 +37,7 @@ class SteelyBot(Client):
         self.load_plugins()
 
     def load_plugins(self):
+        PluginManager.load_plugins()
         self.non_plugins = []
         self.plugins = {}
         self.plugin_helps = {
@@ -64,6 +67,19 @@ class SteelyBot(Client):
         if parsed_message is None:
             return
         command, message = parsed_message
+
+        # Run plugins following SEP1 interface.
+        full_message = '{} {}'.format(command, message)
+        matched_command, plugin, args = PluginManager.get_listener_for_command(full_message)
+        if matched_command is not None:
+            passed_kwargs = kwargs.copy()
+            passed_kwargs.update(args)
+            thread = threading.Thread(target=plugin,
+                    args=(self, author_id, full_message[len(matched_command)+1:], thread_id, thread_type), kwargs=passed_kwargs)
+            thread.deamon = True
+            thread.start()
+
+        # Run normal traditional steely plugins.
         if not command in self.plugins:
             return
         plugin = self.plugins[command]
@@ -79,6 +95,13 @@ class SteelyBot(Client):
             thread.deamon = True
             thread.start()
 
+        for plugin in PluginManager.get_passive_listeners():
+            thread = threading.Thread(target=plugin,
+                                      args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
+            thread.deamon = True
+            thread.start()
+
+
     def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
         if author_id == self.uid:
             return
@@ -90,7 +113,9 @@ class SteelyBot(Client):
         self.run_plugin(author_id, message, thread_id, thread_type, **kwargs)
 
 
+
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
     client = SteelyBot(config.EMAIL, config.TELEGRAM_KEY)
     while True:
         with suppress(requests.exceptions.ConnectionError):
