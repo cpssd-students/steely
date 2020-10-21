@@ -7,6 +7,7 @@ from tinydb import TinyDB
 from vapor import vapor
 from utils import list_plugins
 from plugin import PluginManager
+from message import SteelyMessage
 import config
 import imp
 import os
@@ -102,15 +103,16 @@ class SteelyBot(Client):
             thread.start()
 
 
-    def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
-        if author_id == self.uid:
+    def onMessage(self, message: SteelyMessage):
+        if message.author_id == self.uid:
             return
-        if message is None or message == '':
+        if message.text is None or message.text == '':
             # May occur when an image or sticker is sent.
             return
-        self.run_non_plugins(author_id, message, thread_id,
-                             thread_type, **kwargs)
-        self.run_plugin(author_id, message, thread_id, thread_type, **kwargs)
+        self.run_non_plugins(message.author_id, message.text, message.thread_id,
+                             message.thread_type)
+        self.run_plugin(message.author_id, message.text, message.thread_id,
+                        message.thread_type)
 
 
 
