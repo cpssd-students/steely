@@ -4,10 +4,11 @@ from collections import defaultdict, deque
 from enum import Enum
 
 from utils import new_database
+from message import SteelyMessage
 
 from tinydb import Query
-from telegram import ParseMode, error as telegram_error
-from telegram.ext import Updater, MessageHandler
+from telegram import ParseMode, Update as TelegramUpdate, error as telegram_error
+from telegram.ext import Updater, MessageHandler, CallbackContext
 from telegram.ext.filters import Filters
 
 ThreadType = Enum('ThreadType', 'USER GROUP')
@@ -110,20 +111,29 @@ class Client:
         self.thread = defaultdict(lambda: deque(iterable=[],
             maxlen=Client.NUM_STORED_MESSAGES_IN_THREAD))
 
+    def _create_steely_message(self, author_id, text, thread_id, thread_type):
+        m = SteelyMessage()
+        m.author_id = author_id
+        m.text = text
+        m.thread_id = thread_id
+        m.thread_type = thread_type
+        return m
+
     def listen(self):
-        def innerOnMessage(bot, update):
+        def innerOnMessage(update: TelegramUpdate, context: CallbackContext):
             try:
-                print(update.message)
+                bot = context.bot
                 thread_id = update.effective_chat.id
-                thread_type = _telegram_chat_to_fbchat_thread_type(
-                        update.effective_chat)
-                self.thread[thread_id].append(update.effective_message)
                 author_id = update.effective_user.id
+                self.thread[thread_id].append(update.effective_message)
                 self.user_manager.maybe_add_user(self.bot, thread_id, author_id)
-                self.onMessage(author_id=author_id,
-                               message=update.effective_message.text,
-                               thread_id=thread_id,
-                               thread_type=thread_type)
+
+                message = self._create_steely_message(
+                        author_id = author_id,
+                        text = update.effective_message.text,
+                        thread_id = thread_id,
+                        thread_type = _telegram_chat_to_fbchat_thread_type(update.effective_chat))
+                self.onMessage(message)
             except Exception as e:
                 log(e)
         self.dispatcher.add_handler(MessageHandler(filters=Filters.all,
@@ -184,7 +194,7 @@ class Client:
             log(e)
 
 
-    def onMessage(self, author_id, message, thread_id, thread_type, **kwargs):
+    def onMessage(self, message: SteelyMessage):
         '''Handler method; to be overriden.'''
         pass
 
