@@ -63,20 +63,25 @@ class SteelyBot(Client):
         clean_command = command.split('@')[0].lower().strip()
         return clean_command, message
 
-    def run_plugin(self, author_id, message, thread_id, thread_type, **kwargs):
-        parsed_message = self.parse_command_message(message)
+    def run_plugin(self, message: SteelyMessage):
+        parsed_message = self.parse_command_message(message.text)
         if parsed_message is None:
             return
-        command, message = parsed_message
+        command, rest_of_message = parsed_message
 
         # Run plugins following SEP1 interface.
-        full_message = '{} {}'.format(command, message)
-        matched_command, plugin, args = PluginManager.get_listener_for_command(full_message)
+        full_message = '{} {}'.format(command, rest_of_message)
+        matched_command, plugin, args = PluginManager.get_listener_for_command(
+            full_message)
         if matched_command is not None:
-            passed_kwargs = kwargs.copy()
-            passed_kwargs.update(args)
             thread = threading.Thread(target=plugin,
-                    args=(self, author_id, full_message[len(matched_command)+1:], thread_id, thread_type), kwargs=passed_kwargs)
+                                      args=(self,
+                                            message.author_id,
+                                            full_message[
+                                                len(matched_command) + 1:],
+                                            message.thread_id,
+                                            message.thread_type),
+                                      kwargs=args)
             thread.deamon = True
             thread.start()
 
@@ -85,23 +90,37 @@ class SteelyBot(Client):
             return
         plugin = self.plugins[command]
         thread = threading.Thread(target=plugin.main,
-                                  args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
+                                  args=(self,
+                                        message.author_id,
+                                        message.text,
+                                        message.thread_id,
+                                        message.thread_type),
+                                  kwargs={})
         thread.deamon = True
         thread.start()
 
-    def run_non_plugins(self, author_id, message, thread_id, thread_type, **kwargs):
+    def run_non_plugins(self, message: SteelyMessage):
         for plugin in self.non_plugins:
             thread = threading.Thread(target=plugin.main,
-                                      args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
+                                      args=(self,
+                                            message.author_id,
+                                            message.text,
+                                            message.thread_id,
+                                            message.thread_type),
+                                      kwargs={})
             thread.deamon = True
             thread.start()
 
         for plugin in PluginManager.get_passive_listeners():
             thread = threading.Thread(target=plugin,
-                                      args=(self, author_id, message, thread_id, thread_type), kwargs=kwargs)
+                                      args=(self,
+                                            message.author_id,
+                                            message.text,
+                                            message.thread_id,
+                                            message.thread_type),
+                                      kwargs={})
             thread.deamon = True
             thread.start()
-
 
     def onMessage(self, message: SteelyMessage):
         if message.author_id == self.uid:
@@ -109,11 +128,8 @@ class SteelyBot(Client):
         if message.text is None or message.text == '':
             # May occur when an image or sticker is sent.
             return
-        self.run_non_plugins(message.author_id, message.text, message.thread_id,
-                             message.thread_type)
-        self.run_plugin(message.author_id, message.text, message.thread_id,
-                        message.thread_type)
-
+        self.run_non_plugins(message)
+        self.run_plugin(message)
 
 
 if __name__ == '__main__':
