@@ -9,6 +9,7 @@ from utils import list_plugins
 from plugin import PluginManager
 from message import SteelyMessage
 import config
+import copy
 import imp
 import os
 import random
@@ -74,13 +75,10 @@ class SteelyBot(Client):
         matched_command, plugin, args = PluginManager.get_listener_for_command(
             full_message)
         if matched_command is not None:
+            passed_message = copy.copy(message)
+            passed_message.text = full_message[len(matched_command) + 1:]
             thread = threading.Thread(target=plugin,
-                                      args=(self,
-                                            message.author_id,
-                                            full_message[
-                                                len(matched_command) + 1:],
-                                            message.thread_id,
-                                            message.thread_type),
+                                      args=(self, passed_message),
                                       kwargs=args)
             thread.deamon = True
             thread.start()
@@ -113,11 +111,7 @@ class SteelyBot(Client):
 
         for plugin in PluginManager.get_passive_listeners():
             thread = threading.Thread(target=plugin,
-                                      args=(self,
-                                            message.author_id,
-                                            message.text,
-                                            message.thread_id,
-                                            message.thread_type),
+                                      args=(self, message),
                                       kwargs={})
             thread.deamon = True
             thread.start()

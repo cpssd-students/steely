@@ -1,4 +1,5 @@
 from plugin import create_plugin, PluginManager
+from message import SteelyMessage
 from utils import new_database
 from tinydb import Query
 from paths import CONFIG
@@ -63,48 +64,51 @@ def plugin_setup():
 
 
 @plugin.listen(command='nw [username]')
-def root_command(bot, author_id, message, thread_id, thread_type, **kwargs):
-    user = USERDB.get(USER.id == author_id)
+def root_command(bot, message: SteelyMessage, **kwargs):
+    user = USERDB.get(USER.id == message.author_id)
     if 'username' in kwargs:
         username = kwargs['username']
     elif user:
         username = user['username']
     else:
         bot.sendMessage(f'include username please or use `/nw set`',
-                        thread_id=thread_id, thread_type=thread_type)
+                        thread_id=message.thread_id,
+                        thread_type=message.thread_type)
         return
 
     title, date_str, url = get_most_recent_film(username)
     if title is None:
         bot.sendMessage(f'Could not load most recent film for {username}.',
-                        thread_id=thread_id, thread_type=thread_type)
+                        thread_id=message.thread_id,
+                        thread_type=message.thread_type)
         return
 
     bot.sendMessage(f"{username} added {italic(title)} on {date_str}\n{url}",
-                    thread_id=thread_id, thread_type=thread_type)
+                    thread_id=message.thread_id,
+                    thread_type=message.thread_type)
 
 
 @plugin.listen(command='nw set <username>')
-def set_command(bot, author_id, message, thread_id, thread_type, **kwargs):
+def set_command(bot, message: SteelyMessage, **kwargs):
     if 'username' not in kwargs or not len(kwargs['username']):
-        bot.sendMessage('no username provided', thread_id=thread_id,
-                        thread_type=thread_type)
+        bot.sendMessage('no username provided', thread_id=message.thread_id,
+                        thread_type=message.thread_type)
         return
     username = kwargs['username']
-    if not USERDB.search(USER.id == author_id):
-        USERDB.insert({'id': author_id, 'username': username})
+    if not USERDB.search(USER.id == message.author_id):
+        USERDB.insert({'id': message.author_id, 'username': username})
         bot.sendMessage('good egg, you\'re now {}'.format(username),
-                        thread_id=thread_id,
-                        thread_type=thread_type)
+                        thread_id=message.thread_id,
+                        thread_type=message.thread_type)
     else:
-        USERDB.update({'username': username}, USER.id == author_id)
+        USERDB.update({'username': username}, USER.id == message.author_id)
         bot.sendMessage('updated egg, you\'re now {}'.format(username),
-                        thread_id=thread_id,
-                        thread_type=thread_type)
+                        thread_id=message.thread_id,
+                        thread_type=message.thread_type)
 
 
 @plugin.listen(command='nw help')
-def help_command(bot, author_id, message, thread_id, thread_type, **kwargs):
+def help_command(bot, message: SteelyMessage, **kwargs):
     bot.sendMessage(plugin.help, thread_id=thread_id, thread_type=thread_type)
     bot.sendMessage('\n'.join(("/" + command) for command in plugin.commands),
-                    thread_id=thread_id, thread_type=thread_type)
+                    thread_id=message.thread_id, thread_type=message.thread_type)
