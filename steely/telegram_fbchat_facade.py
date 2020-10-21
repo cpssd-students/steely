@@ -8,7 +8,7 @@ from message import SteelyMessage
 
 from tinydb import Query
 from telegram import ParseMode, Update as TelegramUpdate, error as telegram_error
-from telegram.ext import Updater, MessageHandler, CallbackContext
+from telegram.ext import Updater, MessageHandler, CallbackContext, CallbackQueryHandler
 from telegram.ext.filters import Filters
 
 ThreadType = Enum('ThreadType', 'USER GROUP')
@@ -125,6 +125,15 @@ class Client:
                 bot = context.bot
                 thread_id = update.effective_chat.id
                 author_id = update.effective_user.id
+
+                if update.callback_query is not None:
+                    # If update.callback_query is present, that means that
+                    # someone hit a button ('keyboard') from a message in the
+                    # chat. To make things easier, we'll consider that as a
+                    # message str, instead of creating a separate workflow just
+                    # for buttons.
+                    update.effective_message.text = update.callback_query.data
+
                 self.thread[thread_id].append(update.effective_message)
                 self.user_manager.maybe_add_user(self.bot, thread_id, author_id)
 
@@ -132,12 +141,15 @@ class Client:
                         author_id = author_id,
                         text = update.effective_message.text,
                         thread_id = thread_id,
-                        thread_type = _telegram_chat_to_fbchat_thread_type(update.effective_chat))
+                        thread_type = _telegram_chat_to_fbchat_thread_type(
+                            update.effective_chat))
                 self.onMessage(message)
             except Exception as e:
                 log(e)
         self.dispatcher.add_handler(MessageHandler(filters=Filters.all,
                                                    callback=innerOnMessage))
+
+        self.dispatcher.add_handler(CallbackQueryHandler(callback=innerOnMessage))
         self.updater.start_polling()
         self.updater.idle()
 
@@ -145,7 +157,7 @@ class Client:
         # TODO(iandioch): Do this more efficiently than list()
         return list(self.thread[thread_id])[::-1][:limit]
 
-    def sendMessage(self, text, thread_id, thread_type):
+    def sendMessage(self, text, thread_id, thread_type, *args, **kwargs):
         '''Sends a message.
 
         Args:
@@ -154,10 +166,10 @@ class Client:
             thread_type (str): Is thrown away.'''
         try:
             sent_message = self.bot.send_message(chat_id=thread_id, text=text,
-                                                 parse_mode=ParseMode.MARKDOWN)
+                                                 parse_mode=ParseMode.MARKDOWN, *args, **kwargs)
         except telegram_error.BadRequest as e:
             # If it fails to send as markdown, try to send as plaintext.
-            sent_message = self.bot.send_message(chat_id=thread_id, text=text)
+            sent_message = self.bot.send_message(chat_id=thread_id, text=text, *args, **kwargs)
             print('Failed to send as markdown, sent as plaintext.')
 
         # Add steely's response to the log so you can mock him, etc.
