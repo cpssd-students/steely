@@ -59,4 +59,14 @@ def hire(bot, message, **kwargs):
 
 @plugin.listen(command='intern check')
 def check(bot, author_id, message, thread_id, thread_type, **kwargs):
+    intern_ = get_intern_for_manager(message.author_id)
+    if intern_ is None:
+        hire_button = InlineKeyboardButton('Hire an intern now',
+                                           callback_data='/intern hire')
+        reply_markup = InlineKeyboardMarkup([[hire_button]], n_cols=1)
+        manager_info = bot.fetchUserInfo(message.author_id)[0]
+        bot.sendMessage('{} has no intern!'.format(manager_info['full_name']),
+                        thread_id=thread_id,
+                        thread_type=thread_type,
+                        reply_markup=reply_markup)
     pass
