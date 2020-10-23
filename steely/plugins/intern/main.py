@@ -4,6 +4,7 @@ from formatting import *
 from utils import new_database
 from plugin import create_plugin 
 from plugins.intern.db import *
+from plugins.intern import simulation
 
 HELP_STR = """
 """
@@ -58,7 +59,7 @@ def hire(bot, message, **kwargs):
                     reply_markup=reply_markup)
 
 @plugin.listen(command='intern check')
-def check(bot, author_id, message, thread_id, thread_type, **kwargs):
+def check(bot, message, **kwargs):
     intern_ = get_intern_for_manager(message.author_id)
     if intern_ is None:
         hire_button = InlineKeyboardButton('Hire an intern now',
@@ -69,4 +70,11 @@ def check(bot, author_id, message, thread_id, thread_type, **kwargs):
                         thread_id=thread_id,
                         thread_type=thread_type,
                         reply_markup=reply_markup)
-    pass
+        return
+
+    bot.sendMessage(render_intern_info(intern_),
+                    thread_id=message.thread_id,
+                    thread_type=message.thread_type)
+    bot.sendMessage(simulation.check(intern_),
+                    thread_id=message.thread_id,
+                    thread_type=message.thread_type)

@@ -2,10 +2,13 @@ import random
 import uuid
 from typing import Union
 
+import requests
+
 from tinydb import Query
 
 from formatting import *
 from utils import new_database
+from plugins.intern.task import Task
 
 DATABASE = None
 INTERN = Query()
@@ -15,6 +18,7 @@ NUM_UNHIRED_INTERNS = 3
 def setup_database():
     global DATABASE
     DATABASE = new_database('intern')
+
 
 class Intern:
     # User-facing name ("Cian Ruane").
@@ -35,8 +39,10 @@ class Intern:
     # None means this intern is on the job market.
     manager: Union[str, None] = None
 
+    task: Union[Task, None] = None
+
     @staticmethod
-    def serialize(intern_) -> str:
+    def serialize(intern_):
         d = {
             'name': intern_.name,
             'id_': intern_.id_,
@@ -47,6 +53,8 @@ class Intern:
         }
         if intern_.manager is not None:
             d['manager'] = intern_.manager
+        if intern_.task is not None:
+            d['task'] = Task.serialize(intern_.task)
         return d
 
     @staticmethod
@@ -58,13 +66,15 @@ class Intern:
         n.focus = obj['focus']
         n.efficiency = obj['efficiency']
         n.manager = obj['manager'] if 'manager' in obj else None
+        n.task = Task.deserialize(obj['task']) if 'task' in obj else None
         return n
 
     @staticmethod
     def generate():
         def generate_name() -> str:
-            # TODO(iandioch): Make a proper list of firsts + lasts.
-            return random.choice('abcdefgh') + ' ' + random.choice('abcdefgh')
+            URL = 'http://names.drycodes.com/1'
+            data = requests.get(URL).json()
+            return data[0].replace('_', ' ')
         n = Intern()
         n.name = generate_name()
         n.id_ = uuid.uuid4().hex
@@ -93,6 +103,7 @@ def get_intern_for_manager(user_id: str) -> Union[Intern, None]:
 
 
 def get_unhired_interns():
+    # Sorted by name.
     while True:
         unhired = DATABASE.search(~(INTERN.manager.exists()))
         # If there aren't enough interns on the market, add them one at a time
@@ -105,6 +116,11 @@ def get_unhired_interns():
         interns = [Intern.deserialize(u) for u in unhired]
         interns.sort(key = lambda x: x.name)
         return interns
+
+
+def get_hired_interns():
+    resp = DATABASE.search(INTERN.manager.exists())
+    yield from (Intern.deserialize(u) for u in unhired)
 
 
 def render_intern_info(intern_: Intern) -> str:
