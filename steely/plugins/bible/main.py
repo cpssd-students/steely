@@ -1,11 +1,11 @@
 import json
 import random
 
-from plugin import create_plugin, PluginManager
+from plugin import create_plugin
 from message import SteelyMessage
 
 HELP_STR = """
-Request your faviourite bible quotes, right to the chat.
+Request your favourite bible quotes, right to the chat.
 """
 BIBLE_FILE = "plugins/bible/en_kjv.json"
 
