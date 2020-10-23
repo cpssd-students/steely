@@ -90,7 +90,7 @@ class SteelyBot(Client):
         thread = threading.Thread(target=plugin.main,
                                   args=(self,
                                         message.author_id,
-                                        message.text,
+                                        rest_of_message,
                                         message.thread_id,
                                         message.thread_type),
                                   kwargs={})
