@@ -5,6 +5,7 @@ from collections import namedtuple
 
 from plugins.intern.db import *
 from plugins.intern.task import *
+from plugins.linden import get_balance, handle_intern_earnings
 
 
 def create_task_for_intern(intern_: Intern):
@@ -37,23 +38,27 @@ def create_task_for_intern(intern_: Intern):
 def get_investment_result(intern_: Intern):
     InvestmentResult = namedtuple('InvestmentResult', 'Bad Ok Good')
     options = [InvestmentResult.Bad, InvestmentResult.Ok, InvestmentResult.Good]
-    # intelligence is in range 1..5
     weights = [3 + (5 - intern_.intelligence)*2, 5, 3 + intern_.intelligence]
-    print(options)
-    print(weights)
     result = random.choices(options, weights=weights, k=1)[0]
 
-    # TODO(iandioch): Actually add or remove lindens.
-    # TODO(iandioch): Check that the manager has lindens to lose.
+    num = 0
+    status = ''
     if result is InvestmentResult.Bad:
-        num = random.randint(3, 20)
-        return f'{intern_.name} followed a penny stock investment strategy they found on /r/wsb, and lost {num} lindens.'
-    if result is InvestmentResult.Ok:
+        num = -random.randint(3, 20)
+        if get_balance(intern_.manager) + num < 0:
+            return f"{intern_.name} tried to invest your Lindens, but you didn't have enough..."
+        status = f'{intern_.name} followed a penny stock investment strategy they found on /r/wsb, and lost {num} lindens.'
+    elif result is InvestmentResult.Ok:
         num = random.randint(2, 22)
-        return f'{intern_.name} randomly bought and sold some shares, and gained {num} lindens.'
-    if result is InvestmentResult.Good:
+        status = f'{intern_.name} randomly bought and sold some shares, and gained {num} lindens.'
+    elif result is InvestmentResult.Good:
         num = random.randint(20, 100)
-        return f'{intern_.name} studied the earnings of some oil companies, made a smart bet, and earned {num} lindens.'
+        status = f'{intern_.name} studied the earnings of some oil companies, made a smart bet, and earned {num} lindens.'
+
+    handle_intern_earnings(intern_.manager, num)
+    return status
+
+
 
 
 def get_busy_string(intern_: Intern, task_type: TaskType):
@@ -108,7 +113,8 @@ def check(intern_: Intern):
         return get_busy_string(intern_, task.type_)
 
     # Intern finished their previous task too long ago, now they're doing nothing.
-    if datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=3) > task.end_time:
+    if (datetime.datetime.now(datetime.timezone.utc) -
+            datetime.timedelta(hours=6) > task.end_time):
         intern_.task = create_task_for_intern(intern_)
         # If the intern is not checked on for a while, their focus can decrease.
         if random.random() < 0.2:
