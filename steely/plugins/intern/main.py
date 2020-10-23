@@ -6,8 +6,19 @@ from plugin import create_plugin
 from plugins.intern.db import *
 from plugins.intern import simulation
 
-HELP_STR = """
-"""
+HELP_STR = """Your own personal Steely intern.
+
+This intern can work away on various projects, and might even try to earn you some Lindens.
+
+You can hire an intern with `/intern hire`.
+You can check up on them with `/intern check`.
+
+Each intern has various attributes that affect their performance at their tasks:
+Intelligence makes them more likely to succeed at investing.
+Focus influences the tasks they attempt, and generally makes them more useful.
+Efficiency influences the speed at which they can move through tasks.
+
+Make sure to treat your young intern well!"""
 plugin = create_plugin(name='intern', author='iandioch', help=HELP_STR)
 
 @plugin.setup()
@@ -78,3 +89,10 @@ def check(bot, message, **kwargs):
     bot.sendMessage(simulation.check(intern_),
                     thread_id=message.thread_id,
                     thread_type=message.thread_type)
+
+@plugin.listen(command='intern')
+@plugin.listen(command='intern help')
+def root(bot, message, **kwargs):
+    bot.sendMessage(HELP_STR,
+            thread_id=message.thread_id,
+            thread_type=message.thread_type)
