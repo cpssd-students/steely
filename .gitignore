@@ -60,6 +60,7 @@ ENV/
 # steely spcific 
 logs/
 databases/
+steely/plugins/bible/en_kjv.json
 
 .idea
 

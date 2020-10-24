@@ -236,6 +236,7 @@ class PluginManager:
     @staticmethod
     def load_plugins():
         import plugins.letterboxd.main
+        import plugins.bible.main
 
 
 class Plugin:
