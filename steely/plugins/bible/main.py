@@ -7,6 +7,16 @@ from message import SteelyMessage
 
 HELP_STR = """
 Request your favourite bible quotes, right to the chat.
+
+Usage:
+    /bible - Random quote
+    /bible Genesis 1:3 - Specific verse
+    /bible help - This help text
+
+    Verses are specified in the format {book} {chapter}:{verse}
+
+TODO: Book acronyms, e.g. Gen -> Genesis
+TODO: Verse ranges, e.g. Genesis 1:1-3
 """
 BIBLE_FILE = "plugins/bible/en_kjv.json"
 BIBLE_URL = 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json/en_kjv.json'
@@ -44,7 +54,7 @@ def plugin_setup():
 @plugin.listen(command='bible help')
 def help_command(bot, message: SteelyMessage, **kwargs):
     bot.sendMessage(
-            "Simply call /bible to receive your daily dose of the good book",
+            HELP_STR,
             thread_id=message.thread_id, thread_type=message.thread_type)
 
 
@@ -61,7 +71,6 @@ def get_quote(book, chapter, verse):
 
 
 def get_quote_from_ref(book_name, ref):
-    print("Book to i", book_to_index)
     if book_name.lower() not in book_to_index:
         return "Could not find book name: " + book_name
     book_i = book_to_index[book_name.lower()]
