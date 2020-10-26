@@ -131,6 +131,8 @@ def check(intern_: Intern):
     if task.type_ is TaskType.STUDYING:
         s = get_busy_string(intern_, task.type_)
         if intern_.intelligence < 5 and random.random() < 0.5:
+            intern_.intelligence += 1
+            update_intern(intern_)
             return s + '\n' + f"{intern_.name}'s intelligence increased."
         return s
     if task.type_ is TaskType.INVESTING:
