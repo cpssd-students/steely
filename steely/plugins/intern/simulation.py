@@ -13,9 +13,8 @@ def create_task_for_intern(intern_: Intern):
         return (range_lo + (value - domain_lo) * (range_hi - range_lo) /
                 (domain_hi - domain_lo))
     options = [TaskType.DOSSING, TaskType.STUDYING, TaskType.INVESTING]
-    # All weights in range 1..10
     weights = [10 - _lerp(1, 5, 1, 10, intern_.focus),
-               _lerp(1, 5, 1, 10, intern_.focus),
+               intern_.focus,
                _lerp(1, 5, 1, 10, intern_.focus)]
 
     print('for intern:')
