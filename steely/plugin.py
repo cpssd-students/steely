@@ -236,8 +236,9 @@ class PluginManager:
     @staticmethod
     def load_plugins():
         import plugins.letterboxd.main
+        import plugins.corona.main
         import plugins.bible.main
-
+        
 
 class Plugin:
     """A class containing one Steely plugin.
