@@ -19,7 +19,6 @@ def get_canton_data(canton='ZH'):
     # might not take hospital counts until the evening, etc.).
     csv_url = f'https://github.com/openZH/covid_19/raw/master/fallzahlen_kanton_total_csv_v2/COVID19_Fallzahlen_Kanton_{canton}_total.csv'
     csv_lines = requests.get(csv_url).iter_lines()
-    print(csv_lines)
     reader = csv.reader(codecs.iterdecode(csv_lines, 'utf-8'), delimiter=',')
     # Columns of CSV:
     # [0: date, 1: time, 2: abbreviation_canton_and_fl, 3: ncumul_tested, 
