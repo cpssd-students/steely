@@ -191,6 +191,14 @@ def handle_gex_sell_cards(user_id, ticker, profit):
         if profit < -val:
             gex.gex_give(REED_ID, '{}-loss'.format(val), user_id)
 
+def handle_intern_earnings(user_id, delta):
+    receiver = USERDB.get(USER.id == user_id)
+    if not receiver:
+        raise ValueError(f'No Linden user for ID {user_id}.')
+    new_balance = receiver['lindens'] + delta
+    if new_balance < 0:
+        raise ValueError('New Linden balance is negative.')
+    USERDB.update({'lindens': new_balance}, USER.id == user_id)
 
 def get_balance(user_id):
     matching_users = USERDB.search(USER.id == user_id)
