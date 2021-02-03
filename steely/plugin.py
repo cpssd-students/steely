@@ -244,6 +244,8 @@ class PluginManager:
         import plugins.text_mods.mock
         import plugins.text_mods.muck
         import plugins.text_mods.sort
+        import plugins.text_mods.shout
+        import plugins.text_mods.search
         
 
 class Plugin:
