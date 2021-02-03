@@ -242,6 +242,7 @@ class PluginManager:
         import plugins.text_mods.stretch
         import plugins.text_mods.substitutions
         import plugins.text_mods.mock
+        import plugins.text_mods.muck
         
 
 class Plugin:
