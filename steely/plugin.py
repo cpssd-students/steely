@@ -240,6 +240,7 @@ class PluginManager:
         import plugins.corona.main
         import plugins.bible.main
         import plugins.text_mods.stretch
+        import plugins.text_mods.substitutions
         
 
 class Plugin:
