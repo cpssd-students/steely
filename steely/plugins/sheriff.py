@@ -17,7 +17,7 @@ def parse_emoji_data(url):
 
 COMMAND = 'sheriff'
 TEMPLATE = """⠀ ⠀ ⠀  🤠\n　   {emoji}{emoji}{emoji}\n    {emoji}   {emoji}　{emoji}\n   👇   {emoji}{emoji} 👇\n  　  {emoji}　{emoji}\n　   {emoji}　 {emoji}\n　   👢     👢\nhowdy. i'm the sheriff of {name}"""
-EMOJI_URL = 'https://raw.githubusercontent.com/muan/emojilib/master/emojis.json'
+EMOJI_URL = 'https://raw.githubusercontent.com/muan/emojilib/4cee8ed17f697b8a5a2e55d8d588ba0d9ce46c4c/emojis.json'
 EMOJI_DATA = parse_emoji_data(EMOJI_URL)
 
 
