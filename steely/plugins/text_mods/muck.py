@@ -23,5 +23,5 @@ def vowel_switch(string):
 def mock_listener(bot, trigger: SteelyMessage, **kwargs):
     message = bot.fetchThreadMessages(thread_id=trigger.thread_id, limit=2)[1]
     bot.sendMessage(vowel_switch(message.text),
-            thread_id=trigger.thread_id,
-            thread_type=trigger.thread_type)
+                    thread_id=trigger.thread_id,
+                    thread_type=trigger.thread_type)

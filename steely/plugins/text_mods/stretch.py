@@ -4,7 +4,7 @@ from plugin import create_plugin
 from message import SteelyMessage
 
 plugin = create_plugin(name='stretch', author='CianLR',
-        help='gives the previous message sttrreeetttccchhhheeeeddddd')
+                       help='gives the previous message sttrreeetttccchhhheeeeddddd')
 
 STRETCH_FACTOR = 5
 
@@ -16,8 +16,8 @@ def stretch(bot, trigger: SteelyMessage, **kwargs):
         return
     if len(message.text) > 300:
         bot.sendMessage('Too long you spammy fuck',
-                thread_id=trigger.thread_id,
-                thread_type=trigger.thread_type)
+                        thread_id=trigger.thread_id,
+                        thread_type=trigger.thread_type)
         return
     out = ''
     count = 1
@@ -26,5 +26,5 @@ def stretch(bot, trigger: SteelyMessage, **kwargs):
             count += 1
         out += c * count
     bot.sendMessage(out,
-            thread_id=trigger.thread_id,
-            thread_type=trigger.thread_type)
+                    thread_id=trigger.thread_id,
+                    thread_type=trigger.thread_type)
