@@ -239,6 +239,7 @@ class PluginManager:
         import plugins.intern.main
         import plugins.corona.main
         import plugins.bible.main
+        import plugins.text_mods.stretch
         
 
 class Plugin:
