@@ -17,12 +17,10 @@ except Exception as e:
 
 # Feel free to add offensive or american words here.
 BLACKLIST = set([
-    'poop'
 ])
 
 WORD_TO_EMOJI = defaultdict(list)
 
-print('Getting keywords from emoji data')
 for k in EMOJI_DATA:
     if 'keywords' not in EMOJI_DATA[k]:
         continue
@@ -40,8 +38,6 @@ for k in EMOJI_DATA:
         if len(word) == 2 and EMOJI_DATA[k]['category'] == 'flags':
             continue
         WORD_TO_EMOJI[word].append(emoji)
-
-print('got the keywords')
 
 
 def emojify_or_not_i_am_a_function_not_a_cop(word):
