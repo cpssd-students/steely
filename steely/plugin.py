@@ -243,6 +243,7 @@ class PluginManager:
         import plugins.text_mods.substitutions
         import plugins.text_mods.mock
         import plugins.text_mods.muck
+        import plugins.text_mods.sort
         
 
 class Plugin:
