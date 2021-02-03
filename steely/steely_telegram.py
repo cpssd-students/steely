@@ -4,7 +4,6 @@
 from contextlib import suppress
 from telegram_fbchat_facade import log, Client
 from tinydb import TinyDB
-from vapor import vapor
 from utils import list_plugins
 from plugin import PluginManager
 from message import SteelyMessage

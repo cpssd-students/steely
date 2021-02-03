@@ -6,8 +6,11 @@ from plugin import create_plugin
 from message import SteelyMessage
 
 # Helper method to create a plugin that just translates the alphabet.
-def create_substitution_plugin(command, author, help, trans):
+def create_substitution_plugin(command, author, help, trans, normal=None):
     NORMAL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    if normal is not None:
+        NORMAL = normal
+
     TRANS = str.maketrans(NORMAL, trans)
 
     plugin = create_plugin(name=command, author=author, help=help)
@@ -21,3 +24,7 @@ def create_substitution_plugin(command, author, help, trans):
 
 create_substitution_plugin('goth', 'iandioch', 'It\'s not just a phase mom',
         '𝔞𝔟𝔠𝔡𝔢𝔣𝔤𝔥𝔦𝔧𝔨𝔩𝔪𝔫𝔬𝔭𝔮𝔯𝔰𝔱𝔲𝔳𝔴𝔵𝔶𝔷𝔄𝔅ℭ𝔇𝔈𝔉𝔊ℌℑ𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔ℜ𝔖𝔗𝔘𝔙𝔚𝔛𝔜ℨ')
+
+create_substitution_plugin('vape', ['alexkraak', 'sentriz'], 'gives the previous command ａｅｓｔｈｅｔｉｃ',
+        trans='　０１２３４５６７８９ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ！゛＃＄％＆（）＊＋、ー。／：；〈＝〉？＠［\\］＾＿｛｜｝～',
+        normal=' 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&()*+,-./:;<=>?@[\\]^_{|}~')
