@@ -10,7 +10,7 @@ COMMAND = 'emoji'
 EMOJI_DATA = {}
 try:
     EMOJI_DATA = requests.get(
-        'https://raw.githubusercontent.com/muan/emojilib/master/emojis.json').json()
+        'https://raw.githubusercontent.com/muan/emojilib/4cee8ed17f697b8a5a2e55d8d588ba0d9ce46c4c/emojis.json').json()
 except Exception as e:
     print('No emoji data for you sir! Good day!')
     print(e)
