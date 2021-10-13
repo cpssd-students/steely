@@ -246,6 +246,7 @@ class PluginManager:
         import plugins.text_mods.sort
         import plugins.text_mods.shout
         import plugins.text_mods.search
+        import plugins.randomdigit.main
         
 
 class Plugin:
