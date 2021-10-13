@@ -28,6 +28,7 @@ from plugins import gex
 from tinydb import Query, where
 from tinydb.operations import increment
 from utils import new_database
+from paths import CONFIG
 import json
 import random
 import requests
@@ -46,13 +47,13 @@ class AlphaVantageTickerFetcher:
         self.base_url = "https://www.alphavantage.co/query"
         self.params = ("?function=TIME_SERIES_INTRADAY"
                        "&symbol={}&interval=1min&apikey={}")
-        self.KEY = "6A98QBQPTOVNV1AD"
 
     def GetMultiple(self, tickers):
         return [self.GetSingle(t) for t in tickers]
 
     def GetSingle(self, ticker):
-        url = self.base_url + self.params.format(ticker, self.KEY)
+        url = self.base_url + self.params.format(
+            ticker, CONFIG.ALPHA_VANTAGE_KEY)
 
         r = requests.get(url)
         resp = json.loads(r.text)
@@ -73,7 +74,6 @@ class AlphaVantageCurrencyFetcher:
         self.base_url = "https://www.alphavantage.co/query"
         self.params = ("?function=CURRENCY_EXCHANGE_RATE"
                        "&from_currency={}&to_currency=USD&apikey={}")
-        self.KEY = "6A98QBQPTOVNV1AD"
 
     def GetMultiple(self, tickers):
         return [self.GetSingle(t) for t in tickers]
@@ -82,7 +82,7 @@ class AlphaVantageCurrencyFetcher:
         if not ticker.upper().startswith('FX:'):
             return {"Symbol": ticker, "Bid": None, "Ask": None}
         url = self.base_url + self.params.format(
-                ticker[3:], self.KEY)
+                ticker[3:], CONFIG.ALPHA_VANTAGE_KEY)
 
         r = requests.get(url)
         resp = json.loads(r.text)
