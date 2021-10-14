@@ -32,3 +32,10 @@ create_substitution_plugin('goth', 'iandioch', 'It\'s not just a phase mom',
 create_substitution_plugin('vape', ['alexkraak', 'sentriz'], 'gives the previous command ａｅｓｔｈｅｔｉｃ',
                            trans='　０１２３４５６７８９ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ！゛＃＄％＆（）＊＋、ー。／：；〈＝〉？＠［\\］＾＿｛｜｝～',
                            normal=' 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&()*+,-./:;<=>?@[\\]^_{|}~')
+
+
+RUNE_TRANS = '🜣🜖🝔🜵🞌🝗🜶🜘🜶🜶🝁🜾🝀🝀🜃🜵🜣🜛🜖🜟🜫🜾🝁🝖🜞🜖🜺🜾🜴🜃🜵🝞🜶🝔🝁🜖🜴🝔🜾🝁🝳🜵🜃🜾🝗🜶🝁🞌🝀🜣🜶🝁'
+RUNE_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+create_substitution_plugin('rune', 'iandioch', 'buenos dias',
+        trans=RUNE_TRANS + RUNE_ALPHABET,
+        normal=RUNE_ALPHABET + RUNE_TRANS) 
