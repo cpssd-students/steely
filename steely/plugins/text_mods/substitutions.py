@@ -47,3 +47,9 @@ BUBBLE_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 create_substitution_plugin('bubble', 'iandioch', 'ⓐyy lmao',
                            trans=BUBBLE_TRANS + BUBBLE_ALPHABET,
                            normal=BUBBLE_ALPHABET + BUBBLE_TRANS)
+
+EGYPT_TRANS = '𓊏𓊐𓊑𓊒𓊓𓊔𓊕𓊖𓊗𓊘𓊙𓊚𓊛𓊜𓊝𓊞𓊟𓊠𓊡𓊢𓊣𓊤𓊥𓊦𓊧𓊨𓊩𓊪𓊫𓊬𓊭𓊮𓊯𓊰𓊱𓊲𓊳𓊴𓊵𓊶𓊷𓊸𓊹𓊺𓊻𓊼𓊽𓊾𓊿𓋀𓋁𓋂'
+EGYPT_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+create_substitution_plugin('egypt', 'iandioch', 'walklikeanegyptian',
+                           trans=EGYPT_TRANS + EGYPT_ALPHABET,
+                           normal=EGYPT_ALPHABET + EGYPT_TRANS)
