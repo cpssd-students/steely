@@ -53,3 +53,9 @@ EGYPT_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 create_substitution_plugin('egypt', 'iandioch', 'walklikeanegyptian',
                            trans=EGYPT_TRANS + EGYPT_ALPHABET,
                            normal=EGYPT_ALPHABET + EGYPT_TRANS)
+
+LEET_TRANS = '48(d3f9#|jklmn0pqr5+uvwxy2'
+LEET_ALPHABET = 'abcdefghijklmnopqrstuvwxyz'
+create_substitution_plugin('leet', 'sentriz', 'gives the previous command leet',
+                           trans=LEET_TRANS + LEET_ALPHABET,
+                           normal=LEET_ALPHABET + LEET_TRANS)
