@@ -1,6 +1,8 @@
 from collections import deque
 
+
 class TrieNode:
+
     def __init__(self, key=None):
         self.key = key
         self.children = {}
@@ -16,7 +18,9 @@ class TrieNode:
             self.children[k] = TrieNode(key=k)
         self.children[k].add_descendant(word[1:])
 
+
 class Trie:
+
     def __init__(self):
         self.root = TrieNode()
 
@@ -42,17 +46,20 @@ class Trie:
                 if letters[i] in node.children:
                     used = used_letters[:]
                     used[i] = True
-                    q.append((node.children[letters[i]], path + letters[i], used))
+                    q.append((node.children[letters[i]],
+                              path + letters[i], used))
         return words
 
+
 class CountdownSolver:
+
     def __init__(self, dictionary):
         self.dictionary = dictionary
         self.trie = Trie()
         for word in self.dictionary:
             self.trie.add_word(word)
 
-    # Figures out the longest length of word it is possible to create with the 
+    # Figures out the longest length of word it is possible to create with the
     # letters in the sequence `available_letters`, and returns all such words of
     # that length.
     def all_best_words(self, available_letters):
@@ -60,14 +67,15 @@ class CountdownSolver:
         best_len = max(len(word) for word in all_words)
         return [word for word in all_words if len(word) == best_len]
 
+
 def main():
     c = CountdownSolver(['a', 'aa', 'ab', 'aab', 'abc'])
-    print(c.all_best_words('a')) # Expected: ['a']
-    print(c.all_best_words('ab')) # Expected: ['ab']
-    print(c.all_best_words('aab')) # Expected: ['aab']
-    print(c.all_best_words('ac')) # Expected: ['a']
-    print(c.all_best_words('abc')) # Expected: ['abc']
-    print(c.all_best_words('aabc')) # Expected: ['abc', 'aab']
+    print(c.all_best_words('a'))  # Expected: ['a']
+    print(c.all_best_words('ab'))  # Expected: ['ab']
+    print(c.all_best_words('aab'))  # Expected: ['aab']
+    print(c.all_best_words('ac'))  # Expected: ['a']
+    print(c.all_best_words('abc'))  # Expected: ['abc']
+    print(c.all_best_words('aabc'))  # Expected: ['abc', 'aab']
 
 if __name__ == '__main__':
     main()
