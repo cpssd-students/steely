@@ -41,3 +41,9 @@ RUNE_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 create_substitution_plugin('rune', 'iandioch', 'buenos dias',
                            trans=RUNE_TRANS + RUNE_ALPHABET,
                            normal=RUNE_ALPHABET + RUNE_TRANS)
+
+BUBBLE_TRANS = 'ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ'
+BUBBLE_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+create_substitution_plugin('bubble', 'iandioch', 'ⓐyy lmao',
+                           trans=BUBBLE_TRANS + BUBBLE_ALPHABET,
+                           normal=BUBBLE_ALPHABET + BUBBLE_TRANS)
