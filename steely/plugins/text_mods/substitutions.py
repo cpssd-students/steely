@@ -8,7 +8,8 @@ from message import SteelyMessage
 # Helper method to create a plugin that just translates the alphabet.
 
 
-def create_substitution_plugin(command, author, help, trans, normal=None):
+def create_substitution_plugin(command, author, help, trans, normal=None,
+                               post_trans_modifier_fn=lambda x: x):
     NORMAL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     if normal is not None:
         NORMAL = normal
@@ -21,7 +22,7 @@ def create_substitution_plugin(command, author, help, trans, normal=None):
     def plugin_listener(bot, trigger: SteelyMessage, **kwargs):
         message = bot.fetchThreadMessages(
             thread_id=trigger.thread_id, limit=2)[1]
-        text = message.text.translate(TRANS)
+        text = post_trans_modifier_fn(message.text.translate(TRANS))
         bot.sendMessage(text,
                         thread_id=trigger.thread_id,
                         thread_type=trigger.thread_type)
@@ -65,3 +66,10 @@ PROD_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 create_substitution_plugin('prod', 'iandioch', 'Get te fuck ye taigy bastards',
                            trans=PROD_TRANS + PROD_ALPHABET,
                            normal=PROD_ALPHABET + PROD_TRANS)
+
+FLIP_TRANS = 'ɐqɔpǝⅎƃɥᴉɾʞʅɯuodbɹsʇnʌʍxʎz∀ꓭϽᗡƎᖵ⅁HIᒋꓘ⅂ꟽNOԀꝹꓤSꓕՈɅϺX⅄Z¿¡?!'
+FLIP_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ?!¿¡'
+create_substitution_plugin('flip', 'iandioch', 'My life got flipped, turned upside down',
+                           trans=FLIP_TRANS + FLIP_ALPHABET,
+                           normal=FLIP_ALPHABET + FLIP_TRANS,
+                           post_trans_modifier_fn=lambda x: '\u200F' + x[::-1])
