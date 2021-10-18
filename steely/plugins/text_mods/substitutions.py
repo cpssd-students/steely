@@ -34,8 +34,10 @@ create_substitution_plugin('vape', ['alexkraak', 'sentriz'], 'gives the previous
                            normal=' 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&()*+,-./:;<=>?@[\\]^_{|}~')
 
 
+# TODO(iandioch): Make RUNE_TRANS consist of unique letters, so that it can
+# allow a two-way translation.
 RUNE_TRANS = '🜣🜖🝔🜵🞌🝗🜶🜘🜶🜶🝁🜾🝀🝀🜃🜵🜣🜛🜖🜟🜫🜾🝁🝖🜞🜖🜺🜾🜴🜃🜵🝞🜶🝔🝁🜖🜴🝔🜾🝁🝳🜵🜃🜾🝗🜶🝁🞌🝀🜣🜶🝁'
 RUNE_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 create_substitution_plugin('rune', 'iandioch', 'buenos dias',
-        trans=RUNE_TRANS + RUNE_ALPHABET,
-        normal=RUNE_ALPHABET + RUNE_TRANS) 
+                           trans=RUNE_TRANS + RUNE_ALPHABET,
+                           normal=RUNE_ALPHABET + RUNE_TRANS)
