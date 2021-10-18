@@ -239,6 +239,7 @@ class PluginManager:
         import plugins.intern.main
         import plugins.corona.main
         import plugins.bible.main
+        import plugins.text_mods.b
         import plugins.text_mods.stretch
         import plugins.text_mods.substitutions
         import plugins.text_mods.mock

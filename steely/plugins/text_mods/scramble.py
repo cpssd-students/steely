@@ -16,7 +16,7 @@ def scramble(message):
     return " ".join(split_message)
 
 @plugin.listen(command='scramble')
-def listen(bot, messsage: SteelyMessage, **kwargs):
+def listen(bot, trigger: SteelyMessage, **kwargs):
     message = bot.fetchThreadMessages(thread_id=trigger.thread_id, limit=2)[1]
     bot.sendMessage(scramble(message.text),
             thread_id=trigger.thread_id,
