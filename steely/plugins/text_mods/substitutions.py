@@ -59,3 +59,9 @@ LEET_ALPHABET = 'abcdefghijklmnopqrstuvwxyz'
 create_substitution_plugin('leet', 'sentriz', 'gives the previous command leet',
                            trans=LEET_TRANS + LEET_ALPHABET,
                            normal=LEET_ALPHABET + LEET_TRANS)
+
+PROD_TRANS = '𝒶𝒷𝒸𝒹𝑒𝒻𝑔𝒽𝒾𝒿𝓀𝓁𝓂𝓃𝑜𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏𝒜𝐵𝒞𝒟𝐸𝐹𝒢𝐻𝐼𝒥𝒦𝐿𝑀𝒩𝒪𝒫𝒬𝑅𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵'
+PROD_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+create_substitution_plugin('prod', 'iandioch', 'Get te fuck ye taigy bastards',
+                           trans=PROD_TRANS + PROD_ALPHABET,
+                           normal=PROD_ALPHABET + PROD_TRANS)
