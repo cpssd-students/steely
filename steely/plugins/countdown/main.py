@@ -66,7 +66,7 @@ class CountdownGame:
             return []
         best_score = max(len(self.best_word[w]) for w in self.best_word)
         return [
-            (user, word) for _, (user, word) in enumerate(self.best_word.items()) if len(word) == best_score]
+            (user, word) for (user, word) in self.best_word.items() if len(word) == best_score]
 
     def _is_valid(self, word):
         used_letters = Counter(word)
