@@ -13,7 +13,17 @@ WORDLIST_URL = 'https://raw.githubusercontent.com/jesstess/Scrabble/5d4a1e69ad22
 WORDS = set()
 GAME_MANAGER = None
 
-plugin = create_plugin(name='countdown', author='iandioch', help='TODO')
+HELP_STR = '''Play some countdown!
+You will have a limited amount of time to create the longest word you can from 
+the available letters. When the time is up, any players who made a word that is 
+the longest will be crowned a winner.
+If you try to submit a word that isn't in the dictionary, or that was already 
+given by a different player, it won't count.
+You can do '/countdown' to start a game with the default setup (5 consonants, 4 
+vowels), or do '/countdown ccvvcv' to get a custom choice of letters (where 'c' 
+is a consonant and 'v' is a vowel).'''
+
+plugin = create_plugin(name='countdown', author='iandioch', help=HELP_STR)
 
 
 class CountdownGame:
