@@ -28,6 +28,7 @@ from plugins import gex
 from tinydb import Query, where
 from tinydb.operations import increment
 from utils import new_database
+from paths import CONFIG
 import json
 import random
 import requests
@@ -40,47 +41,19 @@ USERDB = new_database('linden')
 USER = Query()
 REED_ID = None
 
-
-class YahooTickerFetcher:
-
-    def __init__(self):
-        self.base_url = 'https://query.yahooapis.com/v1/public/yql'
-        self.param_string = ('?q={}&format=json&env='
-                             'store://datatables.org/alltableswithkeys')
-        self.query = ('select Symbol,Ask,Bid '
-                      'from yahoo.finance.quotes where symbol in ("{}")')
-
-    def GetMultiple(self, tickers):
-        if not tickers:
-            return []
-
-        filled_q = self.query.format('","'.join(tickers))
-        filled_params = self.param_string.format(filled_q)
-
-        r = requests.get(self.base_url + filled_params)
-        if len(tickers) == 1:
-            # Yahoo for some reson changes the API slightly if you reqest only one ticker.
-            # Wrap the return in a list so we have a consistent API
-            return [json.loads(r.text)['query']['results']['quote']]
-        return json.loads(r.text)['query']['results']['quote']
-
-    def GetSingle(self, ticker):
-        return self.GetMultiple([ticker])[0]
-
-
 class AlphaVantageTickerFetcher:
 
     def __init__(self):
         self.base_url = "https://www.alphavantage.co/query"
         self.params = ("?function=TIME_SERIES_INTRADAY"
                        "&symbol={}&interval=1min&apikey={}")
-        self.KEY = "6A98QBQPTOVNV1AD"
 
     def GetMultiple(self, tickers):
         return [self.GetSingle(t) for t in tickers]
 
     def GetSingle(self, ticker):
-        url = self.base_url + self.params.format(ticker, self.KEY)
+        url = self.base_url + self.params.format(
+            ticker, CONFIG.ALPHA_VANTAGE_KEY)
 
         r = requests.get(url)
         resp = json.loads(r.text)
@@ -95,6 +68,33 @@ class AlphaVantageTickerFetcher:
             "Ask": latest["4. close"],
         }
 
+class AlphaVantageCurrencyFetcher:
+
+    def __init__(self):
+        self.base_url = "https://www.alphavantage.co/query"
+        self.params = ("?function=CURRENCY_EXCHANGE_RATE"
+                       "&from_currency={}&to_currency=USD&apikey={}")
+
+    def GetMultiple(self, tickers):
+        return [self.GetSingle(t) for t in tickers]
+
+    def GetSingle(self, ticker):
+        if not ticker.upper().startswith('FX:'):
+            return {"Symbol": ticker, "Bid": None, "Ask": None}
+        url = self.base_url + self.params.format(
+                ticker[3:], CONFIG.ALPHA_VANTAGE_KEY)
+
+        r = requests.get(url)
+        resp = json.loads(r.text)
+        if "Error Message" in resp:
+            return {"Symbol": ticker, "Bid": None, "Ask": None}
+
+        latest = resp["Realtime Currency Exchange Rate"]
+        return {
+            "Symbol": ticker,
+            "Bid": latest["8. Bid Price"],
+            "Ask": latest["9. Ask Price"],
+        }
 
 class IEXTickerFetcher:
 
@@ -119,8 +119,8 @@ class IEXTickerFetcher:
 
 TICKER_FETCHERS = [
     IEXTickerFetcher(),  # Fast, hopefully robust
-    YahooTickerFetcher(),  # Fast, super flakey
-    AlphaVantageTickerFetcher()  # Slow, little flakey
+    AlphaVantageTickerFetcher(),  # Slow, little flakey
+    AlphaVantageCurrencyFetcher()
 ]
 
 
@@ -279,15 +279,14 @@ def invest_get_quotes_multi_source(tickers):
         return []
     done = []
     for source in TICKER_FETCHERS:
-        redo = []
+        redo = set(tickers)
         for res in source.GetMultiple(tickers):
             if invest_check_valid_quote(res):
                 done.append(res)
-            else:
-                redo.append(res['Symbol'])
+                redo.remove(res['Symbol'])
         if not redo:
             break
-        tickers = redo
+        tickers = list(redo)
     return done
 
 
