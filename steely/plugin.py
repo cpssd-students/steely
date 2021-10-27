@@ -3,7 +3,6 @@ import logging
 from collections import namedtuple
 from enum import Enum
 
-
 class CommandPartType(Enum):
     # A subcommand, eg. the token "set" in "/np set <username>".
     SUBCOMMAND = 1
@@ -69,7 +68,10 @@ class PluginCommand:
         parts = command_str.split(' ')
         return [PluginCommand.CommandPart(part) for part in parts]
 
-    def _parse_command_call(self, expected_command_parts, called_command_parts):
+    def _parse_command_call(self,
+                            expected_command_parts,
+                            called_command_parts,
+                            logger):
         # Returns a CommandMatch tuple for the given expected command parts and
         # actual given command parts.
         parsed_args = {}
@@ -109,13 +111,13 @@ class PluginCommand:
                 # or as a topic for a better overall match.
                 # We do this by trying both options, and seeing which has a
                 # better score, erring on the side of over-matching.
-                logging.debug(
+                logger.debug(
                     'Trying to match part "%s" against optional command "%s".',
                     called_command_parts[i], expected_command_parts[i].name)
 
                 match_with_arg = self._parse_command_call(
                     expected_command_parts[i + 1:],
-                    called_command_parts[i + 1:])
+                    called_command_parts[i + 1:], logger)
                 match_with_arg.args[expected_command_parts[
                     i].name] = called_command_parts[i]
 
@@ -126,13 +128,15 @@ class PluginCommand:
                                               match_with_arg.args)
 
                 match_without_arg = self._parse_command_call(
-                    expected_command_parts[i + 1:], called_command_parts[i:])
+                    expected_command_parts[i + 1:],
+                    called_command_parts[i:],
+                    logger)
 
                 # Choose whether matching or not matching this optional argument
                 # creates a better overall match for the string...
                 best_match = match_without_arg
                 if match_with_arg.num_parts >= match_without_arg.num_parts:
-                    logging.debug(
+                    logger.debug(
                         'Matching "%s" against "%s" is better than not.',
                         called_command_parts[i], expected_command_parts[i].name)
                     best_match = match_with_arg
@@ -167,13 +171,14 @@ class PluginCommand:
             i, called_command_parts, self.command))
         return CommandMatch(i, match_value, str_match_len, parsed_args)
 
-    def get_best_match(self, called_command_parts):
+    def get_best_match(self, called_command_parts, logger):
         # Returns the best possible CommandMatch for this argument.
         # There may be more than one possible match, depending on whether or not
         # optional arguments are consumed, so this will find the best possible
         # one.
         return self._parse_command_call(self.command_parts,
-                                        called_command_parts)
+                                        called_command_parts,
+                                        logger)
 
 
 class PluginManager:
@@ -185,14 +190,16 @@ class PluginManager:
         return cls._passive_listeners
 
     @classmethod
-    def get_listener_for_command(cls, command):
+    def get_listener_for_command(cls, command, logger=None):
         # Assumes "command" does not start with "/". Eg. for "/np top 7day",
         # "command" would be "np top 7day" returns longest matching command and
         # a func to be called against "command".
+        if logger is None:
+            logger = logging.getLogger("plugin_manager")
 
         command = command.lower().strip()
-        logging.debug('Finding longest match for "/{}".'.format(command))
-        logging.debug('Active listeners: %s', ','.join(
+        logger.debug('Finding longest match for "/{}".'.format(command))
+        logger.debug('Active listeners: %s', ','.join(
             c.command for c in cls._command_listeners))
 
         command_parts = command.split(' ')
@@ -201,7 +208,7 @@ class PluginManager:
         best_match_plugin = None
 
         for plugin_command in cls._command_listeners:
-            command_match = plugin_command.get_best_match(command_parts)
+            command_match = plugin_command.get_best_match(command_parts, logger)
             if ((command_match.num_parts > best_match.num_parts) or
                 (command_match.num_parts == best_match.num_parts and
                     command_match.value > best_match.value)):
@@ -209,7 +216,7 @@ class PluginManager:
                 best_match_plugin = plugin_command
 
         if best_match_plugin is None:
-            logging.info(
+            logger.info(
                 'No best matching plugin found for call "{}"'.format(command))
             return None, None, None
 
@@ -248,6 +255,7 @@ class PluginManager:
         import plugins.text_mods.shout
         import plugins.text_mods.search
         import plugins.text_mods.scramble
+        import plugins.randomdigit.main
         
 
 class Plugin:
