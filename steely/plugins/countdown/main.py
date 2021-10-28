@@ -102,6 +102,7 @@ class CountdownGameManager:
         self.game_lock.acquire()
         if thread_id in self.games:
             message_sender('There is already an active game in this chat!')
+            return
         message_sender("Your letters are {}. Let's countdown!".format(letters))
         self.games[thread_id] = CountdownGame(letters, self.word_checker)
         self.message_senders[thread_id] = message_sender
