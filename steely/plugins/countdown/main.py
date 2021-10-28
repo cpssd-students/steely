@@ -102,6 +102,7 @@ class CountdownGameManager:
         self.game_lock.acquire()
         if thread_id in self.games:
             message_sender('There is already an active game in this chat!')
+            self.game_lock.release()
             return
         message_sender("Your letters are {}. Let's countdown!".format(letters))
         self.games[thread_id] = CountdownGame(letters, self.word_checker)
@@ -217,6 +218,7 @@ def generate_letters(schema):
     consonant_distribution = ''.join(c * consonants[c] for c in consonants)
     letters = random.sample(vowel_distribution, num_vowel)
     letters += random.sample(consonant_distribution, num_consonant)
+    random.shuffle(letters)
     return ''.join(letters)
 
 
