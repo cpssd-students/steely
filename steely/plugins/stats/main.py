@@ -109,6 +109,8 @@ def format_stats(title_str, sorted_stats):
         response += f'{command:<{max_command}} {representation:>3,}\n'
     return response
 
+
+
 @PLUGIN.listen("stats top [n]")
 def emit_top_stats(bot, message: SteelyMessage, **kwargs):
     def sort_stats(stats):
@@ -127,3 +129,18 @@ def emit_top_stats(bot, message: SteelyMessage, **kwargs):
 @PLUGIN.listen("stats [n]")
 def emit_default_stats(bot, message: SteelyMessage, **kwargs):
     emit_top_stats(bot, message, **kwargs)
+
+@PLUGIN.listen("stats bottom [n]")
+def emit_bottom_stats(bot, message:SteelyMessage, **kwargs):
+    def sort_stats(stats):
+        return sorted(stats, key=itemgetter(1))
+
+    n = DEFAULT_LIST_SIZE 
+    if 'n' in kwargs and kwargs['n'] != '':
+        n = int(kwargs['n'])
+    stats = sort_stats(get_all_stats())
+    n = min(n, len(stats))
+    response = format_stats(f'bottom {n}', stats[:n])
+    bot.sendMessage(code_block(response),
+                    thread_id=message.thread_id,
+                    thread_type=message.thread_type)
