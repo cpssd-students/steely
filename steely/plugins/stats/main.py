@@ -131,7 +131,7 @@ def emit_default_stats(bot, message: SteelyMessage, **kwargs):
     emit_top_stats(bot, message, **kwargs)
 
 @PLUGIN.listen("stats bottom [n]")
-def emit_bottom_stats(bot, message:SteelyMessage, **kwargs):
+def emit_bottom_stats(bot, message: SteelyMessage, **kwargs):
     def sort_stats(stats):
         return sorted(stats, key=itemgetter(1))
 
@@ -139,6 +139,24 @@ def emit_bottom_stats(bot, message:SteelyMessage, **kwargs):
     if 'n' in kwargs and kwargs['n'] != '':
         n = int(kwargs['n'])
     stats = sort_stats(get_all_stats())
+    n = min(n, len(stats))
+    response = format_stats(f'bottom {n}', stats[:n])
+    bot.sendMessage(code_block(response),
+                    thread_id=message.thread_id,
+                    thread_type=message.thread_type)
+
+@PLUGIN.listen("stats bottom <n> real")
+def emit_real_bottom_stats(bot, message: SteelyMessage, **kwargs):
+    def is_real_stat(stat):
+        return len(stat) and stat[0] == '/' and len(stat.split(' ')) == 1 and '@' not in stat
+    def sort_and_filter_stats(stats):
+        filtered_stats = [stat for stat in stats if is_real_stat(stat[0])]
+        return sorted(filtered_stats, key=itemgetter(1))
+
+    n = DEFAULT_LIST_SIZE 
+    if 'n' in kwargs and kwargs['n'] != '':
+        n = int(kwargs['n'])
+    stats = sort_and_filter_stats(get_all_stats())
     n = min(n, len(stats))
     response = format_stats(f'bottom {n}', stats[:n])
     bot.sendMessage(code_block(response),
