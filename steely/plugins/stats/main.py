@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import logging
+from operator import itemgetter
 
 from tinydb import Query
 from tinydb.operations import increment
@@ -8,6 +9,7 @@ from tinydb.operations import increment
 from utils import new_database
 from plugin import PluginManager, create_plugin
 from message import SteelyMessage
+from formatting import code_block
 
 __author__ = 'sentriz'
 COMMAND = None
@@ -23,6 +25,7 @@ LOGGER.setLevel(logging.INFO)
 HELP_STR = '''TODO'''
 PLUGIN = create_plugin(name="stats", author="sentriz", help=HELP_STR)
 
+LIMIT = 10
 
 def first_word_of(message):
     if ' ' in message:
@@ -79,7 +82,7 @@ def record_command_usage(command, N=2):
 
 
 @PLUGIN.listen()
-def main(bot, message: SteelyMessage, **kwargs):
+def listen_for_usage(bot, message: SteelyMessage, **kwargs):
     if not len(message.text) or not message.text[0] in COMMAND_IDENTIFIERS:
         return
     command = first_word_of(message.text)
@@ -88,3 +91,25 @@ def main(bot, message: SteelyMessage, **kwargs):
             is_new_style_command(message.text)):
         return
     record_command_usage(message.text)
+
+@PLUGIN.listen("stats")
+def emit_usage(bot, message: SteelyMessage, **kwargs):
+    def parse_stats(stats):
+        for stat in CMD_DB.all():
+            yield stat['command'], stat['count']
+
+    def sort_stats(stats):
+        return sorted(stats, key=itemgetter(1), reverse=True)
+    clean_stats = list(parse_stats(CMD_DB))
+    sorted_stats = sort_stats(clean_stats)[:LIMIT]
+    max_command = max(len(command) for command, count in sorted_stats)
+    response = f'top {LIMIT}\n――――――\n'
+    for command, count in sorted_stats:
+        if count == 100:
+            representation = '💯'
+        else:
+            representation = count
+        response += f'{command:<{max_command}} {representation:>3,}\n'
+    bot.sendMessage(code_block(response),
+                    thread_id=message.thread_id,
+                    thread_type=message.thread_type)
