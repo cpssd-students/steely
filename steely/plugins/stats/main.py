@@ -25,7 +25,7 @@ LOGGER.setLevel(logging.INFO)
 HELP_STR = '''TODO'''
 PLUGIN = create_plugin(name="stats", author="sentriz", help=HELP_STR)
 
-LIMIT = 10
+DEFAULT_LIST_SIZE = 10
 
 def first_word_of(message):
     if ' ' in message:
@@ -92,24 +92,38 @@ def listen_for_usage(bot, message: SteelyMessage, **kwargs):
         return
     record_command_usage(message.text)
 
-@PLUGIN.listen("stats")
-def emit_usage(bot, message: SteelyMessage, **kwargs):
+def get_all_stats():
     def parse_stats(stats):
         for stat in CMD_DB.all():
             yield stat['command'], stat['count']
+    return list(parse_stats(CMD_DB))
 
-    def sort_stats(stats):
-        return sorted(stats, key=itemgetter(1), reverse=True)
-    clean_stats = list(parse_stats(CMD_DB))
-    sorted_stats = sort_stats(clean_stats)[:LIMIT]
+def format_stats(title_str, sorted_stats):
     max_command = max(len(command) for command, count in sorted_stats)
-    response = f'top {LIMIT}\n――――――\n'
+    response = f'{title_str}\n――――――\n'
     for command, count in sorted_stats:
         if count == 100:
             representation = '💯'
         else:
             representation = count
         response += f'{command:<{max_command}} {representation:>3,}\n'
+    return response
+
+@PLUGIN.listen("stats top [n]")
+def emit_top_stats(bot, message: SteelyMessage, **kwargs):
+    def sort_stats(stats):
+        return sorted(stats, key=itemgetter(1), reverse=True)
+
+    n = DEFAULT_LIST_SIZE 
+    if 'n' in kwargs and kwargs['n'] != '':
+        n = int(kwargs['n'])
+    stats = sort_stats(get_all_stats())
+    n = min(n, len(stats))
+    response = format_stats(f'top {n}', stats[:n])
     bot.sendMessage(code_block(response),
                     thread_id=message.thread_id,
                     thread_type=message.thread_type)
+
+@PLUGIN.listen("stats [n]")
+def emit_default_stats(bot, message: SteelyMessage, **kwargs):
+    emit_top_stats(bot, message, **kwargs)
