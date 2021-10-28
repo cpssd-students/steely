@@ -4,9 +4,10 @@ import logging
 
 from tinydb import Query
 from tinydb.operations import increment
-from utils import new_database
 
-from plugin import PluginManager
+from utils import new_database
+from plugin import PluginManager, create_plugin
+from message import SteelyMessage
 
 __author__ = 'sentriz'
 COMMAND = None
@@ -18,6 +19,9 @@ COMMAND_IDENTIFIERS = set(['.', '~', '/'])
 
 LOGGER = logging.getLogger("plugins.stats")
 LOGGER.setLevel(logging.INFO)
+
+HELP_STR = '''TODO'''
+PLUGIN = create_plugin(name="stats", author="sentriz", help=HELP_STR)
 
 
 def first_word_of(message):
@@ -74,12 +78,13 @@ def record_command_usage(command, N=2):
             CMD_DB.update(increment('count'), CMD.command == command_prefix)
 
 
-def main(bot, author_id, message, thread_id, thread_type, **kwargs):
-    if not len(message) or not message[0] in COMMAND_IDENTIFIERS:
+@PLUGIN.listen()
+def main(bot, message: SteelyMessage, **kwargs):
+    if not len(message.text) or not message.text[0] in COMMAND_IDENTIFIERS:
         return
-    command = first_word_of(message)
+    command = first_word_of(message.text)
     plugins = bot.plugins
     if not (is_old_style_command(command, plugins) or
-            is_new_style_command(message)):
+            is_new_style_command(message.text)):
         return
-    record_command_usage(message)
+    record_command_usage(message.text)

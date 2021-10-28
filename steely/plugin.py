@@ -255,6 +255,7 @@ class PluginManager:
         import plugins.text_mods.search
         import plugins.randomdigit.main
         import plugins.countdown.main
+        import plugins.stats.main
         
 
 class Plugin:
