@@ -8,7 +8,8 @@ from message import SteelyMessage
 # Helper method to create a plugin that just translates the alphabet.
 
 
-def create_substitution_plugin(command, author, help, trans, normal=None):
+def create_substitution_plugin(command, author, help, trans, normal=None,
+                               post_trans_modifier_fn=lambda x: x):
     NORMAL = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     if normal is not None:
         NORMAL = normal
@@ -21,7 +22,7 @@ def create_substitution_plugin(command, author, help, trans, normal=None):
     def plugin_listener(bot, trigger: SteelyMessage, **kwargs):
         message = bot.fetchThreadMessages(
             thread_id=trigger.thread_id, limit=2)[1]
-        text = message.text.translate(TRANS)
+        text = post_trans_modifier_fn(message.text.translate(TRANS))
         bot.sendMessage(text,
                         thread_id=trigger.thread_id,
                         thread_type=trigger.thread_type)
@@ -32,3 +33,43 @@ create_substitution_plugin('goth', 'iandioch', 'It\'s not just a phase mom',
 create_substitution_plugin('vape', ['alexkraak', 'sentriz'], 'gives the previous command ａｅｓｔｈｅｔｉｃ',
                            trans='　０１２３４５６７８９ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ！゛＃＄％＆（）＊＋、ー。／：；〈＝〉？＠［\\］＾＿｛｜｝～',
                            normal=' 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&()*+,-./:;<=>?@[\\]^_{|}~')
+
+
+# TODO(iandioch): Make RUNE_TRANS consist of unique letters, so that it can
+# allow a two-way translation.
+RUNE_TRANS = '🜣🜖🝔🜵🞌🝗🜶🜘🜶🜶🝁🜾🝀🝀🜃🜵🜣🜛🜖🜟🜫🜾🝁🝖🜞🜖🜺🜾🜴🜃🜵🝞🜶🝔🝁🜖🜴🝔🜾🝁🝳🜵🜃🜾🝗🜶🝁🞌🝀🜣🜶🝁'
+RUNE_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+create_substitution_plugin('rune', 'iandioch', 'buenos dias',
+                           trans=RUNE_TRANS + RUNE_ALPHABET,
+                           normal=RUNE_ALPHABET + RUNE_TRANS)
+
+BUBBLE_TRANS = 'ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ'
+BUBBLE_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+create_substitution_plugin('bubble', 'iandioch', 'ⓐyy lmao',
+                           trans=BUBBLE_TRANS + BUBBLE_ALPHABET,
+                           normal=BUBBLE_ALPHABET + BUBBLE_TRANS)
+
+EGYPT_TRANS = '𓊏𓊐𓊑𓊒𓊓𓊔𓊕𓊖𓊗𓊘𓊙𓊚𓊛𓊜𓊝𓊞𓊟𓊠𓊡𓊢𓊣𓊤𓊥𓊦𓊧𓊨𓊩𓊪𓊫𓊬𓊭𓊮𓊯𓊰𓊱𓊲𓊳𓊴𓊵𓊶𓊷𓊸𓊹𓊺𓊻𓊼𓊽𓊾𓊿𓋀𓋁𓋂'
+EGYPT_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+create_substitution_plugin('egypt', 'iandioch', 'walklikeanegyptian',
+                           trans=EGYPT_TRANS + EGYPT_ALPHABET,
+                           normal=EGYPT_ALPHABET + EGYPT_TRANS)
+
+LEET_TRANS = '48(d3f9#|jklmn0pqr5+uvwxy2'
+LEET_ALPHABET = 'abcdefghijklmnopqrstuvwxyz'
+create_substitution_plugin('leet', 'sentriz', 'gives the previous command leet',
+                           trans=LEET_TRANS + LEET_ALPHABET,
+                           normal=LEET_ALPHABET + LEET_TRANS)
+
+PROD_TRANS = '𝒶𝒷𝒸𝒹𝑒𝒻𝑔𝒽𝒾𝒿𝓀𝓁𝓂𝓃𝑜𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏𝒜𝐵𝒞𝒟𝐸𝐹𝒢𝐻𝐼𝒥𝒦𝐿𝑀𝒩𝒪𝒫𝒬𝑅𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵'
+PROD_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+create_substitution_plugin('prod', 'iandioch', 'Get te fuck ye taigy bastards',
+                           trans=PROD_TRANS + PROD_ALPHABET,
+                           normal=PROD_ALPHABET + PROD_TRANS)
+
+FLIP_TRANS = 'ɐqɔpǝⅎƃɥᴉɾʞʅɯuodbɹsʇnʌʍxʎz∀ꓭϽᗡƎᖵ⅁HIᒋꓘ⅂ꟽNOԀꝹꓤSꓕՈɅϺX⅄Z¿¡?!'
+FLIP_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ?!¿¡'
+create_substitution_plugin('flip', 'iandioch', 'My life got flipped, turned upside down',
+                           trans=FLIP_TRANS + FLIP_ALPHABET,
+                           normal=FLIP_ALPHABET + FLIP_TRANS,
+                           post_trans_modifier_fn=lambda x: '\u200F' + x[::-1])

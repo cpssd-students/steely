@@ -246,6 +246,7 @@ class PluginManager:
         import plugins.intern.main
         import plugins.corona.main
         import plugins.bible.main
+        import plugins.text_mods.b
         import plugins.text_mods.stretch
         import plugins.text_mods.substitutions
         import plugins.text_mods.mock
@@ -253,6 +254,7 @@ class PluginManager:
         import plugins.text_mods.sort
         import plugins.text_mods.shout
         import plugins.text_mods.search
+        import plugins.text_mods.scramble
         import plugins.randomdigit.main
         import plugins.countdown.main
         
