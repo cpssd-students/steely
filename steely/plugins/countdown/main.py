@@ -7,11 +7,12 @@ from collections import Counter, defaultdict
 
 from plugin import create_plugin
 from message import SteelyMessage
-
+from .solver import CountdownSolver
 
 WORDLIST_URL = 'https://raw.githubusercontent.com/jesstess/Scrabble/5d4a1e69ad2267126fa8d82bbc34ca936d1f878a/scrabble/sowpods.txt'
 WORDS = set()
 GAME_MANAGER = None
+SOLVER = None
 
 HELP_STR = '''Play some countdown!
 You will have a limited amount of time to create the longest word you can from 
@@ -175,6 +176,9 @@ class CountdownGameManager:
                 message.append('*{}* by _{}_'.format(word, name))
             send_message('\n'.join(message))
 
+        best_words = SOLVER.all_best_words(self.games[thread_id].letters)
+        send_message(f'Best words: {", ".join("*" + word + "*" for word in best_words)}')
+
         del self.user_name_getters[thread_id]
         del self.message_senders[thread_id]
         del self.games[thread_id]
@@ -239,6 +243,9 @@ def load_wordlist():
     global GAME_MANAGER
     GAME_MANAGER = CountdownGameManager(
         word_checker=lambda word: word in WORDS)
+
+    global SOLVER
+    SOLVER = CountdownSolver(WORDS)
 
 
 @plugin.listen(command='countdown [schema]')
