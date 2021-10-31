@@ -257,6 +257,7 @@ class PluginManager:
         import plugins.text_mods.scramble
         import plugins.randomdigit.main
         import plugins.countdown.main
+        import plugins.stats.main
         
 
 class Plugin:
