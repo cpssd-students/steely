@@ -30,7 +30,7 @@ class Trie:
     def get_words_for_letters(self, letters):
         words = set()
         n = len(letters)
-        q = deque([(self.root, '', [False for _ in range(n)])])
+        q = deque([(self.root, '', [False]*n)])
         while len(q):
             node, path, used_letters = q.popleft()
             if node.is_word_end:
