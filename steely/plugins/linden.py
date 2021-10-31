@@ -153,6 +153,14 @@ def create_user(uid, first_name):
     return data
 
 
+def get_valid_quantity(quant_str):
+    """Returns a float if valid else None"""
+    try:
+        f = float(quant_str)
+        return f if f >= 0.0001 else None
+    except:
+        return None
+
 def handle_gex_sell_cards(user_id, ticker, profit):
     NOAH_ID = '100003244958231'
     MIN_TICKER_CARD_DELTA = 25
@@ -209,12 +217,12 @@ def get_balance(user_id):
 
 def give_cmd(bot, message_parts, author_id, thread_id, thread_type):
     users = list_users(bot, thread_id)
-    if not message_parts[-1].isdigit() or message_parts[-1] == "0":
+    amount = get_valid_quantity(message_parts[-1])
+    if not amount:
         bot.sendMessage('please enter a valid amount',
                         thread_id=thread_id, thread_type=thread_type)
         return
-    reciever_name, amount = message_parts[0].lstrip(
-        "@").capitalize(), int(message_parts[-1])
+    reciever_name = message_parts[0].lstrip("@").capitalize()
     reciever_model = user_from_name(reciever_name, users)
     if reciever_model is None:
         bot.sendMessage("Unrecognised reciever",
@@ -317,9 +325,9 @@ def invest_buy_cmd(user_id, args):
         return 'Usage: .linden invest buy STOCK_TICKER [QUANTITY]'
     tic, qt = args[0].upper().lstrip('$'), 1
     if len(args) == 2:
-        if not args[1].isdigit() or args[1] == '0':
-            return "Quantity must be a positive int, idiot"
-        qt = int(args[1])
+        qt = get_valid_quantity(args[1])
+        if not qt:
+            return "Quantity must be a positive float, idiot"
     # Get the stock deets
     quote = invest_get_quotes_w_cache([tic])[0]
     if quote['Ask'] is None:
@@ -354,9 +362,9 @@ def invest_sell_cmd(user_id, args):
         return 'Usage: .linden invest sell STOCK_TICKER [QUANTITY]'
     tic, qt = args[0].upper().lstrip('$'), 1
     if len(args) == 2:
-        if not args[1].isdigit() or args[1] == 0:
-            return "Quantity must be a positive int, fool"
-        qt = int(args[1])
+        qt = get_valid_quantity(args[1])
+        if not qt:
+            return "Quantity must be a positive float, fool"
     # Get stock deets
     quote = invest_get_quotes_w_cache([tic])[0]
     if quote['Bid'] is None:
