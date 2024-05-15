@@ -257,8 +257,8 @@ class PluginManager:
         import plugins.text_mods.scramble
         import plugins.randomdigit.main
         import plugins.countdown.main
+        import plugins.sam.sam
         import plugins.stats.main
-        
 
 class Plugin:
     """A class containing one Steely plugin.
