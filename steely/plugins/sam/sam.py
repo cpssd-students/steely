@@ -350,6 +350,7 @@ class UserDB():
             self.db.upsert(user._asdict(), users.id == message.author_id)
             return user
 
+        logging.debug(f"get_or_add({message.author_id}) {info=} {docs=}")
         assert(len(docs) == 1)
         return tuple_from_dict(User, docs[0])
 
@@ -412,7 +413,7 @@ class SamManager():
         # should probably make this a smooth gradient
         if (state.last_response_time - now) < SamManager.THRESHOLD_CONVERSATION_SECONDS:
             chance += SamManager.CHANCE_CONVERSATION_INCREASE
-        chance = max(SamManager.CHANCE_RESPONSE, SamManager.THRESHOLD_CHANCE_SPAM)
+        chance = min(SamManager.CHANCE_RESPONSE, SamManager.THRESHOLD_CHANCE_SPAM)
         return random() < chance
 
     def _should_respawn(self) -> bool:
