@@ -24,6 +24,10 @@ def list_plugins():
         yield load_plugin(plugin_file, plugin_path)
 
 
-def new_database(name):
+def new_database(name) -> TinyDB:
+    try:
+        os.makedirs(DB_DIR)
+    except FileExistsError:
+        pass
     full_path = os.path.join(DB_DIR, f'{name}.json')
     return TinyDB(full_path)

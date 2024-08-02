@@ -27,6 +27,15 @@ class FBChatMock:
         self.output_mes.append(mess)
         self.prev_mes.append(mess)
 
+    def fetchUserInfo(self, *ids):
+        return [{
+            'id': id,
+            'first_name': 'Hans',
+            'last_name': 'Moleman',
+            'full_name': 'Hans Moleman',
+            'username': 'raisn_bran_4ever',
+        } for id in ids]
+
 
 class SteelyREPL:
 
